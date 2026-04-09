@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --color-suara-bg: #F8F7F4;
+  --color-suara-blue: #1d4ed8;
+  --color-suara-blue-light: #DBEAFE;
+  --color-suara-blue-border: #BFDBFE;
+  --color-suara-blue-bar: #2563EB;
+  --color-suara-green: #15803d;
+  --color-suara-green-light: #DCFCE7;
+  --color-suara-green-border: #BBF7D0;
+  --color-suara-green-avatar: #BBF7D0;
+  --color-suara-gray: #374151;
+  --color-suara-gray-light: #F3F4F6;
+  --color-suara-gray-border: #D1D5DB;
+  --color-suara-content: #374151;
+  --color-suara-content-bg: #F9FAFB;
+  --color-suara-danger: #DC2626;
+  --color-suara-danger-light: #FEF2F2;
+  --color-suara-amber: #CA8A04;
+  --color-suara-amber-light: #FEF9C3;
+  --font-sans: 'Nunito', sans-serif;
+  --radius-button: 14px;
+}
+
+html {
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-suara-bg);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

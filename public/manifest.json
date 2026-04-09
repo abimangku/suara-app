@@ -1,0 +1,17 @@
+{
+  "name": "Suara",
+  "short_name": "Suara",
+  "description": "Suara ku, dunia ku",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#F8F7F4",
+  "theme_color": "#2563EB",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
