@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 interface SymbolButtonProps {
   emoji?: string
@@ -35,6 +35,10 @@ export default function SymbolButton({
     if (!photoBlob) return null
     return URL.createObjectURL(photoBlob)
   }, [photoBlob])
+
+  useEffect(() => {
+    return () => { if (blobUrl) URL.revokeObjectURL(blobUrl) }
+  }, [blobUrl])
 
   const baseClasses =
     'rounded-button border-2 flex flex-col items-center justify-center gap-1 cursor-pointer select-none active:scale-95 transition-transform duration-[80ms]'

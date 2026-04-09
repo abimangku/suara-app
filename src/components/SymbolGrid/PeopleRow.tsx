@@ -14,17 +14,10 @@ export default function PeopleRow() {
           key={person.id}
           label={person.name}
           variant="people"
+          photoBlob={person.photoBlob}
           onTap={() => addWord({ id: String(person.id), label: person.name, category: 'people' })}
         >
-          {person.photoBlob ? (
-            <img
-              src={URL.createObjectURL(person.photoBlob)}
-              alt={person.name}
-              className="w-[46px] h-[46px] rounded-full object-cover"
-            />
-          ) : (
-            <AvatarCircle initial={person.initial} />
-          )}
+          {!person.photoBlob ? <AvatarCircle initial={person.initial} /> : undefined}
         </SymbolButton>
       ))}
       <SymbolButton
