@@ -8,7 +8,7 @@ export default function SymbolGrid() {
   const activeFolderKey = useAppStore((s) => s.activeFolderKey)
 
   return (
-    <div className="flex-1 grid grid-cols-5 gap-[10px] p-3 min-h-0"
+    <div className="flex-1 grid grid-cols-6 gap-[10px] p-3 min-h-0"
       style={{ gridAutoRows: '1fr' }}
     >
       <CoreRow />

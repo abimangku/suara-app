@@ -14,6 +14,7 @@ export default function CoreRow() {
           label={cw.label}
           variant="core"
           symbolPath={cw.symbolPath}
+          fkColor={cw.fkColor}
           onTap={() => addWord({ id: cw.id, label: cw.label, category: 'core', emoji: cw.emoji, symbolPath: cw.symbolPath, audioPath: cw.audioPath })}
         />
       ))}

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '@/store/appStore'
+import type { FKColor } from '@/types'
 
 interface SymbolButtonProps {
   emoji?: string
@@ -11,6 +12,7 @@ interface SymbolButtonProps {
   children?: React.ReactNode
   symbolPath?: string
   photoBlob?: Blob
+  fkColor?: FKColor
 }
 
 const variantStyles = {
@@ -31,6 +33,7 @@ export default function SymbolButton({
   children,
   symbolPath,
   photoBlob,
+  fkColor: _fkColor,
 }: SymbolButtonProps) {
   const isModelingMode = useAppStore((s) => s.isModelingMode)
   const [isHighlighted, setIsHighlighted] = useState(false)

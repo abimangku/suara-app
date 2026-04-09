@@ -72,7 +72,7 @@ export default function SymbolSearch() {
         )}
 
         {results.length > 0 && (
-          <div className="grid grid-cols-5 gap-[10px]">
+          <div className="grid grid-cols-6 gap-[10px]">
             {results.map((word) => (
               <button
                 key={`${word.category}-${word.id}`}

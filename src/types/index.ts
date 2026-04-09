@@ -95,6 +95,9 @@ export interface VocabularyPack {
 // Runtime types (used by components and hooks)
 // ============================================
 
+// Fitzgerald Key color categories
+export type FKColor = 'verb' | 'pronoun' | 'descriptor' | 'negation' | 'noun' | 'preposition'
+
 // Core word — hardcoded, never in database
 export interface CoreWord {
   id: string
@@ -102,8 +105,9 @@ export interface CoreWord {
   emoji: string
   symbolPath: string
   audioPath: string
-  row: 1 | 2
-  position: 0 | 1 | 2 | 3 | 4
+  row: 1 | 2 | 3 | 4
+  position: 0 | 1 | 2 | 3 | 4 | 5
+  fkColor: FKColor
 }
 
 // Unified word type for sentence bar and suggestions

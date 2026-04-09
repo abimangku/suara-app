@@ -19,8 +19,8 @@ export default function FolderContents({ folderKey }: FolderContentsProps) {
 
   if (!folder) return null
 
-  const hasMore = allWords.length > 5
-  const visibleWords = showAll ? allWords : allWords.slice(0, hasMore ? 4 : 5)
+  const hasMore = allWords.length > 6
+  const visibleWords = showAll ? allWords : allWords.slice(0, hasMore ? 5 : 6)
 
   return (
     <>
@@ -56,12 +56,12 @@ export default function FolderContents({ folderKey }: FolderContentsProps) {
       )}
 
       {showAll &&
-        Array.from({ length: (5 - (allWords.length % 5)) % 5 }).map((_, i) => (
+        Array.from({ length: (6 - (allWords.length % 6)) % 6 }).map((_, i) => (
           <div key={`empty-${i}`} />
         ))}
 
       <button
-        className="col-span-5 rounded-button border-2 border-suara-gray-border bg-suara-gray-light text-suara-gray flex items-center justify-center gap-2 cursor-pointer select-none active:scale-95 transition-transform duration-[80ms]"
+        className="col-span-6 rounded-button border-2 border-suara-gray-border bg-suara-gray-light text-suara-gray flex items-center justify-center gap-2 cursor-pointer select-none active:scale-95 transition-transform duration-[80ms]"
         onClick={() => {
           setShowAll(false)
           setActiveFolder(null)
