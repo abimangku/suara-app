@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#2563EB" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="screen-orientation" content="landscape" />
     <link rel="icon" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.json" />
@@ -14,6 +16,15 @@
     <title>Suara</title>
   </head>
   <body>
+    <div id="portrait-warning">
+      <span style="font-size: 48px;">🔄</span>
+      <p style="font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 700; color: #374151; text-align: center;">
+        Putar perangkat ke landscape
+      </p>
+      <p style="font-family: 'Nunito', sans-serif; font-size: 14px; color: #9CA3AF; text-align: center;">
+        Suara bekerja paling baik dalam mode landscape
+      </p>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

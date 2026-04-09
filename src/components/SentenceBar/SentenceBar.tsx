@@ -1,12 +1,14 @@
 import { useState, useRef } from 'react'
 import WordChip from '@/components/SentenceBar/WordChip'
 import QuickPhrases from '@/components/SentenceBar/QuickPhrases'
+import BottomSheet from '@/components/shared/BottomSheet'
 import { useSentenceBar } from '@/hooks/useSentenceBar'
 import { useAppStore } from '@/store/appStore'
 
 export default function SentenceBar() {
   const { sentenceWords, removeLastWord, clearSentence, speak, handleQuickPhrase } = useSentenceBar()
   const [isQuickPhrasesOpen, setIsQuickPhrasesOpen] = useState(false)
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [isFlashing, setIsFlashing] = useState(false)
   const [confirmClear, setConfirmClear] = useState(false)
   const confirmClearRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -14,6 +16,9 @@ export default function SentenceBar() {
   const toggleSearch = useAppStore((s) => s.toggleSearch)
   const isModelingMode = useAppStore((s) => s.isModelingMode)
   const toggleModelingMode = useAppStore((s) => s.toggleModelingMode)
+  const sentenceHistory = useAppStore((s) => s.sentenceHistory)
+  const isMuted = useAppStore((s) => s.isMuted)
+  const toggleMute = useAppStore((s) => s.toggleMute)
   const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const modelingPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -72,7 +77,7 @@ export default function SentenceBar() {
       )}
       <div
         className="w-full bg-suara-blue-bar flex items-center px-3.5 gap-2 shrink-0"
-        style={{ minHeight: 60 }}
+        style={{ minHeight: 64 }}
         onMouseDown={handlePressStart}
         onMouseUp={handlePressEnd}
         onMouseLeave={handlePressEnd}
@@ -89,12 +94,28 @@ export default function SentenceBar() {
           ⚡
         </button>
         <button
-          className="w-10 h-10 rounded-[10px] bg-white/20 text-white flex items-center justify-center text-lg shrink-0 active:scale-95 transition-transform duration-[80ms]"
+          className="w-10 h-10 rounded-[10px] bg-white/20 text-white flex items-center justify-center text-lg shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
           onClick={toggleSearch}
           type="button"
           aria-label="Cari kata"
         >
           🔍
+        </button>
+        <button
+          className="w-10 h-10 rounded-[10px] bg-white/20 text-white flex items-center justify-center text-lg shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
+          onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+          type="button"
+          aria-label="Riwayat"
+        >
+          🕐
+        </button>
+        <button
+          className="w-10 h-10 rounded-[10px] bg-white/20 text-white flex items-center justify-center text-lg shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
+          onClick={toggleMute}
+          type="button"
+          aria-label={isMuted ? 'Nyalakan suara' : 'Matikan suara'}
+        >
+          {isMuted ? '🔇' : '🔊'}
         </button>
 
         <div className="flex-1 flex items-center gap-1.5 overflow-x-auto min-h-[40px] scrollbar-hide">
@@ -144,6 +165,29 @@ export default function SentenceBar() {
         onClose={() => setIsQuickPhrasesOpen(false)}
         onPhraseTap={handleQuickPhrase}
       />
+
+      <BottomSheet isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)}>
+        <h2 className="text-suara-gray font-bold text-lg mb-3">Riwayat</h2>
+        {sentenceHistory.length === 0 ? (
+          <p className="text-sm text-suara-gray/50 py-4 text-center">Belum ada riwayat</p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {sentenceHistory.map((words, i) => (
+              <button
+                key={i}
+                className="w-full text-left px-5 py-4 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-[16px] active:scale-[0.98] transition-transform duration-[80ms] select-none"
+                onClick={() => {
+                  handleQuickPhrase(words)
+                  setIsHistoryOpen(false)
+                }}
+                type="button"
+              >
+                {words.join(' ')}
+              </button>
+            ))}
+          </div>
+        )}
+      </BottomSheet>
     </>
   )
 }

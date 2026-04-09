@@ -1,7 +1,7 @@
 {
-  "name": "Suara",
+  "name": "Suara — AAC Communication",
   "short_name": "Suara",
-  "description": "Suara ku, dunia ku",
+  "description": "Augmentative and Alternative Communication untuk anak Indonesia",
   "start_url": "/",
   "display": "standalone",
   "orientation": "landscape",

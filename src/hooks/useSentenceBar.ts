@@ -50,6 +50,8 @@ export function useSentenceBar() {
   const speak = useCallback(() => {
     const words = useAppStore.getState().sentenceWords
     if (words.length === 0) return
+    const addToHistory = useAppStore.getState().addToHistory
+    addToHistory(words.map((w) => w.label))
     playSentence(words)
     if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current)
     clearTimeoutRef.current = setTimeout(() => {

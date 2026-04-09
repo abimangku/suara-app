@@ -1,5 +1,6 @@
 import { db } from '@/lib/db'
 import { CORE_WORDS } from '@/data/vocabulary'
+import { BIGRAMS } from '@/lib/bigrams'
 import type { Word } from '@/types'
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
@@ -103,7 +104,72 @@ export async function computeSuggestions(
     if (word) suggestions.push(word)
   }
 
+  // Cold-start fallback: fill remaining slots from static bigrams
+  if (suggestions.length < limit) {
+    const lastWordLabel = sentenceWords[sentenceWords.length - 1].label
+    const bigramCandidates = BIGRAMS[lastWordLabel] ?? []
+    const existingIds = new Set(suggestions.map((s) => s.id))
+
+    for (const candidateLabel of bigramCandidates) {
+      if (suggestions.length >= limit) break
+      // Skip if already suggested or in sentence
+      if (currentWordIds.has(candidateLabel) || existingIds.has(candidateLabel)) continue
+
+      // Try to resolve as a full Word
+      const resolved = await resolveWordByLabel(candidateLabel)
+      if (resolved && !existingIds.has(resolved.id)) {
+        suggestions.push(resolved)
+        existingIds.add(resolved.id)
+      }
+    }
+  }
+
   return suggestions
+}
+
+/**
+ * Resolve a word by its label string (for bigram lookups).
+ */
+async function resolveWordByLabel(label: string): Promise<Word | null> {
+  // Check core words
+  const coreWord = CORE_WORDS.find((cw) => cw.label === label)
+  if (coreWord) {
+    return {
+      id: coreWord.id,
+      label: coreWord.label,
+      category: 'core',
+      emoji: coreWord.emoji,
+      symbolPath: coreWord.symbolPath,
+      audioPath: coreWord.audioPath,
+    }
+  }
+
+  // Check DB words by label
+  const dbWords = await db.words.filter((w) => w.isActive && w.label === label).toArray()
+  if (dbWords.length > 0) {
+    const w = dbWords[0]
+    return {
+      id: String(w.id),
+      label: w.label,
+      category: 'fringe',
+      symbolPath: w.symbolPath,
+      photoBlob: w.photoBlob,
+      audioPath: w.audioPath,
+      audioBlob: w.audioBlob,
+    }
+  }
+
+  // Check people
+  const people = await db.people.filter((p) => p.isActive && p.name.toLowerCase() === label.toLowerCase()).toArray()
+  if (people.length > 0) {
+    return {
+      id: String(people[0].id),
+      label: people[0].name,
+      category: 'people',
+    }
+  }
+
+  return null
 }
 
 /**

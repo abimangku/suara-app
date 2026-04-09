@@ -34,6 +34,14 @@ interface AppStore {
   // Search
   isSearchOpen: boolean
   toggleSearch: () => void
+
+  // Sentence history
+  sentenceHistory: string[][]
+  addToHistory: (words: string[]) => void
+
+  // Mute
+  isMuted: boolean
+  toggleMute: () => void
 }
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -69,4 +77,14 @@ export const useAppStore = create<AppStore>((set) => ({
   // Search
   isSearchOpen: false,
   toggleSearch: () => set((state) => ({ isSearchOpen: !state.isSearchOpen })),
+
+  // Sentence history
+  sentenceHistory: [],
+  addToHistory: (words) => set((state) => ({
+    sentenceHistory: [words, ...state.sentenceHistory].slice(0, 10)
+  })),
+
+  // Mute
+  isMuted: false,
+  toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
 }))

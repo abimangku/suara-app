@@ -3,7 +3,7 @@ interface AvatarCircleProps {
   size?: number
 }
 
-export default function AvatarCircle({ initial, size = 46 }: AvatarCircleProps) {
+export default function AvatarCircle({ initial, size = 60 }: AvatarCircleProps) {
   return (
     <div
       className="rounded-full bg-suara-green-avatar flex items-center justify-center"

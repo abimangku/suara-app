@@ -1,0 +1,40 @@
+/**
+ * Static bigram predictions — word pairs for cold-start suggestions.
+ * Used when the frequency model has insufficient usage data.
+ * Based on common Indonesian AAC communication patterns.
+ */
+export const BIGRAMS: Record<string, string[]> = {
+  aku: ['mau', 'suka', 'tidak', 'pergi', 'lapar', 'minta'],
+  mau: ['makan', 'minum', 'tidur', 'pergi', 'mandi', 'nonton'],
+  tidak: ['mau', 'suka', 'bisa', 'ada'],
+  pergi: ['ke', 'sama', 'lagi'],
+  suka: ['makan', 'ini', 'itu', 'musik'],
+  makan: ['lagi', 'sama', 'nasi goreng', 'mie ayam', 'snack'],
+  minum: ['susu', 'air putih', 'lagi'],
+  ya: ['mau', 'bisa', 'ada'],
+  bantu: ['aku', 'minta'],
+  lagi: ['mau', 'makan', 'minum', 'main'],
+  ini: ['aku', 'mau', 'ada'],
+  itu: ['aku', 'mau', 'ada'],
+  ada: ['makan', 'minum', 'apa'],
+  bisa: ['makan', 'pergi', 'mandi'],
+  apa: ['ini', 'itu', 'mau'],
+  punya: ['aku', 'kamu', 'ada'],
+  ke: ['rumah', 'kamar mandi', 'sekolah', 'toko', 'taman'],
+  di: ['rumah', 'kamar tidur', 'sekolah', 'dapur'],
+  dan: ['makan', 'minum', 'aku', 'kamu'],
+  sama: ['ayah', 'ibu', 'aku', 'kamu', 'nenek'],
+  minta: ['makan', 'minum', 'bantu', 'susu', 'snack'],
+  lihat: ['ini', 'itu', 'aku', 'sini'],
+  kamu: ['mau', 'suka', 'bisa', 'lihat'],
+  berhenti: ['mau', 'tidak'],
+  senang: ['sekali', 'lagi', 'sama'],
+  sedih: ['sekali', 'lagi'],
+  marah: ['sekali', 'sama'],
+  ayah: ['mau', 'ada', 'pergi', 'suka'],
+  ibu: ['mau', 'ada', 'pergi', 'suka'],
+  nenek: ['mau', 'ada', 'pergi'],
+  mbak: ['mau', 'bantu', 'ada'],
+  main: ['lagi', 'sama', 'di'],
+  tidur: ['mau', 'lagi', 'di'],
+}
