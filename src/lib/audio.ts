@@ -83,7 +83,7 @@ class AudioEngine {
   speakSentence(text: string): void {
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.lang = 'id-ID'
-    utterance.rate = 0.9
+    utterance.rate = 0.75
     speechSynthesis.speak(utterance)
   }
 

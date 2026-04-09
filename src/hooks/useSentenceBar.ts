@@ -6,10 +6,32 @@ import type { Word } from '@/types'
 export function useSentenceBar() {
   const sentenceWords = useAppStore((s) => s.sentenceWords)
   const addWordToStore = useAppStore((s) => s.addWord)
-  const removeLastWord = useAppStore((s) => s.removeLastWord)
-  const clearSentence = useAppStore((s) => s.clearSentence)
+  const storeRemoveLastWord = useAppStore((s) => s.removeLastWord)
+  const undoRef = useRef<{ word: Word; time: number } | null>(null)
   const { playWord, playSentence } = useAudio()
   const clearTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const removeLastWord = useCallback(() => {
+    // If undo available (tapped within 2 seconds), restore
+    if (undoRef.current && Date.now() - undoRef.current.time < 2000) {
+      const restored = undoRef.current.word
+      undoRef.current = null
+      addWordToStore(restored)
+      return
+    }
+    // Otherwise delete and store for undo
+    const words = useAppStore.getState().sentenceWords
+    const lastWord = words[words.length - 1]
+    if (lastWord) {
+      undoRef.current = { word: lastWord, time: Date.now() }
+    }
+    storeRemoveLastWord()
+  }, [storeRemoveLastWord, addWordToStore])
+
+  const clearSentence = useCallback(() => {
+    undoRef.current = null
+    useAppStore.getState().clearSentence()
+  }, [])
 
   const addWord = useCallback(
     (word: Word) => {

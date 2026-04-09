@@ -8,6 +8,8 @@ export default function SentenceBar() {
   const { sentenceWords, removeLastWord, clearSentence, speak, handleQuickPhrase } = useSentenceBar()
   const [isQuickPhrasesOpen, setIsQuickPhrasesOpen] = useState(false)
   const [isFlashing, setIsFlashing] = useState(false)
+  const [confirmClear, setConfirmClear] = useState(false)
+  const confirmClearRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const openAdmin = useAppStore((s) => s.openAdmin)
   const toggleSearch = useAppStore((s) => s.toggleSearch)
   const isModelingMode = useAppStore((s) => s.isModelingMode)
@@ -39,6 +41,19 @@ export default function SentenceBar() {
       clearTimeout(longPressRef.current)
       longPressRef.current = null
     }
+  }
+
+  function handleClear() {
+    if (confirmClear) {
+      clearSentence()
+      setConfirmClear(false)
+      if (confirmClearRef.current) clearTimeout(confirmClearRef.current)
+      return
+    }
+    setConfirmClear(true)
+    confirmClearRef.current = setTimeout(() => {
+      setConfirmClear(false)
+    }, 1500)
   }
 
   function handleBicara() {
@@ -97,12 +112,16 @@ export default function SentenceBar() {
           ⌫
         </button>
         <button
-          className="px-3 py-2 rounded-lg bg-white/15 text-red-300 text-[13px] font-bold shrink-0 active:scale-95 transition-transform duration-[80ms]"
-          onClick={clearSentence}
+          className={`px-3 py-2 rounded-lg text-[13px] font-bold shrink-0 active:scale-95 transition-transform duration-[80ms] ${
+            confirmClear
+              ? 'bg-suara-danger text-white'
+              : 'bg-white/15 text-red-300'
+          }`}
+          onClick={handleClear}
           type="button"
           aria-label="Hapus semua"
         >
-          ✕ Hapus
+          {confirmClear ? 'Yakin?' : '✕ Hapus'}
         </button>
         <button
           className="px-5 py-2.5 rounded-xl bg-white text-suara-blue font-extrabold text-[15px] shrink-0 active:scale-95 transition-transform duration-[80ms]"
