@@ -32,6 +32,9 @@ export default function SymbolButton({
   symbolPath,
   photoBlob,
 }: SymbolButtonProps) {
+  const isModelingMode = useAppStore((s) => s.isModelingMode)
+  const [isHighlighted, setIsHighlighted] = useState(false)
+
   const blobUrl = useMemo(() => {
     if (!photoBlob) return null
     return URL.createObjectURL(photoBlob)
@@ -46,6 +49,7 @@ export default function SymbolButton({
 
   const activeClass = isActive ? 'brightness-[0.85]' : ''
   const disabledClass = disabled ? 'opacity-50 cursor-default' : ''
+  const highlightClass = isHighlighted ? 'ring-4 ring-suara-amber brightness-110' : ''
 
   const [imgFailed, setImgFailed] = useState(false)
 
@@ -74,8 +78,16 @@ export default function SymbolButton({
 
   return (
     <button
-      className={`${baseClasses} ${variantStyles[variant]} ${activeClass} ${disabledClass}`}
-      onClick={disabled ? undefined : onTap}
+      className={`${baseClasses} ${variantStyles[variant]} ${activeClass} ${disabledClass} ${highlightClass}`}
+      onClick={() => {
+        if (disabled) return
+        if (isModelingMode) {
+          // Visual highlight only — no audio, no sentence
+          setIsHighlighted(true)
+          setTimeout(() => setIsHighlighted(false), 500)
+        }
+        onTap()
+      }}
       type="button"
     >
       {renderImage()}

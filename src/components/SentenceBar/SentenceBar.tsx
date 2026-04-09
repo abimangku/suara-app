@@ -10,7 +10,23 @@ export default function SentenceBar() {
   const [isFlashing, setIsFlashing] = useState(false)
   const openAdmin = useAppStore((s) => s.openAdmin)
   const toggleSearch = useAppStore((s) => s.toggleSearch)
+  const isModelingMode = useAppStore((s) => s.isModelingMode)
+  const toggleModelingMode = useAppStore((s) => s.toggleModelingMode)
   const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const modelingPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleBicaraPressStart = () => {
+    modelingPressRef.current = setTimeout(() => {
+      toggleModelingMode()
+    }, 2000)
+  }
+
+  const handleBicaraPressEnd = () => {
+    if (modelingPressRef.current) {
+      clearTimeout(modelingPressRef.current)
+      modelingPressRef.current = null
+    }
+  }
 
   const handlePressStart = () => {
     longPressRef.current = setTimeout(() => {
@@ -34,6 +50,11 @@ export default function SentenceBar() {
 
   return (
     <>
+      {isModelingMode && (
+        <div className="w-full px-3 py-1 bg-suara-amber-light text-suara-amber text-xs font-bold text-center">
+          Mode Modeling — ketuk tombol untuk menunjukkan, tanpa suara
+        </div>
+      )}
       <div
         className="w-full bg-suara-blue-bar flex items-center px-3.5 gap-2 shrink-0"
         style={{ minHeight: 60 }}
@@ -86,10 +107,16 @@ export default function SentenceBar() {
         <button
           className="px-5 py-2.5 rounded-xl bg-white text-suara-blue font-extrabold text-[15px] shrink-0 active:scale-95 transition-transform duration-[80ms]"
           onClick={handleBicara}
+          onMouseDown={handleBicaraPressStart}
+          onMouseUp={handleBicaraPressEnd}
+          onMouseLeave={handleBicaraPressEnd}
+          onTouchStart={handleBicaraPressStart}
+          onTouchEnd={handleBicaraPressEnd}
+          onTouchCancel={handleBicaraPressEnd}
           type="button"
           aria-label="Bicara"
         >
-          ▶ Bicara
+          {isModelingMode ? '■ Hentikan' : '▶ Bicara'}
         </button>
       </div>
 
