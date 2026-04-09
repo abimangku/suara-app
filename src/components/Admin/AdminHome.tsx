@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import ManagePeople from '@/components/Admin/ManagePeople'
+import EditWord from '@/components/Admin/EditWord'
 import AddPerson from '@/components/Admin/AddPerson'
 import AddWord from '@/components/Admin/AddWord'
 import QuickPhraseAdmin from '@/components/Admin/QuickPhraseAdmin'
@@ -6,7 +8,7 @@ import VocabPackAdmin from '@/components/Admin/VocabPackAdmin'
 import UsageInsights from '@/components/Admin/UsageInsights'
 import OnboardingGuide from '@/components/Admin/OnboardingGuide'
 
-type AdminSection = 'home' | 'manageWords' | 'managePeople' | 'quickPhrases' | 'vocabPacks' | 'insights' | 'onboarding'
+type AdminSection = 'home' | 'manageWords' | 'managePeople' | 'addPerson' | 'addWord' | 'quickPhrases' | 'vocabPacks' | 'insights' | 'onboarding'
 
 const ADMIN_CARDS = [
   { id: 'manageWords' as const, emoji: '📝', label: 'Kelola Kata', desc: 'Tambah, edit, hapus kosakata' },
@@ -23,14 +25,17 @@ export default function AdminHome() {
   if (activeSection === 'manageWords') {
     return (
       <div className="p-4">
-        <button
-          onClick={() => setActiveSection('home')}
-          className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]"
-          type="button"
-        >
-          ← Kembali
-        </button>
-        <AddWord onDone={() => setActiveSection('home')} />
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <EditWord onDone={() => setActiveSection('home')} onAddWord={() => setActiveSection('addWord')} />
+      </div>
+    )
+  }
+
+  if (activeSection === 'addWord') {
+    return (
+      <div className="p-4">
+        <button onClick={() => setActiveSection('manageWords')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <AddWord onDone={() => setActiveSection('manageWords')} />
       </div>
     )
   }
@@ -38,14 +43,17 @@ export default function AdminHome() {
   if (activeSection === 'managePeople') {
     return (
       <div className="p-4">
-        <button
-          onClick={() => setActiveSection('home')}
-          className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]"
-          type="button"
-        >
-          ← Kembali
-        </button>
-        <AddPerson onDone={() => setActiveSection('home')} />
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <ManagePeople onDone={() => setActiveSection('home')} onAddPerson={() => setActiveSection('addPerson')} />
+      </div>
+    )
+  }
+
+  if (activeSection === 'addPerson') {
+    return (
+      <div className="p-4">
+        <button onClick={() => setActiveSection('managePeople')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <AddPerson onDone={() => setActiveSection('managePeople')} />
       </div>
     )
   }
