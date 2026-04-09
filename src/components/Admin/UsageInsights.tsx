@@ -7,7 +7,7 @@ interface UsageInsightsProps {
 
 export default function UsageInsights({ onDone: _onDone }: UsageInsightsProps) {
   const [period, setPeriod] = useState<7 | 30>(7)
-  const { topWords, totalEvents, totalVocab } = useUsageInsights(period)
+  const { topWords, totalEvents, totalVocab, deadEnds } = useUsageInsights(period)
 
   const maxCount = topWords?.[0]?.count ?? 1
 
@@ -66,6 +66,21 @@ export default function UsageInsights({ onDone: _onDone }: UsageInsightsProps) {
                 />
               </div>
               <span className="w-8 text-right text-xs font-bold text-suara-gray/60">{word.count}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Dead-end detection */}
+      <h4 className="text-sm font-bold text-suara-gray mt-6 mb-2">Jalan Buntu</h4>
+      {!deadEnds || deadEnds.length === 0 ? (
+        <p className="text-sm text-suara-gray/50 py-2">Semua folder digunakan dengan baik</p>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {deadEnds.map((de) => (
+            <div key={de.folderKey} className="p-3 rounded-xl bg-suara-amber-light">
+              <p className="text-sm font-bold text-suara-amber">{de.message}</p>
+              <p className="text-xs text-suara-amber/60 mt-1">Mungkin ada kata yang belum ditambahkan</p>
             </div>
           ))}
         </div>

@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/lib/db'
+import { detectDeadEnds } from '@/lib/vocabulary-gaps'
 
 interface WordCount {
   label: string
@@ -36,5 +37,9 @@ export function useUsageInsights(days: 7 | 30) {
     return db.words.filter((w) => w.isActive).count()
   }, [])
 
-  return { topWords, totalEvents, totalVocab }
+  const deadEnds = useLiveQuery(async () => {
+    return detectDeadEnds(days)
+  }, [days])
+
+  return { topWords, totalEvents, totalVocab, deadEnds }
 }

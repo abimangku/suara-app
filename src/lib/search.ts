@@ -1,4 +1,4 @@
-import Fuse from 'fuse.js'
+import Fuse, { type IFuseOptions } from 'fuse.js'
 import { db } from '@/lib/db'
 import { CORE_WORDS } from '@/data/vocabulary'
 import type { Word } from '@/types'
@@ -6,7 +6,7 @@ import type { Word } from '@/types'
 let fuseInstance: Fuse<Word> | null = null
 let allWords: Word[] = []
 
-const FUSE_OPTIONS: Fuse.IFuseOptions<Word> = {
+const FUSE_OPTIONS: IFuseOptions<Word> = {
   keys: ['label'],
   threshold: 0.4,
   distance: 100,
