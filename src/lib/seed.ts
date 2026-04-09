@@ -56,6 +56,34 @@ export async function seedDatabase(): Promise<void> {
     })
   }
 
+  // Seed vocabulary packs — two per folder (Dasar = first 5, Lengkap = rest)
+  for (const [folderKey, words] of Object.entries(SEED_WORDS)) {
+    const dasarIds = words.slice(0, 5).map((w) => w.id)
+    const lengkapIds = words.slice(5).map((w) => w.id)
+
+    await db.vocabularyPacks.add({
+      name: `${folderKey.charAt(0).toUpperCase() + folderKey.slice(1)} Dasar`,
+      folderKey,
+      wordIds: dasarIds,
+      isActive: true,
+      sortOrder: 0,
+      createdAt: now,
+      updatedAt: now,
+    })
+
+    if (lengkapIds.length > 0) {
+      await db.vocabularyPacks.add({
+        name: `${folderKey.charAt(0).toUpperCase() + folderKey.slice(1)} Lengkap`,
+        folderKey,
+        wordIds: lengkapIds,
+        isActive: true,
+        sortOrder: 1,
+        createdAt: now,
+        updatedAt: now,
+      })
+    }
+  }
+
   // Seed default settings
   const defaultSettings: Array<{ key: string; value: unknown }> = [
     { key: 'appVersion', value: '1.0.0' },
