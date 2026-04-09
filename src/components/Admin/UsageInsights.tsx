@@ -5,7 +5,7 @@ interface UsageInsightsProps {
   onDone: () => void
 }
 
-export default function UsageInsights({ onDone }: UsageInsightsProps) {
+export default function UsageInsights({ onDone: _onDone }: UsageInsightsProps) {
   const [period, setPeriod] = useState<7 | 30>(7)
   const { topWords, totalEvents, totalVocab } = useUsageInsights(period)
 
