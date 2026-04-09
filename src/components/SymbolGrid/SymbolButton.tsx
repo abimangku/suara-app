@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 interface SymbolButtonProps {
   emoji?: string
@@ -42,14 +42,24 @@ export default function SymbolButton({
   const activeClass = isActive ? 'brightness-[0.85]' : ''
   const disabledClass = disabled ? 'opacity-50 cursor-default' : ''
 
+  const [imgFailed, setImgFailed] = useState(false)
+
   // Determine what to render in the image area
+  // Priority: children > photoBlob > symbolPath (if file exists) > emoji > fallback
   function renderImage() {
     if (children) return children
     if (blobUrl) {
       return <img src={blobUrl} alt={label} className="w-[50px] h-[50px] object-cover rounded-lg" />
     }
-    if (symbolPath) {
-      return <img src={`/assets/symbols/${symbolPath}`} alt={label} className="w-[50px] h-[50px] object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextSibling) (e.currentTarget.nextSibling as HTMLElement).style.display = 'block' }} />
+    if (symbolPath && !imgFailed) {
+      return (
+        <img
+          src={`/assets/symbols/${symbolPath}`}
+          alt={label}
+          className="w-[50px] h-[50px] object-contain"
+          onError={() => setImgFailed(true)}
+        />
+      )
     }
     if (emoji) {
       return <span className="text-[34px] leading-tight">{emoji}</span>
