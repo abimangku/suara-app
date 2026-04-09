@@ -22,6 +22,18 @@ interface AppStore {
   // Overlays
   isQuickPhrasesOpen: boolean
   toggleQuickPhrases: () => void
+
+  // AI — Intent suggestions
+  intentSuggestions: Word[]
+  setIntentSuggestions: (suggestions: Word[]) => void
+
+  // Modeling mode
+  isModelingMode: boolean
+  toggleModelingMode: () => void
+
+  // Search
+  isSearchOpen: boolean
+  toggleSearch: () => void
 }
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -45,4 +57,16 @@ export const useAppStore = create<AppStore>((set) => ({
   // Overlays
   isQuickPhrasesOpen: false,
   toggleQuickPhrases: () => set((state) => ({ isQuickPhrasesOpen: !state.isQuickPhrasesOpen })),
+
+  // AI
+  intentSuggestions: [],
+  setIntentSuggestions: (suggestions) => set({ intentSuggestions: suggestions }),
+
+  // Modeling mode
+  isModelingMode: false,
+  toggleModelingMode: () => set((state) => ({ isModelingMode: !state.isModelingMode })),
+
+  // Search
+  isSearchOpen: false,
+  toggleSearch: () => set((state) => ({ isSearchOpen: !state.isSearchOpen })),
 }))

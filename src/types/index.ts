@@ -121,6 +121,13 @@ export interface Word {
 // Folder key — dynamic from DB (no longer fixed union)
 export type FolderKey = string | null
 
+// Intent prediction from frequency model
+export interface IntentPrediction {
+  word: Word
+  score: number
+  reason: 'frequency' | 'time_of_day' | 'sequence'
+}
+
 // ============================================
 // Phase 1 compatibility types (removed in Task 10)
 // ============================================
