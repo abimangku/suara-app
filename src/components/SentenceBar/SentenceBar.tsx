@@ -9,6 +9,7 @@ export default function SentenceBar() {
   const [isQuickPhrasesOpen, setIsQuickPhrasesOpen] = useState(false)
   const [isFlashing, setIsFlashing] = useState(false)
   const openAdmin = useAppStore((s) => s.openAdmin)
+  const toggleSearch = useAppStore((s) => s.toggleSearch)
   const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handlePressStart = () => {
@@ -50,6 +51,14 @@ export default function SentenceBar() {
           aria-label="Frasa cepat"
         >
           ⚡
+        </button>
+        <button
+          className="w-10 h-10 rounded-[10px] bg-white/20 text-white flex items-center justify-center text-lg shrink-0 active:scale-95 transition-transform duration-[80ms]"
+          onClick={toggleSearch}
+          type="button"
+          aria-label="Cari kata"
+        >
+          🔍
         </button>
 
         <div className="flex-1 flex items-center gap-1.5 overflow-x-auto min-h-[40px] scrollbar-hide">

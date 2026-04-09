@@ -2,6 +2,7 @@ import SentenceBar from '@/components/SentenceBar/SentenceBar'
 import SymbolGrid from '@/components/SymbolGrid/SymbolGrid'
 import IntentSuggestions from '@/components/AI/IntentSuggestions'
 import AdminOverlay from '@/components/Admin/AdminOverlay'
+import SymbolSearch from '@/components/AI/SymbolSearch'
 import { useAppStore } from '@/store/appStore'
 import { useIntentSuggestions } from '@/hooks/useIntentSuggestions'
 
@@ -17,6 +18,7 @@ export default function App() {
       <IntentSuggestions />
       <SymbolGrid />
       {isAdminOpen && <AdminOverlay />}
+      <SymbolSearch />
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useAppStore } from '@/store/appStore'
 
 interface SymbolButtonProps {
   emoji?: string

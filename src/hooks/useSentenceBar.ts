@@ -13,6 +13,12 @@ export function useSentenceBar() {
 
   const addWord = useCallback(
     (word: Word) => {
+      const modelingMode = useAppStore.getState().isModelingMode
+      if (modelingMode) {
+        // In modeling mode: play no audio, don't add to sentence
+        // Just return — the button highlight is handled by SymbolButton
+        return
+      }
       addWordToStore(word)
       playWord(word)
     },
