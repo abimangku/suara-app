@@ -1,44 +1,51 @@
 import { useState } from 'react'
 import SymbolButton from '@/components/SymbolGrid/SymbolButton'
-import { FOLDERS } from '@/data/vocabulary'
-import type { FolderKey, Word } from '@/types'
+import { useVocabulary, useFolderWords } from '@/hooks/useVocabulary'
+import { useSentenceBar } from '@/hooks/useSentenceBar'
+import { useAppStore } from '@/store/appStore'
 
 interface FolderContentsProps {
-  folderKey: FolderKey
-  onWordTap: (word: Word) => void
-  onClose: () => void
+  folderKey: string
 }
 
-export default function FolderContents({
-  folderKey,
-  onWordTap,
-  onClose,
-}: FolderContentsProps) {
+export default function FolderContents({ folderKey }: FolderContentsProps) {
   const [showAll, setShowAll] = useState(false)
+  const { folders } = useVocabulary()
+  const { addWord } = useSentenceBar()
+  const setActiveFolder = useAppStore((s) => s.setActiveFolder)
 
-  const folder = FOLDERS.find((f) => f.key === folderKey)
+  const folder = (folders ?? []).find((f) => f.key === folderKey)
+  const allWords = useFolderWords(folder?.id)
+
   if (!folder) return null
 
-  const allWords = folder.words
   const hasMore = allWords.length > 5
   const visibleWords = showAll ? allWords : allWords.slice(0, hasMore ? 4 : 5)
 
   return (
     <>
-      {/* Row 3: folder content words */}
       {visibleWords.map((fw) => (
         <SymbolButton
           key={fw.id}
-          emoji={fw.emoji}
-          label={fw.label}
+          emoji=""
+          label={fw.labelDisplay ?? fw.label}
           variant="fringe"
+          symbolPath={fw.symbolPath}
+          photoBlob={fw.photoBlob}
           onTap={() =>
-            onWordTap({ id: fw.id, label: fw.label, category: 'fringe' })
+            addWord({
+              id: String(fw.id),
+              label: fw.label,
+              category: 'fringe',
+              symbolPath: fw.symbolPath,
+              photoBlob: fw.photoBlob,
+              audioPath: fw.audioPath,
+              audioBlob: fw.audioBlob,
+            })
           }
         />
       ))}
 
-      {/* "lihat semua" button if folder has > 5 words and not showing all */}
       {hasMore && !showAll && (
         <SymbolButton
           emoji="➡️"
@@ -48,18 +55,16 @@ export default function FolderContents({
         />
       )}
 
-      {/* Fill remaining slots if showing all and not a multiple of 5 */}
       {showAll &&
         Array.from({ length: (5 - (allWords.length % 5)) % 5 }).map((_, i) => (
           <div key={`empty-${i}`} />
         ))}
 
-      {/* Row 4 (or final row): Kembali button — spans full width */}
       <button
         className="col-span-5 rounded-button border-2 border-suara-gray-border bg-suara-gray-light text-suara-gray flex items-center justify-center gap-2 cursor-pointer select-none active:scale-95 transition-transform duration-[80ms]"
         onClick={() => {
           setShowAll(false)
-          onClose()
+          setActiveFolder(null)
         }}
         type="button"
       >

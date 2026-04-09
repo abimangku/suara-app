@@ -1,37 +1,23 @@
 import { useState } from 'react'
 import WordChip from '@/components/SentenceBar/WordChip'
 import QuickPhrases from '@/components/SentenceBar/QuickPhrases'
-import type { Word } from '@/types'
+import { useSentenceBar } from '@/hooks/useSentenceBar'
 
-interface SentenceBarProps {
-  words: Word[]
-  onRemoveLast: () => void
-  onClear: () => void
-  onSpeak: () => void
-  onQuickPhrase: (words: string[]) => void
-}
-
-export default function SentenceBar({
-  words,
-  onRemoveLast,
-  onClear,
-  onSpeak,
-  onQuickPhrase,
-}: SentenceBarProps) {
+export default function SentenceBar() {
+  const { sentenceWords, removeLastWord, clearSentence, speak, handleQuickPhrase } = useSentenceBar()
   const [isQuickPhrasesOpen, setIsQuickPhrasesOpen] = useState(false)
   const [isFlashing, setIsFlashing] = useState(false)
 
   function handleBicara() {
-    if (words.length === 0) return
+    if (sentenceWords.length === 0) return
     setIsFlashing(true)
-    onSpeak()
+    speak()
     setTimeout(() => setIsFlashing(false), 150)
   }
 
   return (
     <>
       <div className="w-full bg-suara-blue-bar flex items-center px-3.5 gap-2 shrink-0" style={{ minHeight: 60 }}>
-        {/* Quick phrases button */}
         <button
           className="w-10 h-10 rounded-[10px] bg-white/20 text-white flex items-center justify-center text-lg shrink-0 active:scale-95 transition-transform duration-[80ms]"
           onClick={() => setIsQuickPhrasesOpen(true)}
@@ -41,17 +27,15 @@ export default function SentenceBar({
           ⚡
         </button>
 
-        {/* Word chips area */}
         <div className="flex-1 flex items-center gap-1.5 overflow-x-auto min-h-[40px] scrollbar-hide">
-          {words.map((w, i) => (
+          {sentenceWords.map((w, i) => (
             <WordChip key={`${w.id}-${i}`} label={w.label} isFlashing={isFlashing} />
           ))}
         </div>
 
-        {/* Controls — always visible */}
         <button
           className="px-3 py-2 rounded-lg bg-white/15 text-white text-[13px] font-bold shrink-0 active:scale-95 transition-transform duration-[80ms]"
-          onClick={onRemoveLast}
+          onClick={removeLastWord}
           type="button"
           aria-label="Hapus kata terakhir"
         >
@@ -59,7 +43,7 @@ export default function SentenceBar({
         </button>
         <button
           className="px-3 py-2 rounded-lg bg-white/15 text-red-300 text-[13px] font-bold shrink-0 active:scale-95 transition-transform duration-[80ms]"
-          onClick={onClear}
+          onClick={clearSentence}
           type="button"
           aria-label="Hapus semua"
         >
@@ -78,7 +62,7 @@ export default function SentenceBar({
       <QuickPhrases
         isOpen={isQuickPhrasesOpen}
         onClose={() => setIsQuickPhrasesOpen(false)}
-        onPhraseTap={onQuickPhrase}
+        onPhraseTap={handleQuickPhrase}
       />
     </>
   )

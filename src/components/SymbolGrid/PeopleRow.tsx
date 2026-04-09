@@ -1,35 +1,33 @@
 import SymbolButton from '@/components/SymbolGrid/SymbolButton'
 import AvatarCircle from '@/components/shared/AvatarCircle'
-import { PEOPLE } from '@/data/vocabulary'
-import type { Word } from '@/types'
+import { useVocabulary } from '@/hooks/useVocabulary'
+import { useSentenceBar } from '@/hooks/useSentenceBar'
 
-interface PeopleRowProps {
-  onWordTap: (word: Word) => void
-}
+export default function PeopleRow() {
+  const { people } = useVocabulary()
+  const { addWord } = useSentenceBar()
 
-export default function PeopleRow({ onWordTap }: PeopleRowProps) {
   return (
     <>
-      {PEOPLE.map((person) => (
+      {(people ?? []).map((person) => (
         <SymbolButton
           key={person.id}
-          emoji=""
           label={person.name}
           variant="people"
-          onTap={() =>
-            onWordTap({
-              id: person.id,
-              label: person.name,
-              category: 'people',
-            })
-          }
+          onTap={() => addWord({ id: String(person.id), label: person.name, category: 'people' })}
         >
-          <AvatarCircle initial={person.initial} />
+          {person.photoBlob ? (
+            <img
+              src={URL.createObjectURL(person.photoBlob)}
+              alt={person.name}
+              className="w-[46px] h-[46px] rounded-full object-cover"
+            />
+          ) : (
+            <AvatarCircle initial={person.initial} />
+          )}
         </SymbolButton>
       ))}
-      {/* Tambah placeholder — non-functional in Phase 1 */}
       <SymbolButton
-        emoji="+"
         label="Tambah"
         variant="people"
         onTap={() => {}}

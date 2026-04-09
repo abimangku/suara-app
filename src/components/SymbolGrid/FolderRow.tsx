@@ -1,21 +1,20 @@
 import SymbolButton from '@/components/SymbolGrid/SymbolButton'
-import { FOLDERS } from '@/data/vocabulary'
-import type { FolderKey } from '@/types'
+import { useVocabulary } from '@/hooks/useVocabulary'
+import { useAppStore } from '@/store/appStore'
 
-interface FolderRowProps {
-  onFolderTap: (folderKey: FolderKey) => void
-}
+export default function FolderRow() {
+  const { folders } = useVocabulary()
+  const setActiveFolder = useAppStore((s) => s.setActiveFolder)
 
-export default function FolderRow({ onFolderTap }: FolderRowProps) {
   return (
     <>
-      {FOLDERS.map((folder) => (
+      {(folders ?? []).map((folder) => (
         <SymbolButton
           key={folder.key}
           emoji={folder.emoji}
           label={folder.label}
           variant="folder"
-          onTap={() => onFolderTap(folder.key as FolderKey)}
+          onTap={() => setActiveFolder(folder.key)}
         />
       ))}
     </>

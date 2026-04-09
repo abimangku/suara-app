@@ -1,11 +1,15 @@
+import { useMemo } from 'react'
+
 interface SymbolButtonProps {
-  emoji: string
+  emoji?: string
   label: string
   variant: 'core' | 'people' | 'folder' | 'fringe' | 'kembali'
   onTap: () => void
   isActive?: boolean
   disabled?: boolean
   children?: React.ReactNode
+  symbolPath?: string
+  photoBlob?: Blob
 }
 
 const variantStyles = {
@@ -24,12 +28,34 @@ export default function SymbolButton({
   isActive = false,
   disabled = false,
   children,
+  symbolPath,
+  photoBlob,
 }: SymbolButtonProps) {
+  const blobUrl = useMemo(() => {
+    if (!photoBlob) return null
+    return URL.createObjectURL(photoBlob)
+  }, [photoBlob])
+
   const baseClasses =
     'rounded-button border-2 flex flex-col items-center justify-center gap-1 cursor-pointer select-none active:scale-95 transition-transform duration-[80ms]'
 
   const activeClass = isActive ? 'brightness-[0.85]' : ''
   const disabledClass = disabled ? 'opacity-50 cursor-default' : ''
+
+  // Determine what to render in the image area
+  function renderImage() {
+    if (children) return children
+    if (blobUrl) {
+      return <img src={blobUrl} alt={label} className="w-[50px] h-[50px] object-cover rounded-lg" />
+    }
+    if (symbolPath) {
+      return <img src={`/assets/symbols/${symbolPath}`} alt={label} className="w-[50px] h-[50px] object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextSibling) (e.currentTarget.nextSibling as HTMLElement).style.display = 'block' }} />
+    }
+    if (emoji) {
+      return <span className="text-[34px] leading-tight">{emoji}</span>
+    }
+    return <span className="text-[34px] leading-tight">❓</span>
+  }
 
   return (
     <button
@@ -37,7 +63,7 @@ export default function SymbolButton({
       onClick={disabled ? undefined : onTap}
       type="button"
     >
-      {children ?? <span className="text-[34px] leading-tight">{emoji}</span>}
+      {renderImage()}
       <span className="text-[15px] font-bold leading-tight text-center px-1">
         {label}
       </span>
