@@ -1,12 +1,28 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import WordChip from '@/components/SentenceBar/WordChip'
 import QuickPhrases from '@/components/SentenceBar/QuickPhrases'
 import { useSentenceBar } from '@/hooks/useSentenceBar'
+import { useAppStore } from '@/store/appStore'
 
 export default function SentenceBar() {
   const { sentenceWords, removeLastWord, clearSentence, speak, handleQuickPhrase } = useSentenceBar()
   const [isQuickPhrasesOpen, setIsQuickPhrasesOpen] = useState(false)
   const [isFlashing, setIsFlashing] = useState(false)
+  const openAdmin = useAppStore((s) => s.openAdmin)
+  const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handlePressStart = () => {
+    longPressRef.current = setTimeout(() => {
+      openAdmin()
+    }, 3000)
+  }
+
+  const handlePressEnd = () => {
+    if (longPressRef.current) {
+      clearTimeout(longPressRef.current)
+      longPressRef.current = null
+    }
+  }
 
   function handleBicara() {
     if (sentenceWords.length === 0) return
@@ -17,7 +33,16 @@ export default function SentenceBar() {
 
   return (
     <>
-      <div className="w-full bg-suara-blue-bar flex items-center px-3.5 gap-2 shrink-0" style={{ minHeight: 60 }}>
+      <div
+        className="w-full bg-suara-blue-bar flex items-center px-3.5 gap-2 shrink-0"
+        style={{ minHeight: 60 }}
+        onMouseDown={handlePressStart}
+        onMouseUp={handlePressEnd}
+        onMouseLeave={handlePressEnd}
+        onTouchStart={handlePressStart}
+        onTouchEnd={handlePressEnd}
+        onTouchCancel={handlePressEnd}
+      >
         <button
           className="w-10 h-10 rounded-[10px] bg-white/20 text-white flex items-center justify-center text-lg shrink-0 active:scale-95 transition-transform duration-[80ms]"
           onClick={() => setIsQuickPhrasesOpen(true)}
