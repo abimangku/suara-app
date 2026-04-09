@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import AddPerson from '@/components/Admin/AddPerson'
+import AddWord from '@/components/Admin/AddWord'
 
 type AdminSection = 'home' | 'manageWords' | 'managePeople' | 'quickPhrases' | 'vocabPacks' | 'insights' | 'onboarding'
 
@@ -14,6 +15,21 @@ const ADMIN_CARDS = [
 
 export default function AdminHome() {
   const [activeSection, setActiveSection] = useState<AdminSection>('home')
+
+  if (activeSection === 'manageWords') {
+    return (
+      <div className="p-4">
+        <button
+          onClick={() => setActiveSection('home')}
+          className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]"
+          type="button"
+        >
+          ← Kembali
+        </button>
+        <AddWord onDone={() => setActiveSection('home')} />
+      </div>
+    )
+  }
 
   if (activeSection === 'managePeople') {
     return (
