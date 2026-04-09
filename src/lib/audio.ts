@@ -2,6 +2,10 @@ class AudioEngine {
   private pool: Map<string, HTMLAudioElement> = new Map()
   private blobUrls: Map<string, string> = new Map()
 
+  private vibrate(): void {
+    try { navigator.vibrate?.(10) } catch {}
+  }
+
   /**
    * Preload audio files from static asset paths.
    * Called on app init for core words and on folder open for fringe words.
@@ -34,6 +38,7 @@ class AudioEngine {
    * Uses cloneNode() for rapid re-taps of the same word.
    */
   async play(id: string, label: string): Promise<void> {
+    this.vibrate()
     const source = this.pool.get(id)
     if (source) {
       try {
@@ -65,9 +70,10 @@ class AudioEngine {
    * Browser TTS fallback — Indonesian language, 0.9x speed.
    */
   fallbackTTS(text: string): void {
+    this.vibrate()
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.lang = 'id-ID'
-    utterance.rate = 0.9
+    utterance.rate = 0.85
     speechSynthesis.speak(utterance)
   }
 

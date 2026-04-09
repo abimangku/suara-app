@@ -23,6 +23,15 @@ const variantStyles = {
   kembali: 'bg-suara-gray-light border-suara-gray-border text-suara-gray',
 }
 
+const fkStyles: Record<string, string> = {
+  verb: 'bg-fk-verb-light border-fk-verb-border text-fk-verb',
+  pronoun: 'bg-fk-pronoun-light border-fk-pronoun-border text-fk-pronoun',
+  descriptor: 'bg-fk-descriptor-light border-fk-descriptor-border text-fk-descriptor',
+  negation: 'bg-fk-negation-light border-fk-negation-border text-fk-negation',
+  noun: 'bg-fk-noun-light border-fk-noun-border text-fk-noun',
+  preposition: 'bg-fk-preposition-light border-fk-preposition-border text-fk-preposition',
+}
+
 export default function SymbolButton({
   emoji,
   label,
@@ -33,7 +42,7 @@ export default function SymbolButton({
   children,
   symbolPath,
   photoBlob,
-  fkColor: _fkColor,
+  fkColor,
 }: SymbolButtonProps) {
   const isModelingMode = useAppStore((s) => s.isModelingMode)
   const [isHighlighted, setIsHighlighted] = useState(false)
@@ -81,7 +90,7 @@ export default function SymbolButton({
 
   return (
     <button
-      className={`${baseClasses} ${variantStyles[variant]} ${activeClass} ${disabledClass} ${highlightClass}`}
+      className={`${baseClasses} ${(variant === 'core' && fkColor && fkStyles[fkColor]) ? fkStyles[fkColor] : variantStyles[variant]} ${activeClass} ${disabledClass} ${highlightClass}`}
       onClick={() => {
         if (disabled) return
         if (isModelingMode) {

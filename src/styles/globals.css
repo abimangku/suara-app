@@ -19,6 +19,25 @@
   --color-suara-danger-light: #FEF2F2;
   --color-suara-amber: #CA8A04;
   --color-suara-amber-light: #FEF9C3;
+  /* Fitzgerald Key color-coding (AAC standard) */
+  --color-fk-verb: #166534;
+  --color-fk-verb-light: #DCFCE7;
+  --color-fk-verb-border: #BBF7D0;
+  --color-fk-pronoun: #854d0e;
+  --color-fk-pronoun-light: #FEF9C3;
+  --color-fk-pronoun-border: #FDE68A;
+  --color-fk-descriptor: #1d4ed8;
+  --color-fk-descriptor-light: #DBEAFE;
+  --color-fk-descriptor-border: #BFDBFE;
+  --color-fk-negation: #be185d;
+  --color-fk-negation-light: #FCE7F3;
+  --color-fk-negation-border: #FBCFE8;
+  --color-fk-noun: #c2410c;
+  --color-fk-noun-light: #FFEDD5;
+  --color-fk-noun-border: #FED7AA;
+  --color-fk-preposition: #7e22ce;
+  --color-fk-preposition-light: #F3E8FF;
+  --color-fk-preposition-border: #E9D5FF;
   --font-sans: 'Nunito', sans-serif;
   --radius-button: 14px;
 }
