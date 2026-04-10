@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie'
-import type { DbWord, DbFolder, DbPerson, UsageEvent, DbQuickPhrase, AppSettings, VocabularyPack } from '@/types'
+import type { DbWord, DbFolder, DbPerson, UsageEvent, DbQuickPhrase, AppSettings, VocabularyPack, CommunicationMilestone } from '@/types'
 
 class SuaraDatabase extends Dexie {
   words!: Table<DbWord>
@@ -9,6 +9,7 @@ class SuaraDatabase extends Dexie {
   quickPhrases!: Table<DbQuickPhrase>
   settings!: Table<AppSettings>
   vocabularyPacks!: Table<VocabularyPack>
+  communicationMilestones!: Table<CommunicationMilestone>
 
   constructor() {
     super('SuaraDB')
@@ -30,6 +31,17 @@ class SuaraDatabase extends Dexie {
       quickPhrases: '++id, sortOrder',
       settings: 'key',
       vocabularyPacks: '++id, folderKey, isActive',
+    })
+
+    this.version(3).stores({
+      words: '++id, folderId, label, createdAt',
+      folders: '++id, key, sortOrder',
+      people: '++id, name, sortOrder',
+      usageEvents: '++id, wordId, timestamp, [wordId+timestamp]',
+      quickPhrases: '++id, sortOrder',
+      settings: 'key',
+      vocabularyPacks: '++id, folderKey, isActive',
+      communicationMilestones: '++id, type, detectedAt',
     })
   }
 }

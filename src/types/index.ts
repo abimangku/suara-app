@@ -125,6 +125,16 @@ export interface Word {
 // Folder key — dynamic from DB (no longer fixed union)
 export type FolderKey = string | null
 
+// Communication milestone
+export interface CommunicationMilestone {
+  id?: number
+  type: 'first_word' | 'first_2word' | 'first_3word' | 'first_request' | 'first_comment' | 'first_greeting' | 'first_refusal' | 'vocabulary_growth'
+  description: string
+  wordSequence: string[]
+  detectedAt: number
+  narrative?: string
+}
+
 // Intent prediction from frequency model
 export interface IntentPrediction {
   word: Word
@@ -170,3 +180,4 @@ export interface QuickPhrase {
   words: string[]
   sortOrder: number
 }
+
