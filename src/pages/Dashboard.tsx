@@ -7,7 +7,7 @@ export default function Dashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [pin, setPin] = useState('')
   const [error, setError] = useState('')
-  const { hasPin, verifyPin } = useAdmin()
+  const { verifyPin } = useAdmin()
 
   useEffect(() => {
     if (isAuthenticated) {

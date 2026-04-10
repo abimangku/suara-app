@@ -13,7 +13,7 @@ interface VocabSuggestionsProps {
   onDone: () => void
 }
 
-export default function VocabSuggestions({ onDone }: VocabSuggestionsProps) {
+export default function VocabSuggestions({ onDone: _onDone }: VocabSuggestionsProps) {
   const [suggestions, setSuggestions] = useState<VocabSuggestion[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
