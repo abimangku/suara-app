@@ -1,6 +1,7 @@
 import { useCallback, useRef } from 'react'
 import { useAppStore } from '@/store/appStore'
 import { useAudio } from '@/hooks/useAudio'
+import { checkForNewMilestones } from '@/lib/milestones'
 import type { Word } from '@/types'
 
 export function useSentenceBar() {
@@ -53,6 +54,14 @@ export function useSentenceBar() {
     const addToHistory = useAppStore.getState().addToHistory
     addToHistory(words.map((w) => w.label))
     playSentence(words)
+
+    // Check for communication milestones
+    const wordLabels = words.map((w) => w.label)
+    const wordCategories = words.map((w) => w.category)
+    checkForNewMilestones(wordLabels, wordCategories).catch(() => {
+      // Silent fail — milestone detection must never block communication
+    })
+
     if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current)
     clearTimeoutRef.current = setTimeout(() => {
       clearSentence()

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useUsageInsights } from '@/hooks/useUsageInsights'
+import { useMilestones } from '@/hooks/useMilestones'
 
 interface UsageInsightsProps {
   onDone: () => void
@@ -8,6 +9,7 @@ interface UsageInsightsProps {
 export default function UsageInsights({ onDone: _onDone }: UsageInsightsProps) {
   const [period, setPeriod] = useState<7 | 30>(7)
   const { topWords, totalEvents, totalVocab, deadEnds } = useUsageInsights(period)
+  const { milestones } = useMilestones()
 
   const maxCount = topWords?.[0]?.count ?? 1
 
@@ -81,6 +83,23 @@ export default function UsageInsights({ onDone: _onDone }: UsageInsightsProps) {
             <div key={de.folderKey} className="p-3 rounded-xl bg-suara-amber-light">
               <p className="text-sm font-bold text-suara-amber">{de.message}</p>
               <p className="text-xs text-suara-amber/60 mt-1">Mungkin ada kata yang belum ditambahkan</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Milestones */}
+      <h4 className="text-sm font-bold text-suara-gray mt-6 mb-2">Pencapaian Komunikasi</h4>
+      {milestones.length === 0 ? (
+        <p className="text-sm text-suara-gray/50 py-2">Belum ada pencapaian tercatat</p>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {milestones.map((m) => (
+            <div key={m.id} className="p-3 rounded-xl bg-suara-green-light">
+              <p className="text-sm font-bold text-suara-green">{m.description}</p>
+              <p className="text-xs text-suara-green/60 mt-1">
+                {new Date(m.detectedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </p>
             </div>
           ))}
         </div>
