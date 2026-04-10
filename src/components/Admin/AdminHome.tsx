@@ -8,8 +8,9 @@ import VocabPackAdmin from '@/components/Admin/VocabPackAdmin'
 import UsageInsights from '@/components/Admin/UsageInsights'
 import OnboardingGuide from '@/components/Admin/OnboardingGuide'
 import VocabSuggestions from '@/components/Admin/VocabSuggestions'
+import BackupRestore from '@/components/Admin/BackupRestore'
 
-type AdminSection = 'home' | 'manageWords' | 'managePeople' | 'addPerson' | 'addWord' | 'quickPhrases' | 'vocabPacks' | 'insights' | 'onboarding' | 'vocabSuggestions'
+type AdminSection = 'home' | 'manageWords' | 'managePeople' | 'addPerson' | 'addWord' | 'quickPhrases' | 'vocabPacks' | 'insights' | 'onboarding' | 'vocabSuggestions' | 'backup'
 
 const ADMIN_CARDS = [
   { id: 'manageWords' as const, emoji: '📝', label: 'Kelola Kata', desc: 'Tambah, edit, hapus kosakata' },
@@ -19,6 +20,7 @@ const ADMIN_CARDS = [
   { id: 'insights' as const, emoji: '📊', label: 'Wawasan Penggunaan', desc: 'Lihat kata yang paling sering digunakan' },
   { id: 'onboarding' as const, emoji: '📖', label: 'Panduan Keluarga', desc: 'Cara menggunakan Suara' },
   { id: 'vocabSuggestions' as const, emoji: '🤖', label: 'Saran Kosakata', desc: 'Dapatkan saran kata baru dari AI' },
+  { id: 'backup' as const, emoji: '💾', label: 'Cadangan Data', desc: 'Cadangkan dan pulihkan kosakata' },
 ]
 
 export default function AdminHome() {
@@ -101,6 +103,15 @@ export default function AdminHome() {
       <div className="p-4">
         <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
         <VocabSuggestions onDone={() => setActiveSection('home')} />
+      </div>
+    )
+  }
+
+  if (activeSection === 'backup') {
+    return (
+      <div className="p-4">
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <BackupRestore onDone={() => setActiveSection('home')} />
       </div>
     )
   }
