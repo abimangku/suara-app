@@ -88,7 +88,7 @@ export default function SentenceBar() {
         onTouchCancel={handlePressEnd}
       >
         <button
-          className="w-10 h-10 rounded-[10px] bg-white/20 text-white flex items-center justify-center text-lg shrink-0 active:scale-95 transition-transform duration-[80ms]"
+          className="w-10 h-10 rounded-[10px] bg-white/20 text-white flex items-center justify-center text-lg shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
           onClick={() => setIsQuickPhrasesOpen(true)}
           type="button"
           aria-label="Frasa cepat"
@@ -137,7 +137,7 @@ export default function SentenceBar() {
         </div>
 
         <button
-          className="px-3 py-2 rounded-lg bg-white/15 text-white text-[13px] font-bold shrink-0 active:scale-95 transition-transform duration-[80ms]"
+          className="px-3 py-2 rounded-lg bg-white/15 text-white text-[13px] font-bold shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
           onClick={removeLastWord}
           type="button"
           aria-label="Hapus kata terakhir"
@@ -145,7 +145,7 @@ export default function SentenceBar() {
           ⌫
         </button>
         <button
-          className={`px-3 py-2 rounded-lg text-[13px] font-bold shrink-0 active:scale-95 transition-transform duration-[80ms] ${
+          className={`px-3 py-2 rounded-lg text-[13px] font-bold shrink-0 active:scale-[0.96] transition-transform duration-[80ms] ${
             confirmClear
               ? 'bg-suara-danger text-white'
               : 'bg-white/15 text-red-300'
@@ -157,8 +157,14 @@ export default function SentenceBar() {
           {confirmClear ? 'Yakin?' : '✕ Hapus'}
         </button>
         <button
-          className="px-5 py-2.5 rounded-xl bg-white text-suara-blue font-extrabold text-[15px] shrink-0 active:scale-95 transition-transform duration-[80ms]"
-          onClick={handleBicara}
+          className="px-5 py-2.5 rounded-xl bg-white text-suara-blue font-extrabold text-[15px] shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
+          onClick={() => {
+            if (isModelingMode) {
+              toggleModelingMode()
+              return
+            }
+            handleBicara()
+          }}
           onMouseDown={handleBicaraPressStart}
           onMouseUp={handleBicaraPressEnd}
           onMouseLeave={handleBicaraPressEnd}

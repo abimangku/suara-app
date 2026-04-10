@@ -31,7 +31,7 @@ export default function BottomSheet({ isOpen, onClose, children }: BottomSheetPr
         ref={sheetRef}
         className="relative w-full max-w-2xl bg-white rounded-t-2xl px-4 py-5 pb-8 z-10"
       >
-        <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
+        <div className="w-10 h-1 bg-suara-gray-border rounded-full mx-auto mb-4" />
         {children}
       </div>
     </div>

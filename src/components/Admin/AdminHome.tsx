@@ -33,7 +33,7 @@ export default function AdminHome() {
   if (activeSection === 'manageWords') {
     return (
       <div className="p-4">
-        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <EditWord onDone={() => setActiveSection('home')} onAddWord={() => setActiveSection('addWord')} />
       </div>
     )
@@ -42,7 +42,7 @@ export default function AdminHome() {
   if (activeSection === 'addWord') {
     return (
       <div className="p-4">
-        <button onClick={() => setActiveSection('manageWords')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setActiveSection('manageWords')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <AddWord onDone={() => setActiveSection('manageWords')} />
       </div>
     )
@@ -51,7 +51,7 @@ export default function AdminHome() {
   if (activeSection === 'managePeople') {
     return (
       <div className="p-4">
-        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <ManagePeople onDone={() => setActiveSection('home')} onAddPerson={() => setActiveSection('addPerson')} />
       </div>
     )
@@ -60,7 +60,7 @@ export default function AdminHome() {
   if (activeSection === 'addPerson') {
     return (
       <div className="p-4">
-        <button onClick={() => setActiveSection('managePeople')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setActiveSection('managePeople')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <AddPerson onDone={() => setActiveSection('managePeople')} />
       </div>
     )
@@ -69,7 +69,7 @@ export default function AdminHome() {
   if (activeSection === 'quickPhrases') {
     return (
       <div className="p-4">
-        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <QuickPhraseAdmin onDone={() => setActiveSection('home')} />
       </div>
     )
@@ -78,7 +78,7 @@ export default function AdminHome() {
   if (activeSection === 'vocabPacks') {
     return (
       <div className="p-4">
-        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <VocabPackAdmin onDone={() => setActiveSection('home')} />
       </div>
     )
@@ -87,7 +87,7 @@ export default function AdminHome() {
   if (activeSection === 'insights') {
     return (
       <div className="p-4">
-        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <UsageInsights onDone={() => setActiveSection('home')} />
       </div>
     )
@@ -96,7 +96,7 @@ export default function AdminHome() {
   if (activeSection === 'onboarding') {
     return (
       <div className="p-4">
-        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <OnboardingGuide onDone={() => setActiveSection('home')} />
       </div>
     )
@@ -105,7 +105,7 @@ export default function AdminHome() {
   if (activeSection === 'vocabSuggestions') {
     return (
       <div className="p-4">
-        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <VocabSuggestions onDone={() => setActiveSection('home')} />
       </div>
     )
@@ -114,7 +114,7 @@ export default function AdminHome() {
   if (activeSection === 'backup') {
     return (
       <div className="p-4">
-        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <BackupRestore onDone={() => setActiveSection('home')} />
       </div>
     )
@@ -123,7 +123,7 @@ export default function AdminHome() {
   if (activeSection === 'kioskGuide') {
     return (
       <div className="p-4">
-        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <KioskGuide onDone={() => setActiveSection('home')} />
       </div>
     )
@@ -132,7 +132,7 @@ export default function AdminHome() {
   if (activeSection === 'voiceClone') {
     return (
       <div className="p-4">
-        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <VoiceCloneGuide onDone={() => setActiveSection('home')} />
       </div>
     )
@@ -143,7 +143,7 @@ export default function AdminHome() {
       <div className="p-4">
         <button
           onClick={() => setActiveSection('home')}
-          className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]"
+          className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]"
           type="button"
         >
           ← Kembali

@@ -76,7 +76,7 @@ export default function AdminOverlay() {
           <h1 className="text-lg font-bold">Pengaturan Suara</h1>
           <button
             onClick={closeAdmin}
-            className="px-4 py-2 rounded-lg bg-white/20 text-white font-bold text-sm active:scale-95 transition-transform duration-[80ms]"
+            className="px-4 py-2 rounded-lg bg-white/20 text-white font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]"
             type="button"
           >
             ✕ Tutup
@@ -127,7 +127,7 @@ export default function AdminOverlay() {
               <button
                 key={key}
                 onClick={handleBackspace}
-                className="w-20 h-14 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-xl flex items-center justify-center active:scale-95 transition-transform duration-[80ms]"
+                className="w-20 h-14 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-xl flex items-center justify-center active:scale-[0.96] transition-transform duration-[80ms]"
                 type="button"
               >
                 ⌫
@@ -138,7 +138,7 @@ export default function AdminOverlay() {
             <button
               key={key}
               onClick={() => handleDigit(key)}
-              className="w-20 h-14 rounded-xl bg-suara-blue-light text-suara-blue font-bold text-xl flex items-center justify-center active:scale-95 transition-transform duration-[80ms]"
+              className="w-20 h-14 rounded-xl bg-suara-blue-light text-suara-blue font-bold text-xl flex items-center justify-center active:scale-[0.96] transition-transform duration-[80ms]"
               type="button"
             >
               {key}
@@ -150,7 +150,7 @@ export default function AdminOverlay() {
       {/* Submit button */}
       <button
         onClick={view === 'createPin' ? handleCreatePin : handlePinSubmit}
-        className="mt-6 px-8 py-3 rounded-xl bg-suara-blue-bar text-white font-bold text-base active:scale-95 transition-transform duration-[80ms]"
+        className="mt-6 px-8 py-3 rounded-xl bg-suara-blue-bar text-white font-bold text-base active:scale-[0.96] transition-transform duration-[80ms]"
         type="button"
       >
         {view === 'createPin' && step === 'enter' ? 'Lanjut' : view === 'createPin' ? 'Simpan PIN' : 'Masuk'}

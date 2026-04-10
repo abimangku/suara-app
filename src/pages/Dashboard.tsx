@@ -45,7 +45,7 @@ export default function Dashboard() {
         />
         <button
           onClick={handlePinSubmit}
-          className="px-8 py-3 rounded-xl bg-suara-blue-bar text-white font-bold active:scale-95 transition-transform"
+          className="px-8 py-3 rounded-xl bg-suara-blue-bar text-white font-bold active:scale-[0.96] transition-transform"
           type="button"
         >
           Masuk

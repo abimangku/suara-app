@@ -1,8 +1,17 @@
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/lib/db'
 import { usePhotoCapture } from '@/hooks/usePhotoCapture'
 import type { DbWord } from '@/types'
+
+function WordImage({ photoBlob, symbolPath, label }: { photoBlob?: Blob; symbolPath?: string; label: string }) {
+  const blobUrl = useMemo(() => photoBlob ? URL.createObjectURL(photoBlob) : null, [photoBlob])
+  useEffect(() => { return () => { if (blobUrl) URL.revokeObjectURL(blobUrl) } }, [blobUrl])
+
+  if (blobUrl) return <img src={blobUrl} alt={label} className="w-10 h-10 rounded-lg object-cover" />
+  if (symbolPath) return <img src={`/assets/symbols/${symbolPath}`} alt={label} className="w-10 h-10 object-contain" />
+  return <div className="w-10 h-10 rounded-lg bg-suara-content-bg flex items-center justify-center text-lg">&#x2753;</div>
+}
 
 interface EditWordProps {
   onDone: () => void
@@ -88,13 +97,7 @@ export default function EditWord({ onDone: _onDone, onAddWord }: EditWordProps) 
         {(words ?? []).map((word) => (
           <div key={word.id} className="flex items-center gap-3 p-3 rounded-xl bg-suara-gray-light">
             <button onClick={() => handleUpdatePhoto(word)} className="shrink-0" type="button" title="Ganti foto">
-              {word.photoBlob ? (
-                <img src={URL.createObjectURL(word.photoBlob)} alt={word.label} className="w-10 h-10 rounded-lg object-cover" />
-              ) : word.symbolPath ? (
-                <img src={`/assets/symbols/${word.symbolPath}`} alt={word.label} className="w-10 h-10 object-contain" />
-              ) : (
-                <div className="w-10 h-10 rounded-lg bg-suara-content-bg flex items-center justify-center text-lg">❓</div>
-              )}
+              <WordImage photoBlob={word.photoBlob} symbolPath={word.symbolPath} label={word.label} />
             </button>
 
             {editingId === word.id ? (

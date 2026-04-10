@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { usePhotoCapture } from '@/hooks/usePhotoCapture'
 import PhotoCropPreview from '@/components/Admin/PhotoCropPreview'
@@ -49,6 +49,15 @@ export default function AddWord({ onDone }: AddWordProps) {
     }
   }
 
+  const photoBlobUrl = useMemo(() => {
+    if (!photoBlob) return null
+    return URL.createObjectURL(photoBlob)
+  }, [photoBlob])
+
+  useEffect(() => {
+    return () => { if (photoBlobUrl) URL.revokeObjectURL(photoBlobUrl) }
+  }, [photoBlobUrl])
+
   const selectedFolder = folders?.find((f) => f.id === selectedFolderId)
 
   // Step 1: Photo
@@ -71,14 +80,14 @@ export default function AddWord({ onDone }: AddWordProps) {
             </div>
             <button
               onClick={handlePickPhoto}
-              className="px-6 py-3 rounded-xl bg-suara-blue-bar text-white font-bold text-sm active:scale-95 transition-transform duration-[80ms]"
+              className="px-6 py-3 rounded-xl bg-suara-blue-bar text-white font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]"
               type="button"
             >
               Pilih Foto
             </button>
             <button
               onClick={() => setStep('label')}
-              className="px-6 py-2 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]"
+              className="px-6 py-2 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]"
               type="button"
             >
               Lewati foto
@@ -104,11 +113,11 @@ export default function AddWord({ onDone }: AddWordProps) {
           autoFocus
         />
         <div className="flex gap-3">
-          <button onClick={() => setStep('photo')} className="px-5 py-2.5 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+          <button onClick={() => setStep('photo')} className="px-5 py-2.5 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
           <button
             onClick={() => setStep('folder')}
             disabled={!label.trim()}
-            className="px-5 py-2.5 rounded-xl bg-suara-blue-bar text-white font-bold text-sm active:scale-95 transition-transform duration-[80ms] disabled:opacity-50"
+            className="px-5 py-2.5 rounded-xl bg-suara-blue-bar text-white font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms] disabled:opacity-50"
             type="button"
           >
             Lanjut
@@ -140,7 +149,7 @@ export default function AddWord({ onDone }: AddWordProps) {
             </button>
           ))}
         </div>
-        <button onClick={() => setStep('label')} className="px-5 py-2.5 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setStep('label')} className="px-5 py-2.5 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
       </div>
     )
   }
@@ -150,23 +159,23 @@ export default function AddWord({ onDone }: AddWordProps) {
     <div className="flex flex-col items-center gap-4 py-6">
       <h3 className="text-lg font-bold text-suara-gray">Konfirmasi</h3>
       {photoBlob && (
-        <img src={URL.createObjectURL(photoBlob)} alt={label} className="w-24 h-24 rounded-xl object-cover border-2 border-suara-gray-border" />
+        <img src={photoBlobUrl!} alt={label} className="w-24 h-24 rounded-xl object-cover border-2 border-suara-gray-border" />
       )}
       <p className="text-xl font-bold text-suara-gray">{label}</p>
       <p className="text-sm text-suara-gray/60">Kategori: {selectedFolder?.emoji} {selectedFolder?.label}</p>
       <button
         onClick={handlePreviewTTS}
-        className="px-5 py-2 rounded-xl bg-suara-green-light text-suara-green font-bold text-sm active:scale-95 transition-transform duration-[80ms]"
+        className="px-5 py-2 rounded-xl bg-suara-green-light text-suara-green font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]"
         type="button"
       >
         🔊 Dengar
       </button>
       <div className="flex gap-3">
-        <button onClick={() => setStep('folder')} className="px-5 py-2.5 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <button onClick={() => setStep('folder')} className="px-5 py-2.5 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="px-5 py-2.5 rounded-xl bg-suara-blue-bar text-white font-bold text-sm active:scale-95 transition-transform duration-[80ms] disabled:opacity-50"
+          className="px-5 py-2.5 rounded-xl bg-suara-blue-bar text-white font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms] disabled:opacity-50"
           type="button"
         >
           {saving ? 'Menyimpan...' : 'Simpan'}

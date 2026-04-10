@@ -31,14 +31,14 @@ export default function PhotoCropPreview({
       <div className="flex gap-3">
         <button
           onClick={onRetake}
-          className="px-5 py-2.5 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]"
+          className="px-5 py-2.5 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]"
           type="button"
         >
           Foto ulang
         </button>
         <button
           onClick={onConfirm}
-          className="px-5 py-2.5 rounded-xl bg-suara-blue-bar text-white font-bold text-sm active:scale-95 transition-transform duration-[80ms]"
+          className="px-5 py-2.5 rounded-xl bg-suara-blue-bar text-white font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]"
           type="button"
         >
           Gunakan

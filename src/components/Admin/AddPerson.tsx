@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { usePhotoCapture } from '@/hooks/usePhotoCapture'
 import PhotoCropPreview from '@/components/Admin/PhotoCropPreview'
 import { db } from '@/lib/db'
@@ -13,6 +13,15 @@ export default function AddPerson({ onDone }: AddPersonProps) {
   const [name, setName] = useState('')
   const [step, setStep] = useState<'photo' | 'name'>('photo')
   const [saving, setSaving] = useState(false)
+
+  const photoBlobUrl = useMemo(() => {
+    if (!photoBlob) return null
+    return URL.createObjectURL(photoBlob)
+  }, [photoBlob])
+
+  useEffect(() => {
+    return () => { if (photoBlobUrl) URL.revokeObjectURL(photoBlobUrl) }
+  }, [photoBlobUrl])
 
   async function handlePickPhoto() {
     const blob = await pickAndCrop(200)
@@ -62,14 +71,14 @@ export default function AddPerson({ onDone }: AddPersonProps) {
             </div>
             <button
               onClick={handlePickPhoto}
-              className="px-6 py-3 rounded-xl bg-suara-blue-bar text-white font-bold text-sm active:scale-95 transition-transform duration-[80ms]"
+              className="px-6 py-3 rounded-xl bg-suara-blue-bar text-white font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]"
               type="button"
             >
               Pilih Foto
             </button>
             <button
               onClick={() => setStep('name')}
-              className="px-6 py-2 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]"
+              className="px-6 py-2 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]"
               type="button"
             >
               Lewati foto
@@ -88,7 +97,7 @@ export default function AddPerson({ onDone }: AddPersonProps) {
 
       {photoBlob && (
         <img
-          src={URL.createObjectURL(photoBlob)}
+          src={photoBlobUrl!}
           alt="Foto"
           className="w-20 h-20 rounded-full object-cover border-2 border-suara-green-border"
         />
@@ -106,7 +115,7 @@ export default function AddPerson({ onDone }: AddPersonProps) {
       <div className="flex gap-3">
         <button
           onClick={() => setStep('photo')}
-          className="px-5 py-2.5 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-95 transition-transform duration-[80ms]"
+          className="px-5 py-2.5 rounded-xl bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]"
           type="button"
         >
           ← Kembali
@@ -114,7 +123,7 @@ export default function AddPerson({ onDone }: AddPersonProps) {
         <button
           onClick={handleSave}
           disabled={!name.trim() || saving}
-          className="px-5 py-2.5 rounded-xl bg-suara-blue-bar text-white font-bold text-sm active:scale-95 transition-transform duration-[80ms] disabled:opacity-50"
+          className="px-5 py-2.5 rounded-xl bg-suara-blue-bar text-white font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms] disabled:opacity-50"
           type="button"
         >
           {saving ? 'Menyimpan...' : 'Simpan'}

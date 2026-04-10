@@ -47,7 +47,7 @@ export default function SymbolSearch() {
       <div className="flex items-center gap-3 px-4 py-3 bg-suara-blue-bar">
         <button
           onClick={() => { toggleSearch(); setQuery(''); setResults([]) }}
-          className="w-10 h-10 rounded-lg bg-white/20 text-white flex items-center justify-center font-bold shrink-0 active:scale-95 transition-transform duration-[80ms]"
+          className="w-10 h-10 rounded-lg bg-white/20 text-white flex items-center justify-center font-bold shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
           type="button"
         >
           ←
@@ -77,7 +77,7 @@ export default function SymbolSearch() {
               <button
                 key={`${word.category}-${word.id}`}
                 onClick={() => handleSelect(word)}
-                className="rounded-button border-2 border-suara-gray-border bg-white flex flex-col items-center justify-center gap-1 p-3 cursor-pointer select-none active:scale-95 transition-transform duration-[80ms]"
+                className="rounded-button border-2 border-suara-gray-border bg-white flex flex-col items-center justify-center gap-1 p-3 cursor-pointer select-none active:scale-[0.96] transition-transform duration-[80ms]"
                 type="button"
                 style={{ minHeight: 90 }}
               >
@@ -85,17 +85,17 @@ export default function SymbolSearch() {
                   <img
                     src={`/assets/symbols/${word.symbolPath}`}
                     alt={word.label}
-                    className="w-[40px] h-[40px] object-contain"
+                    className="w-[52px] h-[52px] object-contain"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none'
                     }}
                   />
                 ) : word.emoji ? (
-                  <span className="text-[28px]">{word.emoji}</span>
+                  <span className="text-[34px]">{word.emoji}</span>
                 ) : (
-                  <span className="text-[28px]">❓</span>
+                  <span className="text-[34px]">&#x2753;</span>
                 )}
-                <span className="text-[13px] font-bold text-suara-gray text-center leading-tight">
+                <span className="text-[18px] font-bold text-suara-gray text-center leading-tight" style={{ letterSpacing: '0.4px' }}>
                   {word.label}
                 </span>
               </button>

@@ -1,7 +1,7 @@
 {
   "name": "Suara — AAC Communication",
   "short_name": "Suara",
-  "description": "Augmentative and Alternative Communication untuk anak Indonesia",
+  "description": "Komunikasi Augmentatif dan Alternatif untuk anak Indonesia",
   "start_url": "/",
   "display": "standalone",
   "orientation": "landscape",

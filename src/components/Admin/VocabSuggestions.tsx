@@ -148,7 +148,7 @@ Sarankan 10 kata baru yang mungkin dia butuhkan:`,
               ) : (
                 <button
                   onClick={() => handleAddWord(s)}
-                  className="px-4 py-1.5 rounded-lg bg-suara-blue-bar text-white text-xs font-bold active:scale-95 transition-transform duration-[80ms]"
+                  className="px-4 py-1.5 rounded-lg bg-suara-blue-bar text-white text-xs font-bold active:scale-[0.96] transition-transform duration-[80ms]"
                   type="button"
                 >
                   + Tambah

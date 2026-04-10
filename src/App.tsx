@@ -9,7 +9,7 @@ import CaregiverPane from '@/components/AI/CaregiverPane'
 import ErrorBoundary from '@/components/shared/ErrorBoundary'
 import { useAppStore } from '@/store/appStore'
 import { useIntentSuggestions } from '@/hooks/useIntentSuggestions'
-import { startBackgroundSync } from '@/lib/sync'
+import { startBackgroundSync, stopBackgroundSync } from '@/lib/sync'
 
 export default function App() {
   // Check for dashboard mode via URL parameter
@@ -20,6 +20,7 @@ export default function App() {
   // Start background sync (only active when Supabase env vars are configured)
   useEffect(() => {
     startBackgroundSync()
+    return () => stopBackgroundSync()
   }, [])
 
   // Activate intent suggestions computation

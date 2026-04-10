@@ -6,9 +6,9 @@ export const CORE_WORDS: CoreWord[] = [
   { id: 'mau',      label: 'mau',      emoji: '✋', symbolPath: 'core/mau.png',      audioPath: 'core/mau.mp3',      row: 1, position: 0, fkColor: 'verb' },
   { id: 'berhenti', label: 'berhenti', emoji: '🛑', symbolPath: 'core/berhenti.png', audioPath: 'core/berhenti.mp3', row: 1, position: 1, fkColor: 'verb' },
   { id: 'bantu',    label: 'bantu',    emoji: '🆘', symbolPath: 'core/bantu.png',    audioPath: 'core/bantu.mp3',    row: 1, position: 2, fkColor: 'verb' },
-  { id: 'ya',       label: 'ya',       emoji: '✅', symbolPath: 'core/ya.png',       audioPath: 'core/ya.mp3',       row: 1, position: 3, fkColor: 'negation' },
+  { id: 'ya',       label: 'ya',       emoji: '✅', symbolPath: 'core/ya.png',       audioPath: 'core/ya.mp3',       row: 1, position: 3, fkColor: 'descriptor' },
   { id: 'tidak',    label: 'tidak',    emoji: '🚫', symbolPath: 'core/tidak.png',    audioPath: 'core/tidak.mp3',    row: 1, position: 4, fkColor: 'negation' },
-  { id: 'lagi',     label: 'lagi',     emoji: '➕', symbolPath: 'core/lagi.png',     audioPath: 'core/lagi.mp3',     row: 1, position: 5, fkColor: 'negation' },
+  { id: 'lagi',     label: 'lagi',     emoji: '➕', symbolPath: 'core/lagi.png',     audioPath: 'core/lagi.mp3',     row: 1, position: 5, fkColor: 'descriptor' },
 
   // Row 2: verbs + pronouns
   { id: 'pergi',    label: 'pergi',    emoji: '🚶', symbolPath: 'core/pergi.png',    audioPath: 'core/pergi.mp3',    row: 2, position: 0, fkColor: 'verb' },

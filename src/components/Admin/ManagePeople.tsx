@@ -1,9 +1,17 @@
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/lib/db'
 import { usePhotoCapture } from '@/hooks/usePhotoCapture'
 import AvatarCircle from '@/components/shared/AvatarCircle'
 import type { DbPerson } from '@/types'
+
+function PersonPhoto({ photoBlob, initial, name }: { photoBlob?: Blob; initial: string; name: string }) {
+  const blobUrl = useMemo(() => photoBlob ? URL.createObjectURL(photoBlob) : null, [photoBlob])
+  useEffect(() => { return () => { if (blobUrl) URL.revokeObjectURL(blobUrl) } }, [blobUrl])
+
+  if (blobUrl) return <img src={blobUrl} alt={name} className="w-12 h-12 rounded-full object-cover" />
+  return <AvatarCircle initial={initial} size={48} />
+}
 
 interface ManagePeopleProps {
   onDone: () => void
@@ -49,11 +57,7 @@ export default function ManagePeople({ onDone: _onDone, onAddPerson }: ManagePeo
           <div key={person.id} className="flex items-center gap-3 p-3 rounded-xl bg-suara-gray-light">
             {/* Avatar */}
             <button onClick={() => handleUpdatePhoto(person)} className="shrink-0" type="button" title="Ganti foto">
-              {person.photoBlob ? (
-                <img src={URL.createObjectURL(person.photoBlob)} alt={person.name} className="w-12 h-12 rounded-full object-cover" />
-              ) : (
-                <AvatarCircle initial={person.initial} size={48} />
-              )}
+              <PersonPhoto photoBlob={person.photoBlob} initial={person.initial} name={person.name} />
             </button>
 
             {/* Name / Edit */}

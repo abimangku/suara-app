@@ -19,7 +19,7 @@ export default function IntentSuggestions() {
         <button
           key={word.id}
           onClick={() => addWord(word)}
-          className="flex-1 px-3 py-2 rounded-xl bg-white border-2 border-suara-blue-border text-suara-blue font-bold text-sm text-center active:scale-95 transition-transform duration-[80ms] truncate"
+          className="flex-1 px-3 py-2 rounded-xl bg-white border-2 border-suara-blue-border text-suara-blue font-bold text-sm text-center active:scale-[0.96] transition-transform duration-[80ms] truncate"
           type="button"
         >
           {word.label}

@@ -32,7 +32,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
           </p>
           <button
             onClick={() => this.setState({ hasError: false })}
-            className="px-4 py-2 rounded-lg bg-suara-danger text-white font-bold text-xs active:scale-95 transition-transform duration-[80ms]"
+            className="px-4 py-2 rounded-lg bg-suara-danger text-white font-bold text-xs active:scale-[0.96] transition-transform duration-[80ms]"
             type="button"
           >
             Coba lagi

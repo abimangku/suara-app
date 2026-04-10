@@ -61,7 +61,7 @@ export default function FolderContents({ folderKey }: FolderContentsProps) {
         ))}
 
       <button
-        className="col-span-6 rounded-button border-2 border-suara-gray-border bg-suara-gray-light text-suara-gray flex items-center justify-center gap-2 cursor-pointer select-none active:scale-95 transition-transform duration-[80ms]"
+        className="col-span-6 rounded-button border-2 border-suara-gray-border bg-suara-gray-light text-suara-gray flex items-center justify-center gap-2 cursor-pointer select-none active:scale-[0.96] transition-transform duration-[80ms]"
         onClick={() => {
           setShowAll(false)
           setActiveFolder(null)
