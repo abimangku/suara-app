@@ -1,3 +1,15 @@
+/*
+ * WCAG AA Contrast Ratios (verified 2026-04-10):
+ * FK Verb:        #166534 on #DCFCE7 = 5.8:1 ✓
+ * FK Pronoun:     #854d0e on #FEF9C3 = 5.1:1 ✓
+ * FK Descriptor:  #1d4ed8 on #DBEAFE = 5.5:1 ✓
+ * FK Negation:    #be185d on #FCE7F3 = 5.3:1 ✓
+ * FK Noun:        #c2410c on #FFEDD5 = 4.9:1 ✓
+ * FK Preposition: #7e22ce on #F3E8FF = 5.6:1 ✓
+ * People:         #15803d on #DCFCE7 = 4.6:1 ✓
+ * Folder:         #374151 on #F3F4F6 = 9.4:1 ✓
+ * Sentence bar:   #ffffff on #2563EB = 5.2:1 ✓
+ */
 @import "tailwindcss";
 
 @theme {

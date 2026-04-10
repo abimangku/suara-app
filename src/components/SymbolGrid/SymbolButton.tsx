@@ -93,14 +93,20 @@ export default function SymbolButton({
       className={`${baseClasses} ${(variant === 'core' && fkColor && fkStyles[fkColor]) ? fkStyles[fkColor] : variantStyles[variant]} ${activeClass} ${disabledClass} ${highlightClass}`}
       onClick={() => {
         if (disabled) return
+        const start = performance.now()
         if (isModelingMode) {
-          // Visual highlight only — no audio, no sentence
           setIsHighlighted(true)
           setTimeout(() => setIsHighlighted(false), 500)
         }
         onTap()
+        const elapsed = performance.now() - start
+        if (elapsed > 100) {
+          console.warn(`[Suara Perf] Tap on "${label}" took ${elapsed.toFixed(1)}ms (target: <100ms)`)
+        }
       }}
       type="button"
+      role="gridcell"
+      aria-label={label}
     >
       {renderImage()}
       <span className="text-[18px] font-bold leading-tight text-center px-1" style={{ letterSpacing: '0.4px' }}>

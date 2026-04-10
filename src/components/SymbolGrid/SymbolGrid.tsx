@@ -10,6 +10,8 @@ export default function SymbolGrid() {
   return (
     <div className="flex-1 grid grid-cols-6 gap-[10px] p-3 min-h-0"
       style={{ gridAutoRows: '1fr' }}
+      role="grid"
+      aria-label="Papan komunikasi"
     >
       <CoreRow />
       {activeFolderKey === null ? (
