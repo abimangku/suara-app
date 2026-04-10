@@ -42,6 +42,10 @@ interface AppStore {
   // Mute
   isMuted: boolean
   toggleMute: () => void
+
+  // Caregiver pane
+  isCaregiverPaneOpen: boolean
+  toggleCaregiverPane: () => void
 }
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -87,4 +91,8 @@ export const useAppStore = create<AppStore>((set) => ({
   // Mute
   isMuted: false,
   toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
+
+  // Caregiver pane
+  isCaregiverPaneOpen: false,
+  toggleCaregiverPane: () => set((state) => ({ isCaregiverPaneOpen: !state.isCaregiverPaneOpen })),
 }))

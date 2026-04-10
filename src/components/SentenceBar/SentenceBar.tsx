@@ -19,6 +19,8 @@ export default function SentenceBar() {
   const sentenceHistory = useAppStore((s) => s.sentenceHistory)
   const isMuted = useAppStore((s) => s.isMuted)
   const toggleMute = useAppStore((s) => s.toggleMute)
+  const isCaregiverPaneOpen = useAppStore((s) => s.isCaregiverPaneOpen)
+  const toggleCaregiverPane = useAppStore((s) => s.toggleCaregiverPane)
   const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const modelingPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -116,6 +118,16 @@ export default function SentenceBar() {
           aria-label={isMuted ? 'Nyalakan suara' : 'Matikan suara'}
         >
           {isMuted ? '🔇' : '🔊'}
+        </button>
+        <button
+          className={`w-10 h-10 rounded-[10px] text-white flex items-center justify-center text-lg shrink-0 active:scale-[0.96] transition-transform duration-[80ms] ${
+            isCaregiverPaneOpen ? 'bg-white/40' : 'bg-white/20'
+          }`}
+          onClick={toggleCaregiverPane}
+          type="button"
+          aria-label={isCaregiverPaneOpen ? 'Tutup interpretasi' : 'Buka interpretasi'}
+        >
+          💬
         </button>
 
         <div className="flex-1 flex items-center gap-1.5 overflow-x-auto min-h-[40px] scrollbar-hide">

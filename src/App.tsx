@@ -3,6 +3,7 @@ import SymbolGrid from '@/components/SymbolGrid/SymbolGrid'
 import IntentSuggestions from '@/components/AI/IntentSuggestions'
 import AdminOverlay from '@/components/Admin/AdminOverlay'
 import SymbolSearch from '@/components/AI/SymbolSearch'
+import CaregiverPane from '@/components/AI/CaregiverPane'
 import { useAppStore } from '@/store/appStore'
 import { useIntentSuggestions } from '@/hooks/useIntentSuggestions'
 
@@ -17,6 +18,7 @@ export default function App() {
       <SentenceBar />
       <IntentSuggestions />
       <SymbolGrid />
+      <CaregiverPane />
       {isAdminOpen && <AdminOverlay />}
       <SymbolSearch />
     </div>

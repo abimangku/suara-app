@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
 import { CORE_WORDS } from '@/data/vocabulary'
 import { BIGRAMS } from '@/lib/bigrams'
+import { chatCompletion, isApiAvailable } from '@/lib/openrouter'
 import type { Word } from '@/types'
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000
@@ -124,7 +125,73 @@ export async function computeSuggestions(
     }
   }
 
+  // API enhancement: fill remaining slots with API suggestions when online
+  if (suggestions.length < limit) {
+    const apiSuggestions = await getApiSuggestions(sentenceWords, suggestions, limit)
+    suggestions.push(...apiSuggestions)
+  }
+
   return suggestions
+}
+
+/**
+ * Get API-enhanced suggestions when online and local model has gaps.
+ * Supplements (doesn't replace) frequency + bigram suggestions.
+ */
+async function getApiSuggestions(
+  sentenceWords: Word[],
+  existingSuggestions: Word[],
+  limit: number
+): Promise<Word[]> {
+  if (!isApiAvailable()) return []
+
+  const slotsNeeded = limit - existingSuggestions.length
+  if (slotsNeeded <= 0) return []
+
+  const wordLabels = sentenceWords.map((w) => w.label).join(', ')
+  const existingLabels = new Set(existingSuggestions.map((s) => s.label))
+  const sentenceLabels = new Set(sentenceWords.map((w) => w.label))
+
+  // Get all available words to constrain suggestions
+  const allDbWords = await db.words.filter((w) => w.isActive).toArray()
+  const allCoreLabels = CORE_WORDS.map((cw) => cw.label)
+  const allFringeLabels = allDbWords.map((w) => w.label)
+  const availableVocab = [...allCoreLabels, ...allFringeLabels]
+    .filter((l) => !existingLabels.has(l) && !sentenceLabels.has(l))
+
+  try {
+    const result = await chatCompletion([
+      {
+        role: 'system',
+        content: 'Kamu membantu aplikasi AAC. Berikan saran kata berikutnya berdasarkan konteks kalimat. Jawab HANYA dengan kata-kata dari daftar kosakata yang tersedia, dipisahkan koma. Maksimal 3 kata. Tidak ada penjelasan.',
+      },
+      {
+        role: 'user',
+        content: `Kalimat sejauh ini: ${wordLabels}\nKosakata tersedia: ${availableVocab.slice(0, 50).join(', ')}\nSarankan ${slotsNeeded} kata berikutnya yang paling mungkin:`,
+      },
+    ], { maxTokens: 50, temperature: 0.2 })
+
+    if (!result) return []
+
+    // Parse comma-separated response
+    const apiWords = result.split(',').map((w) => w.trim().toLowerCase()).filter(Boolean)
+    const apiSuggestions: Word[] = []
+
+    for (const label of apiWords) {
+      if (apiSuggestions.length >= slotsNeeded) break
+      if (existingLabels.has(label) || sentenceLabels.has(label)) continue
+
+      const resolved = await resolveWordByLabel(label)
+      if (resolved) {
+        apiSuggestions.push(resolved)
+        existingLabels.add(label)
+      }
+    }
+
+    return apiSuggestions
+  } catch {
+    return []
+  }
 }
 
 /**
