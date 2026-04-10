@@ -5,7 +5,7 @@ interface BackupRestoreProps {
   onDone: () => void
 }
 
-export default function BackupRestore({ onDone }: BackupRestoreProps) {
+export default function BackupRestore({ onDone: _onDone }: BackupRestoreProps) {
   const [status, setStatus] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [confirmRestore, setConfirmRestore] = useState(false)

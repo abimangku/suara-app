@@ -25,7 +25,7 @@ const VOICE_SECTIONS = [
   },
 ]
 
-export default function VoiceCloneGuide({ onDone }: VoiceCloneGuideProps) {
+export default function VoiceCloneGuide({ onDone: _onDone }: VoiceCloneGuideProps) {
   return (
     <div className="max-w-lg mx-auto">
       <h3 className="text-lg font-bold text-suara-gray mb-2">Kloning Suara Keluarga</h3>

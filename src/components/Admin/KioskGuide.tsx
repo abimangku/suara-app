@@ -33,7 +33,7 @@ const KIOSK_STEPS = [
   },
 ]
 
-export default function KioskGuide({ onDone }: KioskGuideProps) {
+export default function KioskGuide({ onDone: _onDone }: KioskGuideProps) {
   return (
     <div className="max-w-lg mx-auto">
       <h3 className="text-lg font-bold text-suara-gray mb-2">Mode Kiosk (Tablet Khusus)</h3>
