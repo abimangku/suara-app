@@ -2,8 +2,21 @@ class AudioEngine {
   private pool: Map<string, HTMLAudioElement> = new Map()
   private blobUrls: Map<string, string> = new Map()
 
-  private vibrate(): void {
-    try { navigator.vibrate?.(10) } catch {}
+  private _hapticMs: number = 10
+
+  /**
+   * Set haptic feedback duration.
+   * off=0, light=10ms, medium=30ms, strong=50ms
+   */
+  setHapticLevel(level: 'off' | 'light' | 'medium' | 'strong'): void {
+    const durations = { off: 0, light: 10, medium: 30, strong: 50 }
+    this._hapticMs = durations[level] ?? 10
+  }
+
+  vibrate(): void {
+    try {
+      if (this._hapticMs > 0) navigator.vibrate?.(this._hapticMs)
+    } catch {}
   }
 
   /**

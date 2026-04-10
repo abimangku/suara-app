@@ -43,6 +43,10 @@ interface AppStore {
   isMuted: boolean
   toggleMute: () => void
 
+  // Haptic feedback (configurable for sensory sensitivity)
+  hapticLevel: 'off' | 'light' | 'medium' | 'strong'
+  setHapticLevel: (level: 'off' | 'light' | 'medium' | 'strong') => void
+
   // Caregiver pane
   isCaregiverPaneOpen: boolean
   toggleCaregiverPane: () => void
@@ -91,6 +95,10 @@ export const useAppStore = create<AppStore>((set) => ({
   // Mute
   isMuted: false,
   toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
+
+  // Haptic feedback
+  hapticLevel: 'light' as const,
+  setHapticLevel: (level) => set({ hapticLevel: level }),
 
   // Caregiver pane
   isCaregiverPaneOpen: false,

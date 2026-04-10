@@ -38,8 +38,9 @@ export function useSentenceBar() {
     (word: Word) => {
       const modelingMode = useAppStore.getState().isModelingMode
       if (modelingMode) {
-        // In modeling mode: play no audio, don't add to sentence
-        // Just return — the button highlight is handled by SymbolButton
+        // In modeling mode: play audio (ALgS requires spoken model)
+        // but do NOT add to sentence bar — modeling is receptive, not expressive
+        playWord(word)
         return
       }
       addWordToStore(word)

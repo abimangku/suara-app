@@ -4,8 +4,13 @@ import type { Word } from '@/types'
 
 export function useAudio() {
   function playWord(word: Word): void {
-    try { navigator.vibrate?.(10) } catch {}
-    const isMuted = useAppStore.getState().isMuted
+    // Sync haptic level from store to audio engine
+    const { isMuted, hapticLevel } = useAppStore.getState()
+    audioEngine.setHapticLevel(hapticLevel)
+
+    // Always vibrate (even when muted — motor confirmation)
+    audioEngine.vibrate()
+
     if (isMuted) return
 
     if (word.audioBlob) {
