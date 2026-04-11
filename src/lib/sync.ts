@@ -102,11 +102,14 @@ export async function syncToSupabase(): Promise<SyncResult> {
     // 3. Sync vocabulary snapshot
     const allWords = await db.words.filter((w) => w.isActive).toArray()
     const snapshot = allWords.map((w) => ({ id: w.id, label: w.label, folderId: w.folderId, source: w.source }))
-    await supabase.from('vocabulary_snapshots').upsert({
+    const { error: snapError } = await supabase.from('vocabulary_snapshots').upsert({
       device_id: deviceId,
       snapshot,
       word_count: snapshot.length,
     }, { onConflict: 'device_id' })
+    if (snapError) {
+      console.warn('[Suara Sync] Snapshot upload error:', snapError.message)
+    }
 
     // Update last sync timestamp
     await db.settings.put({ key: 'lastSyncTimestamp', value: Date.now(), updatedAt: Date.now() })
@@ -127,11 +130,16 @@ let syncInterval: ReturnType<typeof setInterval> | null = null
 
 export function startBackgroundSync(): void {
   if (syncInterval) return
+  // Run once immediately on startup
+  if (isSupabaseAvailable()) {
+    syncToSupabase().catch(() => {})
+  }
+  // Then every 5 minutes
   syncInterval = setInterval(() => {
     if (isSupabaseAvailable()) {
       syncToSupabase().catch(() => {})
     }
-  }, 5 * 60 * 1000) // Every 5 minutes
+  }, 5 * 60 * 1000)
 }
 
 export function stopBackgroundSync(): void {
