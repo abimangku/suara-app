@@ -21,7 +21,7 @@ export const CORE_WORDS: CoreWord[] = [
   // Row 3: descriptors
   { id: 'ini',      label: 'ini',      emoji: '👇', symbolPath: 'core/ini.png',      audioPath: 'core/ini.mp3',      row: 3, position: 0, fkColor: 'descriptor' },
   { id: 'itu',      label: 'itu',      emoji: '👆', symbolPath: 'core/itu.png',      audioPath: 'core/itu.mp3',      row: 3, position: 1, fkColor: 'descriptor' },
-  { id: 'ada',      label: 'ada',      emoji: '📍', symbolPath: 'core/ada.png',      audioPath: 'core/ada.mp3',      row: 3, position: 2, fkColor: 'descriptor' },
+  { id: 'ada',      label: 'ada',      emoji: '📍', symbolPath: 'core/ada.png',      audioPath: 'core/ada.mp3',      row: 3, position: 2, fkColor: 'verb' },
   { id: 'bisa',     label: 'bisa',     emoji: '💪', symbolPath: 'core/bisa.png',     audioPath: 'core/bisa.mp3',     row: 3, position: 3, fkColor: 'descriptor' },
   { id: 'apa',      label: 'apa',      emoji: '❓', symbolPath: 'core/apa.png',      audioPath: 'core/apa.mp3',      row: 3, position: 4, fkColor: 'descriptor' },
   { id: 'punya',    label: 'punya',    emoji: '🤲', symbolPath: 'core/punya.png',    audioPath: 'core/punya.mp3',    row: 3, position: 5, fkColor: 'verb' },
