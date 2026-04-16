@@ -30,6 +30,25 @@ if ('serviceWorker' in navigator) {
   })
 }
 
+// Request fullscreen on first user interaction (required by browser security)
+// This hides the Android navigation bar for a truly immersive AAC experience
+function setupFullscreenOnFirstTouch() {
+  const requestFs = async () => {
+    try {
+      const el = document.documentElement
+      if (el.requestFullscreen && !document.fullscreenElement) {
+        await el.requestFullscreen({ navigationUI: 'hide' } as FullscreenOptions)
+      }
+    } catch {
+      // Silently ignore — fullscreen fails in iframes, dev preview, etc.
+    }
+    window.removeEventListener('touchend', requestFs)
+    window.removeEventListener('click', requestFs)
+  }
+  window.addEventListener('touchend', requestFs, { once: true, passive: true })
+  window.addEventListener('click', requestFs, { once: true })
+}
+
 async function init() {
   await seedDatabase()
   createRoot(document.getElementById('root')!).render(
@@ -37,6 +56,7 @@ async function init() {
       <App />
     </StrictMode>,
   )
+  setupFullscreenOnFirstTouch()
 }
 
 init()

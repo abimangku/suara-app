@@ -78,8 +78,8 @@ export default function SentenceBar() {
         </div>
       )}
       <div
-        className="w-full bg-suara-blue-bar flex items-center px-3.5 gap-2 shrink-0"
-        style={{ minHeight: 64 }}
+        className="w-full bg-suara-blue-bar flex items-center px-3 gap-2 shrink-0"
+        style={{ minHeight: 56, height: 56 }}
         onMouseDown={handlePressStart}
         onMouseUp={handlePressEnd}
         onMouseLeave={handlePressEnd}

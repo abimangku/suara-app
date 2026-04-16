@@ -57,7 +57,7 @@ export default function SymbolButton({
   }, [blobUrl])
 
   const baseClasses =
-    'rounded-button border-2 flex flex-col items-center justify-center gap-1 cursor-pointer select-none active:scale-[0.96] transition-transform duration-[80ms]'
+    'rounded-button border-2 flex flex-col items-center justify-center gap-1 cursor-pointer select-none active:scale-[0.96] transition-transform duration-[80ms] min-h-0 min-w-0 overflow-hidden p-1'
 
   const activeClass = isActive ? 'brightness-[0.85]' : ''
   const disabledClass = disabled ? 'opacity-50 cursor-default' : ''
@@ -70,22 +70,23 @@ export default function SymbolButton({
   function renderImage() {
     if (children) return children
     if (blobUrl) {
-      return <img src={blobUrl} alt={label} className="w-[52px] h-[52px] object-cover rounded-lg" />
+      return <img src={blobUrl} alt={label} className="max-w-[52px] max-h-[52px] min-h-0 flex-1 object-cover rounded-lg" style={{ height: 'min(52px, 60%)' }} />
     }
     if (symbolPath && !imgFailed) {
       return (
         <img
           src={`/assets/symbols/${symbolPath}`}
           alt={label}
-          className="w-[52px] h-[52px] object-contain"
+          className="max-w-[52px] max-h-[52px] min-h-0 flex-1 object-contain"
+          style={{ height: 'min(52px, 60%)' }}
           onError={() => setImgFailed(true)}
         />
       )
     }
     if (emoji) {
-      return <span className="text-[34px] leading-tight">{emoji}</span>
+      return <span className="leading-tight" style={{ fontSize: 'min(34px, 40%)' }}>{emoji}</span>
     }
-    return <span className="text-[34px] leading-tight">❓</span>
+    return <span className="leading-tight" style={{ fontSize: 'min(34px, 40%)' }}>❓</span>
   }
 
   return (
@@ -109,7 +110,13 @@ export default function SymbolButton({
       aria-label={label}
     >
       {renderImage()}
-      <span className="text-[18px] font-bold leading-tight text-center px-1" style={{ letterSpacing: '0.4px' }}>
+      <span
+        className="font-bold leading-tight text-center px-1 truncate w-full shrink-0"
+        style={{
+          letterSpacing: '0.4px',
+          fontSize: 'clamp(11px, 2.2vw, 18px)',
+        }}
+      >
         {label}
       </span>
     </button>

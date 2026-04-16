@@ -3,10 +3,12 @@
   "short_name": "Suara",
   "description": "Komunikasi Augmentatif dan Alternatif untuk anak Indonesia",
   "start_url": "/",
-  "display": "standalone",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
   "orientation": "landscape",
   "background_color": "#F8F7F4",
   "theme_color": "#2563EB",
+  "categories": ["education", "medical", "utilities"],
   "icons": [
     {
       "src": "/favicon.svg",
