@@ -36,7 +36,12 @@ export default function FolderContents({ folderKey }: FolderContentsProps) {
   if (!folder) return null
 
   const hasMore = allWords.length > 6
-  const visibleWords = showAll ? allWords : allWords.slice(0, hasMore ? 5 : 6)
+  const visibleWords = showAll ? allWords.slice(0, 30) : allWords.slice(0, hasMore ? 5 : 6)
+  // Fill spacer cells so Kembali always lands on row 6 (the bottom of the grid)
+  // regardless of how many words the folder has. Motor memory benefits from
+  // "Kembali is always here" — the previous variable position broke that.
+  const wordCellCount = visibleWords.length + (hasMore && !showAll ? 1 : 0)
+  const spacerCount = Math.max(0, 30 - wordCellCount)
 
   return (
     <>
@@ -78,13 +83,13 @@ export default function FolderContents({ folderKey }: FolderContentsProps) {
         />
       )}
 
-      {showAll &&
-        Array.from({ length: (6 - (allWords.length % 6)) % 6 }).map((_, i) => (
-          <div key={`empty-${i}`} />
-        ))}
+      {/* Spacers keep Kembali pinned to row 6 regardless of word count. */}
+      {Array.from({ length: spacerCount }).map((_, i) => (
+        <div key={`empty-${i}`} aria-hidden="true" />
+      ))}
 
       <button
-        className="col-span-6 rounded-button border-2 border-suara-gray-border bg-suara-gray-light text-suara-gray flex items-center justify-center gap-2 cursor-pointer select-none active:scale-[0.96] transition-transform duration-[80ms]"
+        className="col-span-6 rounded-button border-2 border-suara-gray-border bg-suara-gray-light text-suara-gray flex items-center justify-center gap-2 cursor-pointer select-none active:scale-[0.96] transition-transform duration-[80ms] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-suara-blue"
         onClick={() => {
           setShowAll(false)
           setActiveFolder(null)

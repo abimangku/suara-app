@@ -7,6 +7,18 @@ All notable changes to the Suara AAC app are documented here.
 > For AI agent conventions, see [AGENTS.md](./AGENTS.md).
 > For codebase quick reference, see [CLAUDE.md](./CLAUDE.md).
 
+## v1.2.0 — Deep audit Wave C: P2 refinements (2026-04-16)
+
+Continuation of the deep-audit remediation. Three P2 items landed; two deferred.
+
+- **Quick phrase expansion across the 4 communicative purposes** (P2-5). Added `aku tidak tahu`, `apa itu`, `tunggu sebentar`, `permisi`, `aku sayang kamu`, `aku capek`. Previously she had strong coverage of needs/wants and social closeness; information transfer, repair, and etiquette were under-served. Ganz et al. 2017 systematic review: AAC apps systematically under-support non-requesting communicative acts. `topUpSeedData` pushes these to existing installs.
+- **Accessibility pass** (P2-2). Added `focus-visible:ring` on every SymbolButton (WCAG 2.1 SC 2.4.7) + `role="region"` + `aria-live="polite"` + `aria-atomic="true"` on the sentence chip area so assistive tech announces chip changes. No visual cost on touch; large improvement for switch-access or screen-reader-assisted setups.
+- **Kembali pinned to row 6** (P2-7). Previously the Kembali button's grid position shifted based on fringe-word count (row 2 for small folders, row 3+ for larger ones). Motor memory needs "Kembali is always here" to be law. Spacer cells now pad between words and Kembali so it's always at the bottom row regardless of folder contents.
+
+Deferred:
+- **P2-1 first-launch onboarding modal** — the visible ⚙️ admin affordance (v1.1.0) + the existing in-admin OnboardingGuide cover the same discoverability concern. Revisit if caregiver feedback shows the guide isn't reached.
+- **P4-2 typography tightening** — current `clamp(11px, 2.2vw, 18px)` fits Tab A11 comfortably after v1.0.2's gap + padding tightening. No real need.
+
 ## v1.1.0 — Deep audit Wave B: P1 improvements (2026-04-16)
 
 Continuation of the deep-audit remediation. Seven P1 items shipped; one deliberately skipped.

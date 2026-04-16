@@ -190,9 +190,17 @@ async function topUpSeedData(): Promise<void> {
     }
   }
 
-  // --- Social quick phrases ---
-  const socialPhrases = ['halo', 'terima kasih', 'maaf', 'selamat pagi', 'selamat malam', 'dadah']
-  for (const phraseText of socialPhrases) {
+  // --- Social + pragmatic quick phrases ---
+  // Extended in v1.2.0 with phrases covering Light & McNaughton's 4 communicative
+  // purposes (needs/wants + social closeness + information transfer + etiquette)
+  // per Ganz et al. 2017 systematic review finding that AAC under-serves
+  // non-requesting communicative acts.
+  const allSocialPhrases = [
+    'halo', 'terima kasih', 'maaf', 'selamat pagi', 'selamat malam', 'dadah',
+    'aku tidak tahu', 'apa itu', 'tunggu sebentar', 'permisi',
+    'aku sayang kamu', 'aku capek',
+  ]
+  for (const phraseText of allSocialPhrases) {
     const existing = await db.quickPhrases.filter((qp) => qp.phrase === phraseText).first()
     if (!existing) {
       const phrase = SEED_QUICK_PHRASES.find((p) => p.phrase === phraseText)

@@ -82,7 +82,7 @@ export default function SymbolButton({
   }
 
   const baseClasses =
-    'rounded-button border-2 flex flex-col items-center justify-center gap-1 cursor-pointer select-none active:scale-[0.96] transition-transform duration-[80ms] min-h-0 min-w-0 overflow-hidden p-1'
+    'rounded-button border-2 flex flex-col items-center justify-center gap-1 cursor-pointer select-none active:scale-[0.96] transition-transform duration-[80ms] min-h-0 min-w-0 overflow-hidden p-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-suara-blue focus-visible:ring-offset-1 focus-visible:ring-offset-white'
 
   const activeClass = isActive ? 'brightness-[0.85]' : ''
   const disabledClass = disabled ? 'opacity-50 cursor-default' : ''

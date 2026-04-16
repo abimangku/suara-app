@@ -68,6 +68,16 @@ export const SEED_QUICK_PHRASES: Omit<DbQuickPhrase, 'id' | 'createdAt' | 'updat
   { phrase: 'selamat pagi',      words: ['selamat', 'pagi'],   sortOrder: 10, isActive: true },
   { phrase: 'selamat malam',     words: ['selamat', 'malam'],  sortOrder: 11, isActive: true },
   { phrase: 'dadah',             words: ['dadah'],             sortOrder: 12, isActive: true },
+  // Added v1.2.0 — Light & McNaughton's 4 communicative purposes:
+  // information transfer + repair + etiquette + social closeness.
+  // Ganz et al. 2017 systematic review: AAC interventions under-serve
+  // non-requesting communicative acts. These fill that gap.
+  { phrase: 'aku tidak tahu',    words: ['aku', 'tidak', 'tahu'], sortOrder: 13, isActive: true },
+  { phrase: 'apa itu',           words: ['apa', 'itu'],          sortOrder: 14, isActive: true },
+  { phrase: 'tunggu sebentar',   words: ['tunggu', 'sebentar'],  sortOrder: 15, isActive: true },
+  { phrase: 'permisi',           words: ['permisi'],             sortOrder: 16, isActive: true },
+  { phrase: 'aku sayang kamu',   words: ['aku', 'sayang', 'kamu'], sortOrder: 17, isActive: true },
+  { phrase: 'aku capek',         words: ['aku', 'capek'],        sortOrder: 18, isActive: true },
 ]
 
 // Seed data for fringe words — keyed by folder key

@@ -156,7 +156,13 @@ export default function SentenceBar() {
           ⚙️
         </button>
 
-        <div className="flex-1 flex items-center gap-1.5 overflow-x-auto min-h-[40px] scrollbar-hide">
+        <div
+          className="flex-1 flex items-center gap-1.5 overflow-x-auto min-h-[40px] scrollbar-hide"
+          role="region"
+          aria-label="Kalimat yang sedang disusun"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           {sentenceWords.map((w, i) => (
             <WordChip key={`${w.id}-${i}`} label={w.label} isFlashing={isFlashing} />
           ))}
