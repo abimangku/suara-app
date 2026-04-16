@@ -4,15 +4,17 @@ import type { Word } from '@/types'
 
 export function useAudio() {
   function playWord(word: Word): void {
-    // Sync haptic level from store to audio engine
+    // Sync haptic level from store — must happen before vibrate()
     const { isMuted, hapticLevel } = useAppStore.getState()
     audioEngine.setHapticLevel(hapticLevel)
 
-    // Always vibrate (even when muted — motor confirmation)
+    // Haptic fires IMMEDIATELY — always, even when muted (motor confirmation)
+    // This runs synchronously so the user feels the tap before any audio work begins.
     audioEngine.vibrate()
 
     if (isMuted) return
 
+    // Kick off audio — fire-and-forget, no await
     if (word.audioBlob) {
       audioEngine.preloadFromBlob(word.id, word.audioBlob)
       audioEngine.play(word.id, word.label)
@@ -20,6 +22,7 @@ export function useAudio() {
       audioEngine.preloadFromPaths([{ id: word.id, audioPath: word.audioPath }])
       audioEngine.play(word.id, word.label)
     } else {
+      // No audio file — go straight to TTS (no double-vibrate, play() already skipped)
       audioEngine.fallbackTTS(word.label)
     }
   }

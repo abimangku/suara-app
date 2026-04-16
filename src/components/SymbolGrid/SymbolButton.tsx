@@ -92,6 +92,12 @@ export default function SymbolButton({
   return (
     <button
       className={`${baseClasses} ${(variant === 'core' && fkColor && fkStyles[fkColor]) ? fkStyles[fkColor] : variantStyles[variant]} ${activeClass} ${disabledClass} ${highlightClass}`}
+      onPointerDown={() => {
+        // Fire haptic on pointer-down for maximum perceived responsiveness.
+        // This runs ~50-100ms earlier than onClick.
+        if (disabled) return
+        try { navigator.vibrate?.(10) } catch {}
+      }}
       onClick={() => {
         if (disabled) return
         const start = performance.now()

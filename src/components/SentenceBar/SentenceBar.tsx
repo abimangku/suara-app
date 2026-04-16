@@ -88,7 +88,7 @@ export default function SentenceBar() {
         onTouchCancel={handlePressEnd}
       >
         <button
-          className="w-10 h-10 rounded-[10px] bg-white/20 text-white flex items-center justify-center text-lg shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
+          className="w-11 h-11 rounded-[10px] bg-white/20 text-white flex items-center justify-center shrink-0 active:scale-[0.96] transition-transform duration-[80ms] text-[22px] leading-none"
           onClick={() => setIsQuickPhrasesOpen(true)}
           type="button"
           aria-label="Frasa cepat"
@@ -96,7 +96,7 @@ export default function SentenceBar() {
           ⚡
         </button>
         <button
-          className="w-10 h-10 rounded-[10px] bg-white/20 text-white flex items-center justify-center text-lg shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
+          className="w-11 h-11 rounded-[10px] bg-white/20 text-white flex items-center justify-center shrink-0 active:scale-[0.96] transition-transform duration-[80ms] text-[22px] leading-none"
           onClick={toggleSearch}
           type="button"
           aria-label="Cari kata"
@@ -104,7 +104,7 @@ export default function SentenceBar() {
           🔍
         </button>
         <button
-          className="w-10 h-10 rounded-[10px] bg-white/20 text-white flex items-center justify-center text-lg shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
+          className="w-11 h-11 rounded-[10px] bg-white/20 text-white flex items-center justify-center shrink-0 active:scale-[0.96] transition-transform duration-[80ms] text-[22px] leading-none"
           onClick={() => setIsHistoryOpen(!isHistoryOpen)}
           type="button"
           aria-label="Riwayat"
@@ -112,7 +112,7 @@ export default function SentenceBar() {
           🕐
         </button>
         <button
-          className="w-10 h-10 rounded-[10px] bg-white/20 text-white flex items-center justify-center text-lg shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
+          className="w-11 h-11 rounded-[10px] bg-white/20 text-white flex items-center justify-center shrink-0 active:scale-[0.96] transition-transform duration-[80ms] text-[22px] leading-none"
           onClick={toggleMute}
           type="button"
           aria-label={isMuted ? 'Nyalakan suara' : 'Matikan suara'}
@@ -120,7 +120,7 @@ export default function SentenceBar() {
           {isMuted ? '🔇' : '🔊'}
         </button>
         <button
-          className={`w-10 h-10 rounded-[10px] text-white flex items-center justify-center text-lg shrink-0 active:scale-[0.96] transition-transform duration-[80ms] ${
+          className={`w-11 h-11 rounded-[10px] text-white flex items-center justify-center shrink-0 active:scale-[0.96] transition-transform duration-[80ms] text-[22px] leading-none ${
             isCaregiverPaneOpen ? 'bg-white/40' : 'bg-white/20'
           }`}
           onClick={toggleCaregiverPane}
@@ -137,7 +137,7 @@ export default function SentenceBar() {
         </div>
 
         <button
-          className="px-3 py-2 rounded-lg bg-white/15 text-white text-[13px] font-bold shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
+          className="px-3.5 h-11 rounded-lg bg-white/15 text-white text-[18px] font-bold shrink-0 active:scale-[0.96] transition-transform duration-[80ms] leading-none flex items-center justify-center"
           onClick={removeLastWord}
           type="button"
           aria-label="Hapus kata terakhir"
@@ -145,7 +145,7 @@ export default function SentenceBar() {
           ⌫
         </button>
         <button
-          className={`px-3 py-2 rounded-lg text-[13px] font-bold shrink-0 active:scale-[0.96] transition-transform duration-[80ms] ${
+          className={`px-3.5 h-11 rounded-lg text-[14px] font-bold shrink-0 active:scale-[0.96] transition-transform duration-[80ms] flex items-center justify-center ${
             confirmClear
               ? 'bg-suara-danger text-white'
               : 'bg-white/15 text-red-300'
@@ -157,7 +157,7 @@ export default function SentenceBar() {
           {confirmClear ? 'Yakin?' : '✕ Hapus'}
         </button>
         <button
-          className="px-5 py-2.5 rounded-xl bg-white text-suara-blue font-extrabold text-[15px] shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
+          className="px-5 h-11 rounded-xl bg-white text-suara-blue font-extrabold text-[16px] shrink-0 active:scale-[0.96] transition-transform duration-[80ms] flex items-center justify-center"
           onClick={() => {
             if (isModelingMode) {
               toggleModelingMode()

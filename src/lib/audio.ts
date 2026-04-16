@@ -20,6 +20,29 @@ class AudioEngine {
   }
 
   /**
+   * Cached reference to the Indonesian voice, resolved once.
+   * Avoids calling getVoices() on every tap (can be slow on some browsers).
+   */
+  private _idVoice: SpeechSynthesisVoice | null = null
+  private _voiceResolved = false
+
+  private resolveIndonesianVoice(): SpeechSynthesisVoice | null {
+    if (this._voiceResolved) return this._idVoice
+    try {
+      const voices = speechSynthesis.getVoices()
+      if (voices.length === 0) return null // Not loaded yet
+      this._voiceResolved = true
+      this._idVoice =
+        voices.find((v) => v.lang === 'id-ID') ??
+        voices.find((v) => v.lang?.startsWith('id')) ??
+        null
+      return this._idVoice
+    } catch {
+      return null
+    }
+  }
+
+  /**
    * Preload audio files from static asset paths.
    * Called on app init for core words and on folder open for fringe words.
    */
@@ -47,19 +70,24 @@ class AudioEngine {
   }
 
   /**
-   * Play a word's audio. Falls back to browser TTS if not in pool.
+   * Play a word's audio — synchronous path to minimize latency.
+   * Callers should call vibrate() themselves BEFORE this to fire haptic
+   * at the earliest possible moment (see useAudio hook).
    * Uses cloneNode() for rapid re-taps of the same word.
    */
-  async play(id: string, label: string): Promise<void> {
-    this.vibrate()
+  play(id: string, label: string): void {
     const source = this.pool.get(id)
     if (source) {
       try {
         const clone = source.cloneNode(true) as HTMLAudioElement
-        await clone.play()
+        // Fire-and-forget play() — don't await; let it play while we return
+        clone.play().catch(() => {
+          // Audio file playback rejected — fall back to TTS
+          this.fallbackTTS(label)
+        })
         return
       } catch {
-        // Audio file failed to play — fall through to TTS
+        // Pool entry broken — fall through to TTS
       }
     }
     this.fallbackTTS(label)
@@ -72,7 +100,7 @@ class AudioEngine {
   async playSequence(words: Array<{ id: string; label: string }>): Promise<void> {
     for (let i = 0; i < words.length; i++) {
       const word = words[i]
-      await this.play(word.id, word.label)
+      this.play(word.id, word.label)
       if (i < words.length - 1) {
         await new Promise((resolve) => setTimeout(resolve, 200))
       }
@@ -80,24 +108,44 @@ class AudioEngine {
   }
 
   /**
-   * Browser TTS fallback — Indonesian language, 0.9x speed.
+   * Browser TTS fallback — Indonesian language, 0.85x speed.
+   * Cancels any pending utterances first to avoid queue buildup delays.
    */
   fallbackTTS(text: string): void {
-    this.vibrate()
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'id-ID'
-    utterance.rate = 0.85
-    speechSynthesis.speak(utterance)
+    try {
+      // Cancel anything queued — prevents "waiting in line" latency
+      if (speechSynthesis.speaking || speechSynthesis.pending) {
+        speechSynthesis.cancel()
+      }
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = 'id-ID'
+      utterance.rate = 0.85
+      const voice = this.resolveIndonesianVoice()
+      if (voice) utterance.voice = voice
+      speechSynthesis.speak(utterance)
+    } catch {
+      // TTS unavailable
+    }
   }
 
   /**
    * Speak a full sentence as one utterance via browser TTS.
+   * Cancels any pending utterances first for immediate response.
    */
   speakSentence(text: string): void {
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'id-ID'
-    utterance.rate = 0.75
-    speechSynthesis.speak(utterance)
+    try {
+      if (speechSynthesis.speaking || speechSynthesis.pending) {
+        speechSynthesis.cancel()
+      }
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = 'id-ID'
+      utterance.rate = 0.75
+      const voice = this.resolveIndonesianVoice()
+      if (voice) utterance.voice = voice
+      speechSynthesis.speak(utterance)
+    } catch {
+      // TTS unavailable
+    }
   }
 
   /**
