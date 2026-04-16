@@ -8,6 +8,7 @@ import SymbolSearch from '@/components/AI/SymbolSearch'
 import CaregiverPane from '@/components/AI/CaregiverPane'
 import EmergencyBoard from '@/components/AI/EmergencyBoard'
 import ErrorBoundary from '@/components/shared/ErrorBoundary'
+import InstallBanner from '@/components/shared/InstallBanner'
 import { useAppStore } from '@/store/appStore'
 import { useIntentSuggestions } from '@/hooks/useIntentSuggestions'
 import { startBackgroundSync, stopBackgroundSync } from '@/lib/sync'
@@ -33,6 +34,7 @@ export default function App() {
 
   return (
     <div className="w-full h-full flex flex-col bg-suara-bg">
+      <InstallBanner />
       <ErrorBoundary>
         <SentenceBar />
       </ErrorBoundary>
