@@ -74,7 +74,7 @@ export default function SentenceBar() {
     <>
       {isModelingMode && (
         <div className="w-full px-3 py-1 bg-suara-amber-light text-suara-amber text-xs font-bold text-center">
-          Mode Modeling — ketuk tombol untuk menunjukkan, tanpa suara
+          Mode Modeling — suara main, kalimat tidak bertambah
         </div>
       )}
       <div

@@ -8,8 +8,10 @@ export default function IntentSuggestions() {
   const { addWord } = useSentenceBar()
 
   // Don't show if less than 2 words, modeling mode, or no suggestions
+  // Reserve space (invisible placeholder) to prevent grid reflow — button sizes
+  // must stay stable for motor planning.
   if (sentenceWords.length < 2 || isModelingMode || suggestions.length === 0) {
-    return null
+    return <div className="w-full h-[53px] shrink-0" aria-hidden="true" />
   }
 
   return (

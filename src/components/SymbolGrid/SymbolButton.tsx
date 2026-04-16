@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '@/store/appStore'
 import type { FKColor } from '@/types'
 
+const HAPTIC_DURATIONS = { off: 0, light: 10, medium: 30, strong: 50 } as const
+
 interface SymbolButtonProps {
   emoji?: string
   label: string
@@ -45,6 +47,7 @@ export default function SymbolButton({
   fkColor,
 }: SymbolButtonProps) {
   const isModelingMode = useAppStore((s) => s.isModelingMode)
+  const hapticLevel = useAppStore((s) => s.hapticLevel)
   const [isHighlighted, setIsHighlighted] = useState(false)
 
   const blobUrl = useMemo(() => {
@@ -96,7 +99,12 @@ export default function SymbolButton({
         // Fire haptic on pointer-down for maximum perceived responsiveness.
         // This runs ~50-100ms earlier than onClick.
         if (disabled) return
-        try { navigator.vibrate?.(10) } catch {}
+        // Only vibrate for speech-output buttons — not navigation (folder/kembali)
+        if (variant === 'folder' || variant === 'kembali') return
+        const ms = HAPTIC_DURATIONS[hapticLevel] ?? 10
+        if (ms > 0) {
+          try { navigator.vibrate?.(ms) } catch {}
+        }
       }}
       onClick={() => {
         if (disabled) return

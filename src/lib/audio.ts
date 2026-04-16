@@ -113,16 +113,20 @@ class AudioEngine {
    */
   fallbackTTS(text: string): void {
     try {
-      // Cancel anything queued — prevents "waiting in line" latency
-      if (speechSynthesis.speaking || speechSynthesis.pending) {
-        speechSynthesis.cancel()
-      }
       const utterance = new SpeechSynthesisUtterance(text)
       utterance.lang = 'id-ID'
       utterance.rate = 0.85
       const voice = this.resolveIndonesianVoice()
       if (voice) utterance.voice = voice
-      speechSynthesis.speak(utterance)
+
+      if (speechSynthesis.speaking || speechSynthesis.pending) {
+        speechSynthesis.cancel()
+        // Chrome Android bug: cancel+immediate-speak drops silently.
+        // Small delay allows the cancellation to settle before new speech.
+        setTimeout(() => speechSynthesis.speak(utterance), 50)
+      } else {
+        speechSynthesis.speak(utterance)
+      }
     } catch {
       // TTS unavailable
     }
@@ -134,15 +138,20 @@ class AudioEngine {
    */
   speakSentence(text: string): void {
     try {
-      if (speechSynthesis.speaking || speechSynthesis.pending) {
-        speechSynthesis.cancel()
-      }
       const utterance = new SpeechSynthesisUtterance(text)
       utterance.lang = 'id-ID'
       utterance.rate = 0.75
       const voice = this.resolveIndonesianVoice()
       if (voice) utterance.voice = voice
-      speechSynthesis.speak(utterance)
+
+      if (speechSynthesis.speaking || speechSynthesis.pending) {
+        speechSynthesis.cancel()
+        // Chrome Android bug: cancel+immediate-speak drops silently.
+        // Small delay allows the cancellation to settle before new speech.
+        setTimeout(() => speechSynthesis.speak(utterance), 50)
+      } else {
+        speechSynthesis.speak(utterance)
+      }
     } catch {
       // TTS unavailable
     }

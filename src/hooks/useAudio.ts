@@ -4,13 +4,10 @@ import type { Word } from '@/types'
 
 export function useAudio() {
   function playWord(word: Word): void {
-    // Sync haptic level from store — must happen before vibrate()
+    // Sync haptic level from store (kept in sync for other code paths that may vibrate)
     const { isMuted, hapticLevel } = useAppStore.getState()
     audioEngine.setHapticLevel(hapticLevel)
-
-    // Haptic fires IMMEDIATELY — always, even when muted (motor confirmation)
-    // This runs synchronously so the user feels the tap before any audio work begins.
-    audioEngine.vibrate()
+    // Haptic fires from SymbolButton.onPointerDown before this runs (for faster perceived response)
 
     if (isMuted) return
 

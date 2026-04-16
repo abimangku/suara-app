@@ -7,9 +7,13 @@ export default function PeopleRow() {
   const { people } = useVocabulary()
   const { addWord } = useSentenceBar()
 
+  const peopleList = people ?? []
+  const usedSlots = peopleList.length + 1 // +1 for Tambah button
+  const padCount = Math.max(0, 6 - usedSlots)
+
   return (
     <>
-      {(people ?? []).map((person) => (
+      {peopleList.map((person) => (
         <SymbolButton
           key={person.id}
           label={person.name}
@@ -28,6 +32,9 @@ export default function PeopleRow() {
       >
         <AvatarCircle initial="+" size={46} />
       </SymbolButton>
+      {Array.from({ length: padCount }).map((_, i) => (
+        <div key={`spacer-${i}`} aria-hidden="true" />
+      ))}
     </>
   )
 }
