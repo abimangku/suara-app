@@ -7,6 +7,15 @@ All notable changes to the Suara AAC app are documented here.
 > For AI agent conventions, see [AGENTS.md](./AGENTS.md).
 > For codebase quick reference, see [CLAUDE.md](./CLAUDE.md).
 
+## v1.2.1 — Folder view hotfix (2026-04-16)
+
+Fixes two regressions reported by the primary caregiver testing v1.2.0 on Tab A11:
+
+- **Folder view was showing 4 rows of core words + 1 row of fringe + Kembali.** Opening a folder like Tubuh rendered 24 core words at the top and squeezed only 5 fringe words into a single narrow row. Buttons were small and the folder content felt absent. This was not a v1.2.0 change — the CoreRow was always rendered regardless of folder state — but it became visually worse after v1.2.0's accumulated small-grid changes. Fixed by HIDING core rows when a folder is open. Now folder view uses 5 full rows for fringe words + 1 for Kembali, buttons render at core-size, fringe is the focus. Works because our auto-return-to-home (added earlier this session) means she never needs core while inside a folder.
+- **P2-7 spacer padding reverted.** The "pin Kembali to row 6" logic added 30 spacer cells which forced every folder to render as 6 rows regardless of word count, shrinking every button to 1/6 height. Reverted. Motor memory for Kembali position is lower priority than readable button size.
+
+Also removed: `lihat semua` pagination button + `showAll` state. With 5 full rows × 6 cols = 30 visible cells in folder view, all realistic folder word lists fit on the first page.
+
 ## v1.2.0 — Deep audit Wave C: P2 refinements (2026-04-16)
 
 Continuation of the deep-audit remediation. Three P2 items landed; two deferred.
