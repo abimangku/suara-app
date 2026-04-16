@@ -2,6 +2,18 @@
 
 All notable changes to the Suara AAC app are documented here.
 
+> For what the app is and how it works, see [SPEC.md](./SPEC.md).
+> For the clinical research behind every decision, see [RESEARCH.md](./RESEARCH.md).
+> For AI agent conventions, see [AGENTS.md](./AGENTS.md).
+> For codebase quick reference, see [CLAUDE.md](./CLAUDE.md).
+
+## v1.0.1-docs — Documentation consolidation (2026-04-16)
+- Added **SPEC.md** — single source of truth for what the app does and why
+- Added **RESEARCH.md** — all clinical, UX, and accessibility research citations with links to implementing files
+- Added **AGENTS.md** — instructions for AI coding agents (Codex, Claude, Cursor, Copilot)
+- Refreshed **CLAUDE.md** to reflect v1.0.1 state (emergency surface, new admin sections, v1.0.1 bug fixes, cross-links to sibling docs)
+- No code changes in this entry — documentation only
+
 ## v1.0.1 — Deep AAC Audit + Clinical Content Sprint (2026-04-16)
 ### Bug fixes (critical)
 - **Grid row mixing**: PeopleRow emitted 5 cells instead of 6, causing the first folder (Makanan) to wrap into the people row. Both PeopleRow and FolderRow now pad to 6 cells with `aria-hidden` spacer divs.

@@ -1,236 +1,267 @@
 # Suara — AAC Communication App
 
+> **Current version:** v1.0.1 (2026-04-16, commit `5c2f82d`)
+> **Live at:** https://suara-tau.vercel.app
+> **Related docs:** [SPEC.md](./SPEC.md) (product+tech spec) · [RESEARCH.md](./RESEARCH.md) (clinical evidence) · [AGENTS.md](./AGENTS.md) (AI agent rules) · [CHANGELOG.md](./CHANGELOG.md) (release history)
+
 ## What This Is
-Suara ("voice" in Indonesian) is a tablet-based AAC app for a young woman with autism in Jakarta. She taps symbol buttons to build sentences the device speaks aloud. Every design decision is research-backed and serves her communication.
+Suara ("voice" in Indonesian) is a tablet-based AAC app for a young non-speaking autistic woman in Jakarta. She taps symbol buttons to build Bahasa Indonesia sentences the tablet speaks aloud. Every design decision is research-backed (see [RESEARCH.md](./RESEARCH.md)) and serves her communication.
+
+Target device: Samsung Galaxy Tab A11 (1000×600 CSS viewport). Installed as a PWA, works 100% offline for core communication.
 
 ## Quick Start
 ```bash
 npm install
-npm run dev          # Dev server at localhost:5173
-npm run build        # Production build
-npm run preview      # Preview production build
-npm run download-symbols  # Download ARASAAC pictograms
+npm run dev                   # Dev server at localhost:5173
+npm run build                 # Production build (tsc -b && vite build)
+npm run preview               # Preview production build
+npm run download-symbols      # Download ARASAAC pictograms (build-time only)
+npx tsc --noEmit              # Type-check without emit
+vercel deploy --prod --yes --scope abimnagari-gmailcoms-projects
 ```
 
 ## Architecture
-- **Framework:** React 19 + TypeScript + Vite 8
-- **Styling:** Tailwind CSS v4 with @theme design tokens
-- **State:** Zustand (UI state) + Dexie.js/IndexedDB (persisted data)
-- **Audio:** AudioEngine class with browser TTS fallback (Indonesian, 0.85x/0.75x speed)
-- **AI:** OpenRouter API (configurable model), frequency-based intent suggestions, Fuse.js search
-- **PWA:** vite-plugin-pwa with Workbox caching, installable on Android
-- **Sync:** Optional Supabase background sync (every 5 min when configured)
+- **Framework:** React 19 + TypeScript 6 + Vite 8
+- **Styling:** Tailwind CSS v4 with `@theme` design tokens
+- **State:** Zustand (UI) + Dexie.js/IndexedDB v3 (persisted)
+- **Audio:** `AudioEngine` class with Web Speech API fallback (Indonesian, 0.85× word / 0.75× sentence)
+- **AI:** OpenRouter API (OpenAI-compatible), frequency+bigram+AI 3-tier intent, Fuse.js search
+- **PWA:** vite-plugin-pwa with Workbox, installable on Android, landscape-locked, fullscreen
+- **Sync:** Optional Supabase background sync (5 min) — usage events, milestones, vocab snapshots
+- **Deploy:** Vercel (free tier), SPA rewrites in `vercel.json`, `.npmrc` has `legacy-peer-deps=true`
 
 ## Critical Rules (NEVER violate)
-1. Core word positions NEVER move — motor planning depends on consistency
-2. AI NEVER speaks for her — suggestions display only, she taps to accept
-3. Core communication works 100% offline — cloud features are optional
-4. No animations in the communication grid — only 80ms scale tap feedback
-5. All UI text in Bahasa Indonesia
-6. No business logic in components — extract to hooks
-7. No direct IndexedDB access in components — always through hooks
-8. Use @/ absolute imports — never relative ../../
+1. **Core word positions NEVER move** — motor planning depends on consistency (LAMP research)
+2. **AI NEVER speaks for her** — suggestions display only, she taps to accept
+3. **Core communication works 100% offline** — cloud features are optional
+4. **No animations in the grid** — only 80 ms `scale(0.96)` tap feedback allowed
+5. **All UI text in Bahasa Indonesia**
+6. **No business logic in components** — extract to hooks
+7. **No direct IndexedDB access in components** — always through hooks
+8. **Use `@/` absolute imports** — never relative `../../`
+9. **Undo + confirm-clear on sentence bar** — accidental deletion is #1 AAC abandonment cause
+10. **Haptic fires even when muted** — muting is audio, not touch. ONE source (`SymbolButton.onPointerDown`).
 
-## File Structure
+## File Structure (as of v1.0.1)
+
 ```
 src/
-  App.tsx                              # Root — SentenceBar + IntentSuggestions + SymbolGrid + overlays
-  main.tsx                             # Entry point
-  vite-env.d.ts                        # Vite client types
+  App.tsx                              # Top-level composition: SentenceBar + IntentSuggestions + SymbolGrid + overlays
+  main.tsx                             # Entry; first-gesture fullscreen + orientation + TTS warmup
+  vite-env.d.ts
   components/
     AI/
       CaregiverPane.tsx                # AI translation pane for communication partners
-      IntentSuggestions.tsx             # 3 prediction buttons after 2+ words
-      SymbolSearch.tsx                  # Fuse.js fuzzy search overlay
+      EmergencyBoard.tsx               # v1.0.1 — red SOS overlay (long-press bantu)
+      IntentSuggestions.tsx            # 3 prediction buttons after 2+ words; 53px placeholder when empty
+      SymbolSearch.tsx                 # Fuse.js fuzzy search overlay
     Admin/
-      AddPerson.tsx                    # Photo capture + name input for new person
+      AddPerson.tsx                    # Photo capture + name for new person
       AddWord.tsx                      # Photo + label + folder picker for new word
       AdminHome.tsx                    # Admin home grid (entry to all admin features)
       AdminOverlay.tsx                 # PIN-gated full-screen admin overlay
       BackupRestore.tsx                # Export/import vocabulary as JSON
       EditWord.tsx                     # Edit existing word details
-      KioskGuide.tsx                   # Tablet kiosk mode setup instructions
+      EmergencyContacts.tsx            # v1.0.1 — Ibu/Ayah/Ambulans phone number config
+      KioskGuide.tsx                   # Tablet kiosk mode setup
       ManagePeople.tsx                 # Edit/delete people
       OnboardingGuide.tsx              # Family onboarding guide in Bahasa Indonesia
       PhotoCropPreview.tsx             # Center-square crop preview (200px JPEG)
       QuickPhraseAdmin.tsx             # Quick phrase CRUD + reorder
       UsageInsights.tsx                # Top words, dead-ends, milestones
-      VocabPackAdmin.tsx               # Vocabulary pack toggles (Dasar/Lengkap)
-      VocabSuggestions.tsx             # AI-powered vocabulary expansion suggestions
+      VocabPackAdmin.tsx               # Toggle Dasar/Lengkap per folder
+      VocabSuggestions.tsx             # AI vocabulary expansion suggestions
       VoiceCloneGuide.tsx              # XTTS-v2 voice cloning setup guide
     SentenceBar/
-      QuickPhrases.tsx                 # Bottom sheet with preset phrases
-      SentenceBar.tsx                  # Top blue bar, word chips, action buttons, Bicara
-      WordChip.tsx                     # White pill with flash state for speech animation
+      QuickPhrases.tsx                 # Bottom sheet, 13 preset phrases (7 original + 6 social v1.0.1)
+      SentenceBar.tsx                  # Top blue bar; minHeight 56, not fixed height
+      WordChip.tsx                     # White pill with flash state
     SymbolGrid/
-      CoreRow.tsx                      # Renders one row of 6 core words (fixed positions)
-      FolderContents.tsx               # Fringe words inside an open folder
-      FolderRow.tsx                    # 5 category folders + 1 slot
-      PeopleRow.tsx                    # People with avatar initials (max 6)
-      SymbolButton.tsx                 # Color-coded button by FK category
-      SymbolGrid.tsx                   # 6-col grid container — CoreRows + PeopleRow + FolderRow
+      CoreRow.tsx                      # 6 core words; passes onLongPress=openEmergency for `bantu`
+      FolderContents.tsx               # Fringe words inside open folder
+      FolderRow.tsx                    # 6 folders (Makanan, Aktivitas, Pakaian, Tubuh, Pertanyaan, spacer)
+      PeopleRow.tsx                    # Up to 4 people + Tambah + spacer pad to 6 cells
+      SymbolButton.tsx                 # Color-coded by FK category; haptic from store; onLongPress support
+      SymbolGrid.tsx                   # 6-col container — CoreRows + PeopleRow + FolderRow
     shared/
-      AvatarCircle.tsx                 # Circular avatar with initial letter
-      BottomSheet.tsx                  # Slide-up sheet component
+      AvatarCircle.tsx
+      BottomSheet.tsx
       ErrorBoundary.tsx                # Independent crash recovery per section
   data/
-    vocabulary.ts                      # 24 hardcoded core words + seed data for folders/people/phrases
+    vocabulary.ts                      # 24 CORE_WORDS (hardcoded) + SEED_FOLDERS + SEED_WORDS + SEED_PEOPLE + SEED_QUICK_PHRASES
   hooks/
-    useAdmin.ts                        # PIN verify/set, admin state
-    useAudio.ts                        # playWord, playSentence (haptic + mute check)
-    useCaregiverTranslation.ts         # OpenRouter API interpretation for caregivers
-    useIntentSuggestions.ts            # Frequency model computation
-    useMilestones.ts                   # Milestone detection and display
-    usePhotoCapture.ts                 # Camera/gallery + square crop
-    useSentenceBar.ts                  # addWord, removeLastWord (undo), clearSentence (confirm), speak
-    useUsageInsights.ts                # Top words, dead-ends, milestones
-    useUsageLog.ts                     # Tap event logging (never blocking)
-    useVocabulary.ts                   # Reactive reads from IndexedDB (folders, people, phrases)
+    useAdmin.ts
+    useAudio.ts                        # playWord, playSentence (no longer double-fires haptic)
+    useCaregiverTranslation.ts
+    useIntentSuggestions.ts
+    useMilestones.ts
+    usePhotoCapture.ts
+    useSentenceBar.ts                  # addWord, removeLastWord w/ 2s undo toast, clearSentence w/ confirm
+    useUsageInsights.ts
+    useUsageLog.ts
+    useVocabulary.ts                   # Reactive reads via dexie-react-hooks
   lib/
-    audio.ts                           # AudioEngine class — preload pool, blob, TTS fallback
-    backup.ts                          # JSON export/import of full vocabulary
-    bigrams.ts                         # Static bigram predictions for cold start
-    dashboard-data.ts                  # Data fetching for parent dashboard
-    db.ts                              # Dexie v3 database schema (8 tables)
-    frequency.ts                       # Usage-based intent model (recency + time-of-day)
-    milestones.ts                      # Milestone detection logic
-    openrouter.ts                      # OpenRouter API client (OpenAI-compatible)
-    pin.ts                             # SHA-256 PIN hashing
-    search.ts                          # Fuse.js search engine setup
-    seed.ts                            # Database seed function (5 folders, 50 words, 4 people, 7 phrases)
-    slm.ts                             # SLM abstraction layer (API-backed, ready for local WASM)
-    supabase.ts                        # Supabase client initialization
-    sync.ts                            # Background sync (usage events, milestones, vocab snapshots)
-    vocabulary-gaps.ts                 # Vocabulary gap detection (unused folders)
-    vocabulary-packs.ts                # Progressive vocabulary masking logic
+    audio.ts                           # AudioEngine; 50ms setTimeout between cancel+speak on Chrome Android
+    backup.ts
+    bigrams.ts
+    dashboard-data.ts
+    db.ts                              # Dexie v3 (8 tables)
+    frequency.ts
+    milestones.ts
+    openrouter.ts
+    pin.ts                             # SHA-256
+    search.ts
+    seed.ts                            # runInitialSeed + topUpSeedData (idempotent migration)
+    slm.ts
+    supabase.ts
+    sync.ts
+    vocabulary-gaps.ts
+    vocabulary-packs.ts
   pages/
-    Dashboard.tsx                      # PIN-protected parent analytics dashboard (?dashboard=true)
+    Dashboard.tsx                      # Parent dashboard (?dashboard=true)
   scripts/
-    download-symbols.ts                # Build-time ARASAAC pictogram downloader
-    vocab-list.ts                      # Vocabulary list for symbol download
+    download-symbols.ts                # Build-time ARASAAC downloader (excluded from browser tsconfig)
+    vocab-list.ts
   store/
-    appStore.ts                        # Zustand store — sentence, folders, modes, settings
+    appStore.ts                        # Zustand; isEmergencyOpen added v1.0.1
   styles/
-    globals.css                        # Tailwind @theme tokens, Fitzgerald Key colors, WCAG verified
+    globals.css                        # @theme tokens, Fitzgerald Key palette, WCAG verified
   types/
-    index.ts                           # All TypeScript types (DB + runtime)
+    index.ts                           # All shared types (DB + runtime)
 ```
 
 ## Color System (Fitzgerald Key)
-| Category     | Text Color | Background | Contrast |
-|-------------|-----------|-----------|----------|
-| Verbs       | #166534   | #DCFCE7   | 5.8:1    |
-| Pronouns    | #854d0e   | #FEF9C3   | 5.1:1    |
-| Descriptors | #1d4ed8   | #DBEAFE   | 5.5:1    |
-| Negation    | #be185d   | #FCE7F3   | 5.3:1    |
-| Nouns       | #c2410c   | #FFEDD5   | 4.9:1    |
-| Prepositions| #7e22ce   | #F3E8FF   | 5.6:1    |
-| People      | #15803d   | #DCFCE7   | 4.6:1    |
-| Folders     | #374151   | #F3F4F6   | 9.4:1    |
+Per-category color-coding supports grammatical awareness and reduces visual search time (Thistle & Wilkinson 2013). All ratios WCAG AA verified.
 
-- App background: #F8F7F4 (warm off-white, NOT pure white)
-- Sentence bar: #2563EB (white text, 5.2:1 contrast)
-- All ratios WCAG AA verified (4.5:1+)
+| Category     | Text Color | Background | Contrast | Example words |
+|--------------|-----------|-----------|----------|---------------|
+| Verbs        | #166534   | #DCFCE7   | 5.8:1    | mau, pergi, makan, minum, lihat, bisa |
+| Pronouns     | #854d0e   | #FEF9C3   | 5.1:1    | aku, kamu, ini, itu |
+| Descriptors  | #1d4ed8   | #DBEAFE   | 5.5:1    | ya, lagi, ada |
+| Negation     | #be185d   | #FCE7F3   | 5.3:1    | tidak |
+| Nouns        | #c2410c   | #FFEDD5   | 4.9:1    | (fringe words in Makanan, Pakaian, Tubuh folders) |
+| Prepositions | #7e22ce   | #F3E8FF   | 5.6:1    | ke, di, dan, sama |
+| People       | #15803d   | #DCFCE7   | 4.6:1    | Ibu, Ayah, Bibi, Kakak |
+| Folders      | #374151   | #F3F4F6   | 9.4:1    | 🍽️ Makanan, 🎮 Aktivitas, 👕 Pakaian, 🫀 Tubuh, ❓ Pertanyaan |
+
+- App background: `#F8F7F4` (warm off-white; NOT pure white — reduces autism sensory fatigue)
+- Sentence bar: `#2563EB` (white text, 5.2:1)
+- Emergency board: `#DC2626` full-screen red overlay with white buttons
 
 ## Grid Layout
-- 6 columns x variable rows
-- 24 core words (rows 1-4) — HARDCODED in src/data/vocabulary.ts, never from database
-- People row (row 5) — from IndexedDB, max 6
-- Folder row (row 6) — 5 categories + 1 slot
-- Grid gap: 8px, padding: 8px
-  - Tightened for Samsung Galaxy Tab A11 (~1000x600 CSS viewport). Larger viewports have extra breathing room.
-- Button border-radius: 14px, press animation: scale(0.96) for 80ms
+- 6 columns × variable rows (4 core + 1 people + 1 folder visible simultaneously)
+- 24 core words (rows 1-4) — HARDCODED in `src/data/vocabulary.ts`, NEVER from database
+- People row (row 5) — up to 4 from IndexedDB + Tambah + spacer padding to 6 cells
+- Folder row (row 6) — 5 folders + Pertanyaan (new v1.0.1) = 6; spacer pad if fewer
+- Grid gap: **8px**, padding: **8px**
+  - Tightened for Samsung Galaxy Tab A11 (~1000×600 CSS viewport). Larger viewports have extra breathing room.
+- Button border-radius: 14px (`rounded-button` token)
+- Press animation: `scale(0.96)` for 80ms (the ONLY allowed grid animation)
 - Button labels: 18px bold, 0.4px letter-spacing, Nunito font
-- Symbol images: 52x52px within buttons
-- All WCAG AA contrast ratios verified (4.5:1+)
+- Symbol images: up to 52×52px within buttons
+- Fallback glyph: neutral dashed circle with first letter of label (NOT `?` — that would read as "apa")
 
 ## Database (Dexie v3)
 Tables: `words`, `folders`, `people`, `usageEvents`, `quickPhrases`, `settings`, `vocabularyPacks`, `communicationMilestones`
 
-- Core words are NOT in the database — hardcoded in `src/data/vocabulary.ts`
+- Core words are NOT in the database — hardcoded in `src/data/vocabulary.ts` (motor memory depends on them)
 - Fringe words linked to folders by `folderId`
-- Settings is key-value store (`key` primary)
+- Settings is key-value store (`key` primary). Keys include: `pinHash`, `appVersion`, `hapticLevel`, `emergencyContacts` (v1.0.1)
 - Usage events logged on every tap (never blocking UI)
 - DB version history: v1 (base), v2 (+vocabularyPacks), v3 (+communicationMilestones)
+- Seeding: `seedDatabase()` → `runInitialSeed()` on first install, `topUpSeedData()` on every launch (idempotent migration)
 
 ## Key Components
-- **SentenceBar** — top blue bar, word chips, action buttons (quick phrases, search, history, speak, caregiver), Bicara button
-- **SymbolGrid** — 6-col grid, renders CoreRow + PeopleRow + FolderRow/FolderContents
-- **SymbolButton** — color-coded by variant + Fitzgerald Key fkColor
-- **AdminOverlay** — PIN-gated full-screen overlay, long-press sentence bar 3s
-- **IntentSuggestions** — 3 prediction buttons after 2+ words in sentence
-- **CaregiverPane** — AI translation for communication partners
+- **SentenceBar** — top blue bar, word chips, action buttons (⚡ quick phrases, 🔍 search, 🕐 history, 🔊/🔇 mute, 💬 caregiver), ⌫ backspace, ✕ Hapus (confirm-clear), ▶ Bicara (long-press 2s → modeling mode)
+- **SymbolGrid** — 6-col grid, renders CoreRow × 4 + PeopleRow + FolderRow OR FolderContents when a folder is open
+- **SymbolButton** — color-coded by variant + Fitzgerald Key `fkColor`; haptic on `onPointerDown`; optional `onLongPress` (1500 ms, used by `bantu` for emergency)
+- **IntentSuggestions** — 3 prediction buttons after 2+ words; renders an invisible 53px placeholder when empty to prevent grid reflow
+- **EmergencyBoard** — full-screen red overlay with 4 large SMS buttons; triggered by 1.5 s long-press on `bantu`
+- **AdminOverlay** — PIN-gated full-screen overlay, long-press SentenceBar 3s to open
+- **CaregiverPane** — AI translation for communication partners (OpenRouter)
 - **SymbolSearch** — Fuse.js fuzzy search overlay
 - **ErrorBoundary** — wraps each major section for independent crash recovery
 
 ## Hooks (all business logic lives here)
 - **useVocabulary** — reactive reads from IndexedDB (folders, people, phrases) via dexie-react-hooks
-- **useAudio** — playWord, playSentence (with haptic + mute check)
-- **useSentenceBar** — addWord, removeLastWord (with 2s undo toast), clearSentence (with confirm dialog), speak
+- **useAudio** — playWord, playSentence. Syncs `hapticLevel` to AudioEngine but no longer fires vibration (moved to SymbolButton)
+- **useSentenceBar** — addWord, removeLastWord (2s undo toast), clearSentence (confirm dialog), speak
 - **useUsageLog** — tap event logging with session ID, hour-of-day, day-of-week
 - **useAdmin** — PIN verify/set, admin state management
-- **useIntentSuggestions** — frequency model computation (top 3 predictions)
-- **useCaregiverTranslation** — OpenRouter API interpretation of tap chains
-- **useMilestones** — milestone detection and display
+- **useIntentSuggestions** — frequency + bigram + OpenRouter (3-tier fallback)
+- **useCaregiverTranslation** — OpenRouter interprets tap chains for caregivers
+- **useMilestones** — milestone detection + display
 - **usePhotoCapture** — camera/gallery + center-square crop to 200px JPEG
-- **useUsageInsights** — top words, dead-end detection, milestone display
+- **useUsageInsights** — top words, dead-end folders, milestone display
 
-## AI Features
-1. **Intent suggestions:** frequency model + static bigrams + OpenRouter API (3-tier fallback)
-2. **Symbol search:** Fuse.js fuzzy matching over all vocabulary
-3. **Caregiver translation:** OpenRouter interprets tap chains for communication partners
-4. **Vocabulary expansion:** AI suggests new words in admin based on usage patterns
-5. **Milestone detection:** tracks first word, first combo, first request, first comment, first greeting, first refusal, vocabulary growth
-6. **Vocabulary gap detection:** identifies unused folders
+## AI Features (all optional; core offline)
+1. **Intent suggestions** — frequency model + static bigrams + OpenRouter API (3-tier)
+2. **Symbol search** — Fuse.js fuzzy over all vocabulary
+3. **Caregiver translation** — OpenRouter interprets her tap chains
+4. **Vocabulary expansion** — AI suggests new words based on usage patterns (admin panel)
+5. **Milestone detection** — first word, first combo, first request/comment/greeting/refusal, vocab growth
+6. **Vocabulary gap detection** — flags unused folders in admin
 
-## Admin Mode (long-press sentence bar 3s)
-- PIN-protected (SHA-256 hash stored in IndexedDB settings)
-- Manage words (add/edit/delete with photos)
-- Manage people (add/edit/delete with photos)
-- Quick phrases (CRUD + reorder)
-- Vocabulary packs (toggle Dasar/Lengkap per folder)
-- Usage insights + milestones
-- Vocabulary expansion suggestions (AI)
-- Backup/restore (JSON export/import)
-- Kiosk mode guide + voice cloning guide (XTTS-v2)
-- Family onboarding guide (Bahasa Indonesia)
+## Admin Mode (long-press sentence bar 3s → PIN)
+PIN-protected (SHA-256 hash in IndexedDB settings). 14 sections:
+- ➕ Tambah Kata / 👤 Tambah Orang (add word/person with photos)
+- ✏️ Kelola Kata / 👥 Kelola Orang (edit/delete)
+- ⚡ Frasa Cepat (phrase CRUD + reorder)
+- 📦 Paket Kosakata (Dasar/Lengkap toggle per folder)
+- 📊 Insight Penggunaan / 🏅 Milestone (usage analytics)
+- 💡 Saran AI (vocab expansion suggestions)
+- 💾 Cadangan Data (JSON export/import)
+- 📱 Kiosk Mode (tablet setup guide)
+- 🎙️ Voice Cloning (XTTS-v2 guide for future voice personalization)
+- 📘 Panduan Keluarga (family onboarding in Bahasa Indonesia)
+- 🆘 Kontak Darurat — **v1.0.1** — Ibu/Ayah/Ambulans phone config for emergency board
 
 ## Environment Variables
 ```
 VITE_OPENROUTER_API_KEY=               # Required for AI features (intent, caregiver, vocab expansion)
 VITE_OPENROUTER_MODEL=                 # Default: anthropic/claude-sonnet-4-20250514
-VITE_SUPABASE_URL=                     # Optional: enables cloud sync
+VITE_SUPABASE_URL=                     # Optional: enables cloud sync + parent dashboard
 VITE_SUPABASE_ANON_KEY=                # Optional: enables cloud sync
 ```
+All `VITE_` prefixed → baked into client bundle → **public**. Acceptable for personal family use.
 
-## Modeling Mode (Aided Language Stimulation)
-- Long-press Bicara 2s to toggle
-- Buttons highlight with amber ring AND play audio (ALgS research)
-- Words do NOT add to sentence bar
-- Click "Hentikan" banner to exit
-- Purpose: caregiver demonstrates language by tapping words alongside natural speech
+## Modeling Mode (Aided Language Stimulation — Binger & Light 2007)
+- Long-press `▶ Bicara` for 2 s to toggle
+- Amber banner: **"Mode Modeling — suara main, kalimat tidak bertambah"**
+- Buttons highlight with amber ring AND play audio (audio IS played — that's the research)
+- Words do NOT add to the sentence bar (caregiver is demonstrating, not composing)
+- Tap "■ Hentikan" banner button to exit
 
 ## Haptic Feedback
-- Configurable: off / light (10ms) / medium (30ms) / strong (50ms)
-- Fires even when muted (motor confirmation for sensory needs)
-- Set via `appStore.hapticLevel`
-- Default: light (10ms)
+- Configurable via `appStore.hapticLevel`: `off` (0) / `light` (10ms) / `medium` (30ms) / `strong` (50ms)
+- Fires from a SINGLE source: `SymbolButton.onPointerDown` (was double-firing in v1.0.0; fixed v1.0.1)
+- Fires even when muted — motor confirmation is separate from audio
+- Does NOT fire on folder/back navigation (not speech output)
+- Long-press trigger has an extra 50 ms pulse to confirm the gesture registered
+
+## Emergency Surface (v1.0.1)
+- Long-press `bantu` core word for 1.5 s
+- Full-screen red overlay with 4 large white buttons: Aku sakit / Panggil Ibu / Panggil Ayah / Panggil Ambulans
+- Each triggers `sms:NUMBER?body=ENCODED_MESSAGE` → opens SMS composer
+- Caregivers configure numbers in Admin → 🆘 Kontak Darurat
+- Ambulans defaults to `118` (Indonesian emergency medical)
+- Falls back to alert if contact not configured
 
 ## PWA Configuration
-- Orientation: landscape (locked)
-- Display: standalone
-- Background color: #F8F7F4
-- Theme color: #2563EB
-- Service Worker: Workbox with precaching
-- Update notification: prompts user when new version available
+- Manifest: `display: 'fullscreen'`, `display_override: ['fullscreen', 'standalone']`, `orientation: 'landscape'`
+- Theme color: `#2563EB`, background color: `#F8F7F4`
+- Service Worker: Workbox with precaching (79 entries, ~1.83 MB)
+- `registerType: 'autoUpdate'` — prompts user with toast when new version available
+- First-gesture orientation lock + fullscreen (Screen Orientation API requires fullscreen first on Android Chrome)
 
 ## Parent Dashboard
-- Access via `?dashboard=true` URL parameter
+- Access via `?dashboard=true` URL parameter (bookmark on parent phone)
 - PIN-protected (same PIN as admin)
-- Shows usage analytics, word frequency, communication milestones
-- Separate page component, not part of main AAC interface
+- Shows: usage analytics, word frequency, communication milestones, vocab growth
+- Separate page component (`src/pages/Dashboard.tsx`), not part of main AAC interface
 
 ## Build Tags
+- `v1.0.1` — **Deep audit + clinical content sprint** (2026-04-16) — Pertanyaan folder, social phrases, emergency SOS, bug fixes
 - `v1.0.0` — Production Release (Phase 6: Polish & Hardening)
 - `v0.5.0-phase5` — AI Cloud Layer
 - `v0.4.1-improvement-sprint` — UX Improvement Sprint
@@ -239,11 +270,31 @@ VITE_SUPABASE_ANON_KEY=                # Optional: enables cloud sync
 - `v0.2.0-phase2` — Data & Audio Layer
 - `v0.1.0-phase1` — Static UI Shell
 
-## Research References
-- **Fitzgerald Key (1929)** — color-coding standard for grammatical categories
-- **LAMP** — motor planning, fixed positions (why core words never move)
-- **Binger & Light (2007)** — Aided Language Stimulation (modeling mode)
-- **Schlosser et al. (2014)** — speech rate for ASD (0.85x/0.75x speed)
+## Research References (summary — full in [RESEARCH.md](./RESEARCH.md))
+- **Fitzgerald Key (1929, Carroll/Fitzgerald)** — color-coding by grammatical category
+- **LAMP (Halloran 2006)** — motor planning, why core positions never move
+- **Binger & Light (2007)** — Aided Language Stimulation = modeling mode
+- **Schlosser et al. (2014)** — speech rate 0.75–0.85× for autism
 - **Trewin et al. (PMC3572909)** — button sizing for motor impairment
-- **WCAG 2.1** — contrast ratios (4.5:1+), touch targets (44px+)
-- **McNaughton & Light (2013)** — accidental deletion frustration (why we have undo + confirm-clear)
+- **WCAG 2.1** — contrast (≥4.5:1), touch targets (≥44px)
+- **McNaughton & Light (2013)** — accidental deletion as #1 AAC abandonment cause
+- **Banajee, Dicarlo, Stricklin (2003)** — core vocabulary research (70-80% expressive coverage)
+- **Trnka et al. (2009)** — intent prediction, frequency + recency + bigrams
+- **Brewster et al. (2007)** — tactile feedback for motor confirmation
+
+## When something's broken on the tablet
+1. Check browser console (Chrome Android remote debug via `chrome://inspect`)
+2. Clear site data → reinstall PWA → tests `runInitialSeed()` path
+3. Don't clear DB → reload → tests `topUpSeedData()` migration path
+4. Check `registration.waiting` in dev tools to confirm SW update state
+5. If audio silent: verify TTS warmup fired (needs first user gesture), voices loaded, not muted
+6. If grid looks wrong: check `useVocabulary` is returning expected folder/people counts — padding should fill to 6
+
+## Deployment checklist
+- [ ] `npx tsc --noEmit` clean
+- [ ] `npm run build` succeeds with no warnings
+- [ ] CHANGELOG.md updated
+- [ ] Tag new version (`git tag -a vX.Y.Z -m "..."`)
+- [ ] `vercel deploy --prod --yes --scope abimnagari-gmailcoms-projects`
+- [ ] Verify live URL, check PWA update toast appears on existing install
+- [ ] Test on Tab A11: fullscreen, orientation locked, audio plays, haptic respects setting
