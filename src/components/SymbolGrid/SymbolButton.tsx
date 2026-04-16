@@ -126,7 +126,7 @@ export default function SymbolButton({
 
   return (
     <button
-      className={`${baseClasses} ${(variant === 'core' && fkColor && fkStyles[fkColor]) ? fkStyles[fkColor] : variantStyles[variant]} ${activeClass} ${disabledClass} ${highlightClass}`}
+      className={`${baseClasses} ${(fkColor && fkStyles[fkColor] && (variant === 'core' || variant === 'fringe')) ? fkStyles[fkColor] : variantStyles[variant]} ${activeClass} ${disabledClass} ${highlightClass}`}
       onPointerDown={() => {
         // Fire haptic on pointer-down for maximum perceived responsiveness.
         // This runs ~50-100ms earlier than onClick.
@@ -170,7 +170,10 @@ export default function SymbolButton({
         const start = performance.now()
         if (isModelingMode) {
           setIsHighlighted(true)
-          setTimeout(() => setIsHighlighted(false), 500)
+          // Persist the amber ring for 2 seconds so a child who looks up
+          // partway through the caregiver's demo still sees which word was
+          // modeled. 500 ms was often over before she glanced back.
+          setTimeout(() => setIsHighlighted(false), 2000)
         }
         onTap()
         const elapsed = performance.now() - start

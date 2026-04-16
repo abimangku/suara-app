@@ -101,6 +101,26 @@ export default function EmergencyContacts({ onDone: _onDone }: EmergencyContacts
                   placeholder="+628xxxxxxxxxx"
                   className="px-3 py-2 rounded-lg border-2 border-suara-gray-border bg-white text-suara-gray font-bold text-sm focus:outline-none focus:border-suara-blue-border"
                 />
+                {/* Test button — opens the real SMS/tel composer so caregiver
+                    can verify the number works BEFORE a real emergency. */}
+                {contacts[key].phone.trim() && (
+                  <button
+                    onClick={() => {
+                      const phone = contacts[key].phone.trim()
+                      if (key === 'ambulans') {
+                        window.location.href = `tel:${phone}`
+                      } else {
+                        const msg = encodeURIComponent('Uji coba dari Suara AAC — abaikan.')
+                        window.location.href = `sms:${phone}?body=${msg}`
+                      }
+                    }}
+                    type="button"
+                    className="mt-2 px-3 py-1.5 rounded-lg bg-suara-green-light text-suara-green font-bold text-xs self-start active:scale-[0.96] transition-transform"
+                    aria-label={`Uji kontak ${info.title}`}
+                  >
+                    🧪 Uji {key === 'ambulans' ? 'panggilan' : 'SMS'}
+                  </button>
+                )}
               </div>
             </div>
           )

@@ -1,8 +1,8 @@
 # Suara — AAC Communication App
 
-> **Current version:** v1.0.1 (2026-04-16, commit `5c2f82d`)
+> **Current version:** v1.1.0 (2026-04-16) — Deep audit Wave A + B
 > **Live at:** https://suara-tau.vercel.app
-> **Related docs:** [SPEC.md](./SPEC.md) (product+tech spec) · [RESEARCH.md](./RESEARCH.md) (clinical evidence) · [AGENTS.md](./AGENTS.md) (AI agent rules) · [CHANGELOG.md](./CHANGELOG.md) (release history)
+> **Related docs:** [SPEC.md](./SPEC.md) (product+tech spec) · [RESEARCH.md](./RESEARCH.md) (clinical evidence) · [AGENTS.md](./AGENTS.md) (AI agent rules) · [CHANGELOG.md](./CHANGELOG.md) (release history) · [.audit/](./.audit/) (deep-audit reports)
 
 ## What This Is
 Suara ("voice" in Indonesian) is a tablet-based AAC app for a young non-speaking autistic woman in Jakarta. She taps symbol buttons to build Bahasa Indonesia sentences the tablet speaks aloud. Every design decision is research-backed (see [RESEARCH.md](./RESEARCH.md)) and serves her communication.
@@ -151,7 +151,7 @@ Per-category color-coding supports grammatical awareness and reduces visual sear
 ## Grid Layout
 - 6 columns × variable rows (4 core + 1 people + 1 folder visible simultaneously)
 - 24 core words (rows 1-4) — HARDCODED in `src/data/vocabulary.ts`, NEVER from database
-- People row (row 5) — up to 4 from IndexedDB + Tambah + spacer padding to 6 cells
+- People row (row 5) — up to 6 from IndexedDB; Tambah placeholder visible when <6, opens admin PIN gate on tap. When people.length = 6, Tambah hides.
 - Folder row (row 6) — 5 folders + Pertanyaan (new v1.0.1) = 6; spacer pad if fewer
 - Grid gap: **6px**, padding: **6px** (via `gap-[6px] p-1.5`)
   - Tightened further in v1.0.2 so the full 6-row grid fits on Samsung Galaxy Tab A11's ~1024×600 CSS viewport. Larger viewports have extra breathing room.
@@ -175,7 +175,7 @@ Tables: `words`, `folders`, `people`, `usageEvents`, `quickPhrases`, `settings`,
 ## Key Components
 - **SentenceBar** — top blue bar, word chips, action buttons (⚡ quick phrases, 🔍 search, 🕐 history, 🔊/🔇 mute, 💬 caregiver), ⌫ backspace, ✕ Hapus (confirm-clear), ▶ Bicara (long-press 2s → modeling mode)
 - **SymbolGrid** — 6-col grid, renders CoreRow × 4 + PeopleRow + FolderRow OR FolderContents when a folder is open
-- **SymbolButton** — color-coded by variant + Fitzgerald Key `fkColor`; haptic on `onPointerDown`; optional `onLongPress` (1500 ms, used by `bantu` for emergency)
+- **SymbolButton** — color-coded by variant + Fitzgerald Key `fkColor` (applies to BOTH `core` and `fringe` variants as of v1.1.0); haptic on `onPointerDown`; optional `onLongPress` (1500 ms, used by `bantu` for emergency). Modeling-mode amber ring persists 2s (was 500ms before v1.1.0).
 - **IntentSuggestions** — 3 prediction buttons after 2+ words; renders an invisible 53px placeholder when empty to prevent grid reflow
 - **EmergencyBoard** — full-screen red overlay with 4 large SMS buttons; triggered by 1.5 s long-press on `bantu`
 - **AdminOverlay** — PIN-gated full-screen overlay, long-press SentenceBar 3s to open
@@ -186,7 +186,7 @@ Tables: `words`, `folders`, `people`, `usageEvents`, `quickPhrases`, `settings`,
 ## Hooks (all business logic lives here)
 - **useVocabulary** — reactive reads from IndexedDB (folders, people, phrases) via dexie-react-hooks
 - **useAudio** — playWord, playSentence. Syncs `hapticLevel` to AudioEngine but no longer fires vibration (moved to SymbolButton)
-- **useSentenceBar** — addWord, removeLastWord (2s undo toast), clearSentence (confirm dialog), speak
+- **useSentenceBar** — addWord (with usage logging — v1.0.3), removeLastWord (exposes `undoWord` + `restoreUndo` for the visible 2s toast — v1.1.0), clearSentence (confirm dialog), speak (sentence PERSISTS after speaking as of v1.0.3 — no auto-clear)
 - **useUsageLog** — tap event logging with session ID, hour-of-day, day-of-week
 - **useAdmin** — PIN verify/set, admin state management
 - **useIntentSuggestions** — frequency + bigram + OpenRouter (3-tier fallback)
@@ -203,19 +203,25 @@ Tables: `words`, `folders`, `people`, `usageEvents`, `quickPhrases`, `settings`,
 5. **Milestone detection** — first word, first combo, first request/comment/greeting/refusal, vocab growth
 6. **Vocabulary gap detection** — flags unused folders in admin
 
-## Admin Mode (long-press sentence bar 3s → PIN)
-PIN-protected (SHA-256 hash in IndexedDB settings). 14 sections:
-- ➕ Tambah Kata / 👤 Tambah Orang (add word/person with photos)
-- ✏️ Kelola Kata / 👥 Kelola Orang (edit/delete)
+## Admin Mode (two entry paths)
+1. Long-press blue sentence bar for 3 seconds
+2. Tap the ⚙️ gear icon in the sentence bar (v1.1.0)
+3. Tap the + "Tambah" placeholder in people row (v1.0.3)
+
+All paths land on the PIN gate (SHA-256 hash in IndexedDB). 11 admin sections:
+- 📝 Kelola Kata (edit/add/delete fringe words with photos)
+- 👥 Kelola Orang (edit/add/delete people with photos)
 - ⚡ Frasa Cepat (phrase CRUD + reorder)
-- 📦 Paket Kosakata (Dasar/Lengkap toggle per folder)
-- 📊 Insight Penggunaan / 🏅 Milestone (usage analytics)
-- 💡 Saran AI (vocab expansion suggestions)
+- 📊 Wawasan Penggunaan (usage analytics + milestones)
+- 📈 Dashboard Orang Tua (opens parent dashboard in new tab — v1.1.0)
+- 📖 Panduan Keluarga (family onboarding in Bahasa Indonesia)
+- 🤖 Saran Kosakata (AI vocab expansion suggestions)
 - 💾 Cadangan Data (JSON export/import)
-- 📱 Kiosk Mode (tablet setup guide)
-- 🎙️ Voice Cloning (XTTS-v2 guide for future voice personalization)
-- 📘 Panduan Keluarga (family onboarding in Bahasa Indonesia)
-- 🆘 Kontak Darurat — **v1.0.1** — Ibu/Ayah/Ambulans phone config for emergency board
+- 📱 Mode Kiosk (tablet setup guide)
+- 🎙️ Kloning Suara (XTTS-v2 guide for future voice personalization)
+- 🆘 Kontak Darurat (Ibu/Ayah/Ambulans config; Ibu/Ayah → `sms:`, Ambulans → `tel:`; test button per contact)
+
+Removed in v1.1.0: 📦 Paket Kosakata — toggle never reached FolderContents (silent feature). Use Kelola Kata for per-word pruning instead.
 
 ## Environment Variables
 ```
@@ -262,7 +268,10 @@ All `VITE_` prefixed → baked into client bundle → **public**. Acceptable for
 - Separate page component (`src/pages/Dashboard.tsx`), not part of main AAC interface
 
 ## Build Tags
-- `v1.0.1` — **Deep audit + clinical content sprint** (2026-04-16) — Pertanyaan folder, social phrases, emergency SOS, bug fixes
+- `v1.1.0` — **Deep audit Wave B** (2026-04-16) — FK colors on fringe, visible ⚙️ admin, undo toast, modeling ring 2s, test-SMS/call, VocabPack removal, Dashboard admin card
+- `v1.0.3` — **Deep audit Wave A P0** (2026-04-16) — usage logging wired, Ibu initial fix, Tambah opens admin, no auto-clear after Bicara, Ambulans tel:
+- `v1.0.2` — Tab A11 viewport fit (grid gap 8→6, IntentSuggestions placeholder removed)
+- `v1.0.1` — Clinical content sprint — Pertanyaan folder, social phrases, emergency SOS, bug fixes
 - `v1.0.0` — Production Release (Phase 6: Polish & Hardening)
 - `v0.5.0-phase5` — AI Cloud Layer
 - `v0.4.1-improvement-sprint` — UX Improvement Sprint

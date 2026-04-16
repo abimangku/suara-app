@@ -6,7 +6,7 @@ import { useSentenceBar } from '@/hooks/useSentenceBar'
 import { useAppStore } from '@/store/appStore'
 
 export default function SentenceBar() {
-  const { sentenceWords, removeLastWord, clearSentence, speak, handleQuickPhrase } = useSentenceBar()
+  const { sentenceWords, removeLastWord, clearSentence, speak, handleQuickPhrase, undoWord, restoreUndo } = useSentenceBar()
   const [isQuickPhrasesOpen, setIsQuickPhrasesOpen] = useState(false)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [isFlashing, setIsFlashing] = useState(false)
@@ -77,6 +77,19 @@ export default function SentenceBar() {
           Mode Modeling — suara main, kalimat tidak bertambah
         </div>
       )}
+      {undoWord && (
+        <div className="absolute top-14 right-3 z-[60] flex items-center gap-2 bg-suara-gray text-white px-3 py-2 rounded-xl shadow-lg animate-fade-in text-sm font-bold">
+          <span>Dihapus: "{undoWord.label}"</span>
+          <button
+            onClick={restoreUndo}
+            className="px-3 py-1 rounded-lg bg-white text-suara-gray font-extrabold text-xs active:scale-[0.96] transition-transform"
+            type="button"
+            aria-label="Kembalikan kata"
+          >
+            ↶ Kembalikan
+          </button>
+        </div>
+      )}
       <div
         className="w-full bg-suara-blue-bar flex items-center px-3 gap-2 shrink-0"
         style={{ minHeight: 56 }}
@@ -128,6 +141,19 @@ export default function SentenceBar() {
           aria-label={isCaregiverPaneOpen ? 'Tutup interpretasi' : 'Buka interpretasi'}
         >
           💬
+        </button>
+        {/* Visible admin affordance. The PIN gate is the real access control —
+            this button just makes admin discoverable to a caregiver who doesn't
+            know the 3-second long-press gesture. Primary user can tap but will
+            only see the PIN pad. */}
+        <button
+          className="w-11 h-11 rounded-[10px] bg-white/15 text-white flex items-center justify-center shrink-0 active:scale-[0.96] transition-transform duration-[80ms] text-[20px] leading-none"
+          onClick={openAdmin}
+          type="button"
+          aria-label="Pengaturan keluarga"
+          title="Pengaturan keluarga"
+        >
+          ⚙️
         </button>
 
         <div className="flex-1 flex items-center gap-1.5 overflow-x-auto min-h-[40px] scrollbar-hide">

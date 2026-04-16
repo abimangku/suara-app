@@ -3,6 +3,22 @@ import SymbolButton from '@/components/SymbolGrid/SymbolButton'
 import { useVocabulary, useFolderWords } from '@/hooks/useVocabulary'
 import { useSentenceBar } from '@/hooks/useSentenceBar'
 import { useAppStore } from '@/store/appStore'
+import type { FKColor } from '@/types'
+
+// Map each seeded folder to a Fitzgerald Key color so fringe words inherit
+// grammatical coloring (nouns orange, verbs green, questions purple, etc.).
+// Per research §1 (Thistle & Wilkinson, Wilkinson et al. 2022), color coding
+// is useful as a REDUNDANT cue on top of spatial clustering — we apply it
+// across the full grid, not just core. Custom family-added folders default
+// to 'noun' since most user-added words are things/people/places.
+const FOLDER_FK_COLOR: Record<string, FKColor> = {
+  makanan: 'noun',
+  perasaan: 'descriptor',
+  aktivitas: 'verb',
+  tempat: 'noun',
+  tubuh: 'noun',
+  pertanyaan: 'preposition', // traditional Fitzgerald question = purple (our preposition slot)
+}
 
 interface FolderContentsProps {
   folderKey: string
@@ -30,6 +46,7 @@ export default function FolderContents({ folderKey }: FolderContentsProps) {
           emoji=""
           label={fw.labelDisplay ?? fw.label}
           variant="fringe"
+          fkColor={FOLDER_FK_COLOR[folderKey] ?? 'noun'}
           symbolPath={fw.symbolPath}
           photoBlob={fw.photoBlob}
           onTap={() => {

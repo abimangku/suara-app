@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppStore } from '@/store/appStore'
 import { useAudio } from '@/hooks/useAudio'
 import { useUsageLog } from '@/hooks/useUsageLog'
@@ -9,29 +9,45 @@ export function useSentenceBar() {
   const sentenceWords = useAppStore((s) => s.sentenceWords)
   const addWordToStore = useAppStore((s) => s.addWord)
   const storeRemoveLastWord = useAppStore((s) => s.removeLastWord)
-  const undoRef = useRef<{ word: Word; time: number } | null>(null)
+  // Exposed state for the visible undo toast. Previously the undo was hidden
+  // in a ref and reused the ⌫ button for both "delete" and "restore" modes,
+  // which made tapping ⌫ twice ambiguous. Now ⌫ always deletes; the toast
+  // gives an explicit "↶ Kembalikan" button visible for 2 seconds.
+  const [undoWord, setUndoWord] = useState<Word | null>(null)
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { playWord, playSentence } = useAudio()
   const { logTap } = useUsageLog()
 
-  const removeLastWord = useCallback(() => {
-    // If undo available (tapped within 2 seconds), restore
-    if (undoRef.current && Date.now() - undoRef.current.time < 2000) {
-      const restored = undoRef.current.word
-      undoRef.current = null
-      addWordToStore(restored)
-      return
+  useEffect(() => {
+    return () => {
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
     }
-    // Otherwise delete and store for undo
+  }, [])
+
+  const removeLastWord = useCallback(() => {
     const words = useAppStore.getState().sentenceWords
     const lastWord = words[words.length - 1]
-    if (lastWord) {
-      undoRef.current = { word: lastWord, time: Date.now() }
-    }
+    if (!lastWord) return
     storeRemoveLastWord()
-  }, [storeRemoveLastWord, addWordToStore])
+    setUndoWord(lastWord)
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
+    undoTimerRef.current = setTimeout(() => setUndoWord(null), 2000)
+  }, [storeRemoveLastWord])
+
+  const restoreUndo = useCallback(() => {
+    setUndoWord((current) => {
+      if (current) addWordToStore(current)
+      return null
+    })
+    if (undoTimerRef.current) {
+      clearTimeout(undoTimerRef.current)
+      undoTimerRef.current = null
+    }
+  }, [addWordToStore])
 
   const clearSentence = useCallback(() => {
-    undoRef.current = null
+    setUndoWord(null)
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
     useAppStore.getState().clearSentence()
   }, [])
 
@@ -115,5 +131,7 @@ export function useSentenceBar() {
     clearSentence,
     speak,
     handleQuickPhrase,
+    undoWord,
+    restoreUndo,
   }
 }

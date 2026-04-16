@@ -1,6 +1,6 @@
 # Suara — Product & Technical Specification
 
-> Last updated: 2026-04-16, corresponds to **v1.0.1** (commit `5c2f82d`).
+> Last updated: 2026-04-16, corresponds to **v1.1.0** (Deep audit Wave A + B).
 > This is the single source of truth for what the app does and why. If the code and this document disagree, the code wins — but then this document is a bug and must be updated.
 
 ---
@@ -373,7 +373,10 @@ Semantic versioning, but the 1.0.0 line represents "shipped to my daughter." Min
 
 | Version | Date | Scope |
 |---|---|---|
-| v1.0.1 | 2026-04-16 | Deep audit fixes + clinical content (Pertanyaan folder, social phrases, emergency surface) |
+| v1.1.0 | 2026-04-16 | Deep audit Wave B (P1): FK colors on fringe, visible ⚙️ admin, undo toast, modeling ring persist, test-SMS/call, VocabPack removed |
+| v1.0.3 | 2026-04-16 | Deep audit Wave A (P0): usage logging wired, Ibu initial, Tambah→admin, no auto-clear, Ambulans tel: |
+| v1.0.2 | 2026-04-16 | Tab A11 viewport fit |
+| v1.0.1 | 2026-04-16 | Clinical content (Pertanyaan folder, social phrases, emergency surface) |
 | v1.0.0 | 2026-04-10 | Production release (Phase 6: Polish & Hardening) |
 | v0.5.0 | 2026-04-10 | AI cloud layer |
 | v0.4.1 | 2026-04-09 | UX improvement sprint (Lovable prototype learnings) |

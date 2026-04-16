@@ -7,6 +7,21 @@ All notable changes to the Suara AAC app are documented here.
 > For AI agent conventions, see [AGENTS.md](./AGENTS.md).
 > For codebase quick reference, see [CLAUDE.md](./CLAUDE.md).
 
+## v1.1.0 — Deep audit Wave B: P1 improvements (2026-04-16)
+
+Continuation of the deep-audit remediation. Seven P1 items shipped; one deliberately skipped.
+
+- **Fringe words now use Fitzgerald Key colors** (P1-2). Previously `SymbolButton` applied `fkColor` only for `variant === 'core'`, so all fringe words (nasi goreng, rumah, sakit kepala) rendered neutral gray. Now fringe words inherit a folder-level FK mapping: Makanan/Tempat/Tubuh → noun (orange), Aktivitas → verb (green), Perasaan → descriptor (blue), Pertanyaan → preposition (purple — traditional Fitzgerald question color). Research §1 (Wilkinson et al. 2022) supports color as redundant cue across the full grid, not just core.
+- **Visible ⚙️ admin affordance in SentenceBar** (P1-1). Long-press 3s was undiscoverable for new caregivers. A gear icon now sits between 💬 and the chip area; tap opens the PIN gate directly. PIN is still the access control — the icon just makes admin reachable.
+- **Undo toast now visible after backspace** (P1-4). Previously the 2-second undo window was silent; tapping ⌫ twice was ambiguous ("another delete?" or "undo?"). Now ⌫ always deletes; a pill appears above the chip row for 2 seconds showing "Dihapus: 'X' [↶ Kembalikan]". Explicit restore button, no double-meaning for ⌫.
+- **Modeling-mode amber ring persists 2 seconds** (P1-5). Was 500 ms — too short for a caregiver's demo to register if the child looked up partway through. Research: Binger & Light 2007 dose (30 models / 15 min) requires each model to be visually salient.
+- **Test-SMS / Test-call buttons in Kontak Darurat admin** (P1-6). Each configured contact now has a "🧪 Uji SMS" or "🧪 Uji panggilan" button that opens the real composer with a harmless test message. Caregivers verify numbers work BEFORE a real emergency.
+- **VocabPackAdmin removed** (P1-3). The toggle updated `vocabularyPacks.isActive` but FolderContents never read from that table — silent feature contradicting SPEC.md §3.3. Caregivers can prune unwanted words via "📝 Kelola Kata" instead. Future progressive disclosure can be reintroduced with proper word→pack wiring.
+- **"📈 Dashboard Orang Tua" card added to admin** (P2-3 promoted). Previously reachable only via URL `?dashboard=true`. Now a tap from admin opens it in a new tab.
+- **SPEC.md + CLAUDE.md drift corrected** (P1-8). PeopleRow cap (6 not 4), admin card count (11 not 14), v1.0.3/v1.1.0 noted, Tambah→admin wiring documented, sentence-persist behavior updated, FK on fringe documented.
+
+Deliberately skipped: **P1-7 (embed core on fringe pages)**. Commercial AAC apps (P2G, TouchChat, Snap) embed core inside folders because they keep the user in the folder after selecting a word. Our auto-return-to-home after fringe tap (shipped earlier in this session) solves the same problem more cleanly — she's always back at core before picking the next word. Documented as a deliberate divergence.
+
 ## v1.0.3 — Deep audit Wave A: P0 bug fixes (2026-04-16)
 
 After a comprehensive 3-agent research audit (commercial AAC comparison, academic literature review, code audit), shipped the 5 most critical fixes.

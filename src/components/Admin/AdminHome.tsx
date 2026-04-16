@@ -4,7 +4,6 @@ import EditWord from '@/components/Admin/EditWord'
 import AddPerson from '@/components/Admin/AddPerson'
 import AddWord from '@/components/Admin/AddWord'
 import QuickPhraseAdmin from '@/components/Admin/QuickPhraseAdmin'
-import VocabPackAdmin from '@/components/Admin/VocabPackAdmin'
 import UsageInsights from '@/components/Admin/UsageInsights'
 import OnboardingGuide from '@/components/Admin/OnboardingGuide'
 import VocabSuggestions from '@/components/Admin/VocabSuggestions'
@@ -13,14 +12,14 @@ import KioskGuide from '@/components/Admin/KioskGuide'
 import VoiceCloneGuide from '@/components/Admin/VoiceCloneGuide'
 import EmergencyContacts from '@/components/Admin/EmergencyContacts'
 
-type AdminSection = 'home' | 'manageWords' | 'managePeople' | 'addPerson' | 'addWord' | 'quickPhrases' | 'vocabPacks' | 'insights' | 'onboarding' | 'vocabSuggestions' | 'backup' | 'kioskGuide' | 'voiceClone' | 'emergencyContacts'
+type AdminSection = 'home' | 'manageWords' | 'managePeople' | 'addPerson' | 'addWord' | 'quickPhrases' | 'insights' | 'onboarding' | 'vocabSuggestions' | 'backup' | 'kioskGuide' | 'voiceClone' | 'emergencyContacts' | 'dashboard'
 
 const ADMIN_CARDS = [
   { id: 'manageWords' as const, emoji: '📝', label: 'Kelola Kata', desc: 'Tambah, edit, hapus kosakata' },
   { id: 'managePeople' as const, emoji: '👥', label: 'Kelola Orang', desc: 'Tambah foto dan nama keluarga' },
   { id: 'quickPhrases' as const, emoji: '⚡', label: 'Frasa Cepat', desc: 'Atur frasa yang sering digunakan' },
-  { id: 'vocabPacks' as const, emoji: '📦', label: 'Paket Kosakata', desc: 'Aktifkan atau nonaktifkan paket kata' },
   { id: 'insights' as const, emoji: '📊', label: 'Wawasan Penggunaan', desc: 'Lihat kata yang paling sering digunakan' },
+  { id: 'dashboard' as const, emoji: '📈', label: 'Dashboard Orang Tua', desc: 'Analitik dan milestone komunikasi' },
   { id: 'onboarding' as const, emoji: '📖', label: 'Panduan Keluarga', desc: 'Cara menggunakan Suara' },
   { id: 'vocabSuggestions' as const, emoji: '🤖', label: 'Saran Kosakata', desc: 'Dapatkan saran kata baru dari AI' },
   { id: 'backup' as const, emoji: '💾', label: 'Cadangan Data', desc: 'Cadangkan dan pulihkan kosakata' },
@@ -77,13 +76,13 @@ export default function AdminHome() {
     )
   }
 
-  if (activeSection === 'vocabPacks') {
-    return (
-      <div className="p-4">
-        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
-        <VocabPackAdmin onDone={() => setActiveSection('home')} />
-      </div>
-    )
+  if (activeSection === 'dashboard') {
+    // Opens parent dashboard in a new tab — it's a standalone page.
+    // Doing it as a nav change would lose admin state; opening in-tab is cleaner.
+    const url = `${window.location.origin}${window.location.pathname}?dashboard=true`
+    window.open(url, '_blank', 'noopener')
+    setActiveSection('home')
+    return null
   }
 
   if (activeSection === 'insights') {
