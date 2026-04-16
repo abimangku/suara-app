@@ -38,6 +38,17 @@ export default function EmergencyBoard() {
     window.location.href = `sms:${contact.phone}?body=${encoded}`
   }
 
+  function handleCall(contact: EmergencyContact | undefined) {
+    if (!contact?.phone) {
+      alert(`Kontak ${contact?.name ?? ''} belum diatur. Buka pengaturan admin untuk mengatur.`)
+      return
+    }
+    // Direct phone call — appropriate for medical emergency where speaking
+    // (even via speaker/partner) beats SMS. For personal contacts we keep SMS
+    // so the caregiver receives context text even if they can't answer live.
+    window.location.href = `tel:${contact.phone}`
+  }
+
   return (
     <div className="fixed inset-0 z-[95] bg-suara-danger/95 flex flex-col items-center justify-center p-6">
       <button
@@ -82,7 +93,7 @@ export default function EmergencyBoard() {
 
         <button
           className="bg-white rounded-2xl p-6 flex flex-col items-center justify-center gap-2 active:scale-[0.96] transition-transform"
-          onClick={() => handleSms(contacts.ambulans, 'Darurat medis, butuh ambulans.')}
+          onClick={() => handleCall(contacts.ambulans)}
           aria-label="Panggil ambulans"
         >
           <span className="text-5xl">🚑</span>
@@ -91,7 +102,7 @@ export default function EmergencyBoard() {
       </div>
 
       <p className="text-white/70 text-sm mt-6 text-center">
-        Ketuk untuk mengirim SMS ke kontak darurat
+        Aku sakit / Ibu / Ayah → SMS. Ambulans → panggilan telepon.
       </p>
     </div>
   )

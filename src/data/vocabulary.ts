@@ -48,7 +48,7 @@ export const SEED_FOLDERS: Omit<DbFolder, 'id' | 'createdAt' | 'updatedAt'>[] = 
 // Seed data for people
 export const SEED_PEOPLE: Omit<DbPerson, 'id' | 'createdAt' | 'updatedAt'>[] = [
   { name: 'Ayah',  initial: 'A', sortOrder: 0, isActive: true },
-  { name: 'Ibu',   initial: 'K', sortOrder: 1, isActive: true },
+  { name: 'Ibu',   initial: 'I', sortOrder: 1, isActive: true },
   { name: 'Nenek', initial: 'N', sortOrder: 2, isActive: true },
   { name: 'Mbak',  initial: 'M', sortOrder: 3, isActive: true },
 ]

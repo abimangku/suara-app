@@ -2,10 +2,12 @@ import SymbolButton from '@/components/SymbolGrid/SymbolButton'
 import AvatarCircle from '@/components/shared/AvatarCircle'
 import { useVocabulary } from '@/hooks/useVocabulary'
 import { useSentenceBar } from '@/hooks/useSentenceBar'
+import { useAppStore } from '@/store/appStore'
 
 export default function PeopleRow() {
   const { people } = useVocabulary()
   const { addWord } = useSentenceBar()
+  const openAdmin = useAppStore((s) => s.openAdmin)
 
   const peopleList = people ?? []
   // 6-col grid cap: show up to 6 people. Hide the "Tambah" placeholder once the
@@ -30,11 +32,14 @@ export default function PeopleRow() {
         </SymbolButton>
       ))}
       {showTambah && (
+        // Tambah opens the admin PIN gate. Caregivers can add people here;
+        // the PIN keeps the primary user from accidentally entering admin.
+        // Previously this was disabled — looked tappable, did nothing, and
+        // habituated the appearance of a broken button.
         <SymbolButton
           label="Tambah"
           variant="people"
-          onTap={() => {}}
-          disabled
+          onTap={openAdmin}
         >
           <AvatarCircle initial="+" size={46} />
         </SymbolButton>

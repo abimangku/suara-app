@@ -7,6 +7,20 @@ All notable changes to the Suara AAC app are documented here.
 > For AI agent conventions, see [AGENTS.md](./AGENTS.md).
 > For codebase quick reference, see [CLAUDE.md](./CLAUDE.md).
 
+## v1.0.3 — Deep audit Wave A: P0 bug fixes (2026-04-16)
+
+After a comprehensive 3-agent research audit (commercial AAC comparison, academic literature review, code audit), shipped the 5 most critical fixes.
+
+- **Usage logging pipeline lit up.** `logTap` was defined but never called from any component. `useSentenceBar.addWord` and `handleQuickPhrase` now log every tap (core / fringe / people / quickphrase) to `db.usageEvents`. This wakes up: frequency model, intent suggestions, milestone detection, UsageInsights, parent dashboard, AI vocab suggestions. Skips logging in modeling mode (those are caregiver demonstrations, not her expressive data).
+- **`Ibu` avatar initial corrected `K` → `I`.** Data bug in `SEED_PEOPLE`.
+- **`Tambah` button now opens admin (PIN-gated).** Was `disabled` with no-op onTap, which looked tappable and habituated as broken. Now launches the admin PIN overlay — the PIN still prevents the primary user from accidentally entering admin.
+- **Sentence no longer auto-clears after Bicara.** Previously a 1500 ms setTimeout wiped the sentence. She couldn't re-speak, partners couldn't read what she said, noisy environments required 2-tap workarounds through history. Sentence now persists until she taps ✕ Hapus (still confirm-guarded).
+- **"Panggil Ambulans" uses `tel:` not `sms:`.** Label said "call" but action opened SMS composer. For medical emergency, a voice call beats a text message. Ibu/Ayah stay on `sms:` (preserves context for personal contacts).
+
+Deep audit reports are in `.audit/`: `DEEP_AUDIT.md` (synthesis), `AAC_COMPETITIVE_ANALYSIS.md` (9 commercial apps), `AAC_RESEARCH_REVIEW.md` (15 research questions, 60+ citations), `CODE_UX_AUDIT.md` (line-level findings).
+
+Wave B (P1 improvements: Fitzgerald colors on fringe, core on fringe pages, visible admin affordance, undo toast, modeling ring, test-SMS, VocabPack wiring, doc sync) and Wave C (P2 + P4 optimizations) to follow.
+
 ## v1.0.2 — Tab A11 viewport fit (2026-04-16)
 - **Folder row cut off on Tab A11**: the 53px always-reserved `IntentSuggestions` placeholder added in v1.0.1 ate too much of the 600px landscape viewport, pushing the folder row (Makanan / Aktivitas / Pakaian / Tubuh / Pertanyaan) off the bottom of the screen. Reverted the placeholder — `IntentSuggestions` now returns `null` when empty. When suggestions appear after 2+ taps there's a ~8% button reflow; positions stay fixed so motor memory is preserved.
 - Tightened grid spacing: `gap-[8px] p-2` → `gap-[6px] p-1.5`. Saves 18px vertically — enough cushion so the grid stays comfortable even when suggestions are showing.
