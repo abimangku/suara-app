@@ -7,6 +7,11 @@ All notable changes to the Suara AAC app are documented here.
 > For AI agent conventions, see [AGENTS.md](./AGENTS.md).
 > For codebase quick reference, see [CLAUDE.md](./CLAUDE.md).
 
+## v1.0.2 — Tab A11 viewport fit (2026-04-16)
+- **Folder row cut off on Tab A11**: the 53px always-reserved `IntentSuggestions` placeholder added in v1.0.1 ate too much of the 600px landscape viewport, pushing the folder row (Makanan / Aktivitas / Pakaian / Tubuh / Pertanyaan) off the bottom of the screen. Reverted the placeholder — `IntentSuggestions` now returns `null` when empty. When suggestions appear after 2+ taps there's a ~8% button reflow; positions stay fixed so motor memory is preserved.
+- Tightened grid spacing: `gap-[8px] p-2` → `gap-[6px] p-1.5`. Saves 18px vertically — enough cushion so the grid stays comfortable even when suggestions are showing.
+- `CLAUDE.md` grid spec updated to match.
+
 ## v1.0.1-docs — Documentation consolidation (2026-04-16)
 - Added **SPEC.md** — single source of truth for what the app does and why
 - Added **RESEARCH.md** — all clinical, UX, and accessibility research citations with links to implementing files

@@ -8,7 +8,7 @@ export default function SymbolGrid() {
   const activeFolderKey = useAppStore((s) => s.activeFolderKey)
 
   return (
-    <div className="flex-1 grid grid-cols-6 gap-[8px] p-2 min-h-0 overflow-hidden"
+    <div className="flex-1 grid grid-cols-6 gap-[6px] p-1.5 min-h-0 overflow-hidden"
       style={{ gridAutoRows: 'minmax(0, 1fr)' }}
       role="grid"
       aria-label="Papan komunikasi"

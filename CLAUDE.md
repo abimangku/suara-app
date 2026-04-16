@@ -153,8 +153,9 @@ Per-category color-coding supports grammatical awareness and reduces visual sear
 - 24 core words (rows 1-4) — HARDCODED in `src/data/vocabulary.ts`, NEVER from database
 - People row (row 5) — up to 4 from IndexedDB + Tambah + spacer padding to 6 cells
 - Folder row (row 6) — 5 folders + Pertanyaan (new v1.0.1) = 6; spacer pad if fewer
-- Grid gap: **8px**, padding: **8px**
-  - Tightened for Samsung Galaxy Tab A11 (~1000×600 CSS viewport). Larger viewports have extra breathing room.
+- Grid gap: **6px**, padding: **6px** (via `gap-[6px] p-1.5`)
+  - Tightened further in v1.0.2 so the full 6-row grid fits on Samsung Galaxy Tab A11's ~1024×600 CSS viewport. Larger viewports have extra breathing room.
+  - IntentSuggestions has NO reserved placeholder — returns `null` when empty. A ~8% reflow when it appears after 2+ taps is acceptable; button positions stay fixed so motor memory is preserved.
 - Button border-radius: 14px (`rounded-button` token)
 - Press animation: `scale(0.96)` for 80ms (the ONLY allowed grid animation)
 - Button labels: 18px bold, 0.4px letter-spacing, Nunito font
