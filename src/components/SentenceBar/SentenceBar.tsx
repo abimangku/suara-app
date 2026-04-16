@@ -13,12 +13,9 @@ export default function SentenceBar() {
   const [confirmClear, setConfirmClear] = useState(false)
   const confirmClearRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const openAdmin = useAppStore((s) => s.openAdmin)
-  const toggleSearch = useAppStore((s) => s.toggleSearch)
   const isModelingMode = useAppStore((s) => s.isModelingMode)
   const toggleModelingMode = useAppStore((s) => s.toggleModelingMode)
   const sentenceHistory = useAppStore((s) => s.sentenceHistory)
-  const isMuted = useAppStore((s) => s.isMuted)
-  const toggleMute = useAppStore((s) => s.toggleMute)
   const isCaregiverPaneOpen = useAppStore((s) => s.isCaregiverPaneOpen)
   const toggleCaregiverPane = useAppStore((s) => s.toggleCaregiverPane)
   const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -110,27 +107,11 @@ export default function SentenceBar() {
         </button>
         <button
           className="w-11 h-11 rounded-[10px] bg-white/20 text-white flex items-center justify-center shrink-0 active:scale-[0.96] transition-transform duration-[80ms] text-[22px] leading-none"
-          onClick={toggleSearch}
-          type="button"
-          aria-label="Cari kata"
-        >
-          🔍
-        </button>
-        <button
-          className="w-11 h-11 rounded-[10px] bg-white/20 text-white flex items-center justify-center shrink-0 active:scale-[0.96] transition-transform duration-[80ms] text-[22px] leading-none"
           onClick={() => setIsHistoryOpen(!isHistoryOpen)}
           type="button"
           aria-label="Riwayat"
         >
           🕐
-        </button>
-        <button
-          className="w-11 h-11 rounded-[10px] bg-white/20 text-white flex items-center justify-center shrink-0 active:scale-[0.96] transition-transform duration-[80ms] text-[22px] leading-none"
-          onClick={toggleMute}
-          type="button"
-          aria-label={isMuted ? 'Nyalakan suara' : 'Matikan suara'}
-        >
-          {isMuted ? '🔇' : '🔊'}
         </button>
         <button
           className={`w-11 h-11 rounded-[10px] text-white flex items-center justify-center shrink-0 active:scale-[0.96] transition-transform duration-[80ms] text-[22px] leading-none ${
