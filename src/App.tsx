@@ -6,6 +6,7 @@ import IntentSuggestions from '@/components/AI/IntentSuggestions'
 import AdminOverlay from '@/components/Admin/AdminOverlay'
 import SymbolSearch from '@/components/AI/SymbolSearch'
 import CaregiverPane from '@/components/AI/CaregiverPane'
+import EmergencyBoard from '@/components/AI/EmergencyBoard'
 import ErrorBoundary from '@/components/shared/ErrorBoundary'
 import { useAppStore } from '@/store/appStore'
 import { useIntentSuggestions } from '@/hooks/useIntentSuggestions'
@@ -49,6 +50,9 @@ export default function App() {
           <AdminOverlay />
         </ErrorBoundary>
       )}
+      <ErrorBoundary>
+        <EmergencyBoard />
+      </ErrorBoundary>
       <ErrorBoundary>
         <SymbolSearch />
       </ErrorBoundary>

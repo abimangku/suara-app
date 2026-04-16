@@ -11,8 +11,9 @@ import VocabSuggestions from '@/components/Admin/VocabSuggestions'
 import BackupRestore from '@/components/Admin/BackupRestore'
 import KioskGuide from '@/components/Admin/KioskGuide'
 import VoiceCloneGuide from '@/components/Admin/VoiceCloneGuide'
+import EmergencyContacts from '@/components/Admin/EmergencyContacts'
 
-type AdminSection = 'home' | 'manageWords' | 'managePeople' | 'addPerson' | 'addWord' | 'quickPhrases' | 'vocabPacks' | 'insights' | 'onboarding' | 'vocabSuggestions' | 'backup' | 'kioskGuide' | 'voiceClone'
+type AdminSection = 'home' | 'manageWords' | 'managePeople' | 'addPerson' | 'addWord' | 'quickPhrases' | 'vocabPacks' | 'insights' | 'onboarding' | 'vocabSuggestions' | 'backup' | 'kioskGuide' | 'voiceClone' | 'emergencyContacts'
 
 const ADMIN_CARDS = [
   { id: 'manageWords' as const, emoji: '📝', label: 'Kelola Kata', desc: 'Tambah, edit, hapus kosakata' },
@@ -25,6 +26,7 @@ const ADMIN_CARDS = [
   { id: 'backup' as const, emoji: '💾', label: 'Cadangan Data', desc: 'Cadangkan dan pulihkan kosakata' },
   { id: 'kioskGuide' as const, emoji: '📱', label: 'Mode Kiosk', desc: 'Panduan mengunci tablet untuk AAC' },
   { id: 'voiceClone' as const, emoji: '🎙️', label: 'Kloning Suara', desc: 'Buat tablet bicara dengan suara keluarga' },
+  { id: 'emergencyContacts' as const, emoji: '🆘', label: 'Kontak Darurat', desc: 'Atur kontak SMS darurat (Ibu, Ayah, Ambulans)' },
 ]
 
 export default function AdminHome() {
@@ -134,6 +136,15 @@ export default function AdminHome() {
       <div className="p-4">
         <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
         <VoiceCloneGuide onDone={() => setActiveSection('home')} />
+      </div>
+    )
+  }
+
+  if (activeSection === 'emergencyContacts') {
+    return (
+      <div className="p-4">
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <EmergencyContacts onDone={() => setActiveSection('home')} />
       </div>
     )
   }

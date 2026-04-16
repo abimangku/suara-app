@@ -42,6 +42,7 @@ export const SEED_FOLDERS: Omit<DbFolder, 'id' | 'createdAt' | 'updatedAt'>[] = 
   { key: 'aktivitas', label: 'Aktivitas', emoji: '🎮', sortOrder: 2, isActive: true },
   { key: 'tempat',    label: 'Tempat',    emoji: '📍', sortOrder: 3, isActive: true },
   { key: 'tubuh',     label: 'Tubuh',     emoji: '💪', sortOrder: 4, isActive: true },
+  { key: 'pertanyaan', label: 'Pertanyaan', emoji: '❓', sortOrder: 5, isActive: true },
 ]
 
 // Seed data for people
@@ -61,6 +62,12 @@ export const SEED_QUICK_PHRASES: Omit<DbQuickPhrase, 'id' | 'createdAt' | 'updat
   { phrase: 'tidak mau',      words: ['tidak', 'mau'],           sortOrder: 4, isActive: true },
   { phrase: 'aku lapar',      words: ['aku', 'lapar'],           sortOrder: 5, isActive: true },
   { phrase: 'mau Ibu',        words: ['mau', 'Ibu'],             sortOrder: 6, isActive: true },
+  { phrase: 'halo',              words: ['halo'],              sortOrder: 7, isActive: true },
+  { phrase: 'terima kasih',      words: ['terima', 'kasih'],   sortOrder: 8, isActive: true },
+  { phrase: 'maaf',              words: ['maaf'],              sortOrder: 9, isActive: true },
+  { phrase: 'selamat pagi',      words: ['selamat', 'pagi'],   sortOrder: 10, isActive: true },
+  { phrase: 'selamat malam',     words: ['selamat', 'malam'],  sortOrder: 11, isActive: true },
+  { phrase: 'dadah',             words: ['dadah'],             sortOrder: 12, isActive: true },
 ]
 
 // Seed data for fringe words — keyed by folder key
@@ -124,6 +131,13 @@ export const SEED_WORDS: Record<string, Array<{ id: string; label: string; emoji
     { id: 'dingin',       label: 'dingin',       emoji: '🥶', sortOrder: 7 },
     { id: 'gatal',        label: 'gatal',        emoji: '🤚', sortOrder: 8 },
     { id: 'capek',        label: 'capek',        emoji: '😩', sortOrder: 9 },
+  ],
+  pertanyaan: [
+    { id: 'siapa',     label: 'siapa',     emoji: '🙋', sortOrder: 0 },
+    { id: 'dimana',    label: 'dimana',    emoji: '📍', sortOrder: 1 },
+    { id: 'kapan',     label: 'kapan',     emoji: '⏰', sortOrder: 2 },
+    { id: 'kenapa',    label: 'kenapa',    emoji: '🤔', sortOrder: 3 },
+    { id: 'bagaimana', label: 'bagaimana', emoji: '💭', sortOrder: 4 },
   ],
 }
 

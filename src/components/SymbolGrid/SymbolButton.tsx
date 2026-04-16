@@ -1,14 +1,16 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '@/store/appStore'
 import type { FKColor } from '@/types'
 
 const HAPTIC_DURATIONS = { off: 0, light: 10, medium: 30, strong: 50 } as const
+const LONG_PRESS_MS = 1500
 
 interface SymbolButtonProps {
   emoji?: string
   label: string
   variant: 'core' | 'people' | 'folder' | 'fringe' | 'kembali'
   onTap: () => void
+  onLongPress?: () => void
   isActive?: boolean
   disabled?: boolean
   children?: React.ReactNode
@@ -39,6 +41,7 @@ export default function SymbolButton({
   label,
   variant,
   onTap,
+  onLongPress,
   isActive = false,
   disabled = false,
   children,
@@ -50,6 +53,9 @@ export default function SymbolButton({
   const hapticLevel = useAppStore((s) => s.hapticLevel)
   const [isHighlighted, setIsHighlighted] = useState(false)
 
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const didLongPressRef = useRef(false)
+
   const blobUrl = useMemo(() => {
     if (!photoBlob) return null
     return URL.createObjectURL(photoBlob)
@@ -58,6 +64,22 @@ export default function SymbolButton({
   useEffect(() => {
     return () => { if (blobUrl) URL.revokeObjectURL(blobUrl) }
   }, [blobUrl])
+
+  useEffect(() => {
+    return () => {
+      if (longPressTimerRef.current) {
+        clearTimeout(longPressTimerRef.current)
+        longPressTimerRef.current = null
+      }
+    }
+  }, [])
+
+  function clearLongPressTimer() {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current)
+      longPressTimerRef.current = null
+    }
+  }
 
   const baseClasses =
     'rounded-button border-2 flex flex-col items-center justify-center gap-1 cursor-pointer select-none active:scale-[0.96] transition-transform duration-[80ms] min-h-0 min-w-0 overflow-hidden p-1'
@@ -110,14 +132,41 @@ export default function SymbolButton({
         // This runs ~50-100ms earlier than onClick.
         if (disabled) return
         // Only vibrate for speech-output buttons — not navigation (folder/kembali)
-        if (variant === 'folder' || variant === 'kembali') return
-        const ms = HAPTIC_DURATIONS[hapticLevel] ?? 10
-        if (ms > 0) {
-          try { navigator.vibrate?.(ms) } catch {}
+        if (variant !== 'folder' && variant !== 'kembali') {
+          const ms = HAPTIC_DURATIONS[hapticLevel] ?? 10
+          if (ms > 0) {
+            try { navigator.vibrate?.(ms) } catch {}
+          }
         }
+        // Start long-press timer if handler is provided
+        if (onLongPress) {
+          didLongPressRef.current = false
+          clearLongPressTimer()
+          longPressTimerRef.current = setTimeout(() => {
+            didLongPressRef.current = true
+            longPressTimerRef.current = null
+            // Extra haptic cue on long-press trigger for motor confirmation
+            try { navigator.vibrate?.(50) } catch {}
+            onLongPress()
+          }, LONG_PRESS_MS)
+        }
+      }}
+      onPointerUp={() => {
+        clearLongPressTimer()
+      }}
+      onPointerLeave={() => {
+        clearLongPressTimer()
+      }}
+      onPointerCancel={() => {
+        clearLongPressTimer()
       }}
       onClick={() => {
         if (disabled) return
+        // If long-press already fired, skip normal tap and reset flag
+        if (didLongPressRef.current) {
+          didLongPressRef.current = false
+          return
+        }
         const start = performance.now()
         if (isModelingMode) {
           setIsHighlighted(true)

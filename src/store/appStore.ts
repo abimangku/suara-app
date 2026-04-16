@@ -50,6 +50,11 @@ interface AppStore {
   // Caregiver pane
   isCaregiverPaneOpen: boolean
   toggleCaregiverPane: () => void
+
+  // Emergency surface
+  isEmergencyOpen: boolean
+  openEmergency: () => void
+  closeEmergency: () => void
 }
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -103,4 +108,9 @@ export const useAppStore = create<AppStore>((set) => ({
   // Caregiver pane
   isCaregiverPaneOpen: false,
   toggleCaregiverPane: () => set((state) => ({ isCaregiverPaneOpen: !state.isCaregiverPaneOpen })),
+
+  // Emergency surface
+  isEmergencyOpen: false,
+  openEmergency: () => set({ isEmergencyOpen: true }),
+  closeEmergency: () => set({ isEmergencyOpen: false }),
 }))
