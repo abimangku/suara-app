@@ -178,6 +178,18 @@ It checks `appVersion` to skip `runInitialSeed()` after first install, but ALWAY
 
 `src/scripts/` is excluded from the browser build (`tsconfig.app.json`). `download-symbols.ts` uses Node `fs`/`path` — never import it from app code.
 
+### 7.9 Retained-but-unreachable components (v1.2.2)
+
+`SymbolSearch` (🔍 search overlay) and the mute logic (🔊 toggle) are still in the codebase but were removed from the SentenceBar UI per caregiver feedback. Store state (`isSearchOpen`, `isMuted`) and underlying components are unchanged. Don't delete them — re-adding either button is one line in `SentenceBar.tsx`. If you're pruning dead code, check with the user first.
+
+### 7.10 Folder view hides core (v1.2.1+)
+
+`SymbolGrid` renders `CoreRow + PeopleRow + FolderRow` ONLY when `activeFolderKey === null`. Inside a folder, only `FolderContents` renders — giving fringe words the full 5-row grid. This differs from commercial AAC (P2G, TouchChat, Snap) which embed core on fringe pages. Our model works because of the auto-return-to-home after fringe tap — she never needs core while inside a folder. Don't "fix" this by re-adding core rows without re-thinking the auto-return behavior.
+
+### 7.11 PWA install UX (v1.2.2)
+
+`InstallBanner` (`src/components/shared/InstallBanner.tsx`) surfaces a programmatic install button via `beforeinstallprompt`. This matters because Samsung Chrome and some other builds bury or omit the "Install aplikasi" menu item, leaving caregivers with the "Tambahkan ke layar utama" shortcut (which creates a Chrome tab bookmark, not a PWA). The banner is the reliable path. Don't remove it.
+
 ---
 
 ## 8. Running agents in parallel

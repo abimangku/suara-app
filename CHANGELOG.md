@@ -7,6 +7,27 @@ All notable changes to the Suara AAC app are documented here.
 > For AI agent conventions, see [AGENTS.md](./AGENTS.md).
 > For codebase quick reference, see [CLAUDE.md](./CLAUDE.md).
 
+## v1.2.2 — UX cleanup + install UX + icon fix (2026-04-16)
+
+Several small changes shipped as individual commits; consolidating here.
+
+### SentenceBar simplified
+- **Removed 🔍 search button** — the primary user never uses it; visual noise.
+- **Removed 🔊/🔇 mute button** — device hardware volume buttons handle this.
+- SentenceBar actions now: ⚡ quick phrases / 🕐 history / 💬 caregiver pane / ⚙️ admin. One less row of distraction, ~90 px more horizontal space for sentence chips before they scroll.
+- Underlying `isSearchOpen` / `isMuted` store state + `SymbolSearch` component are unchanged — just unreachable from the primary UI. Re-adding either button is one line.
+
+### PWA install experience
+- **New `InstallBanner` component** (`src/components/shared/InstallBanner.tsx`). Many Samsung Chrome builds surface only "Tambahkan ke layar utama" (add shortcut) in the three-dot menu and bury or omit "Install aplikasi" — caregivers end up with a Chrome bookmark that shows the URL bar on top of Suara instead of a true PWA install. The banner listens for `beforeinstallprompt`, shows a "📲 Install" button at the top when installable, and fires Chrome's native install dialog programmatically on tap. Hides automatically when running standalone or after `appinstalled`.
+- **Rewrote KioskGuide** (Admin → 📱 Mode Kiosk). Old guide incorrectly told caregivers to use "Tambahkan ke layar utama" which creates the broken shortcut. New guide (10 steps, was 7) clearly distinguishes "Install aplikasi" (correct — true PWA) vs. "Tambahkan ke layar utama" (wrong — Chrome tab shortcut), covers verification, battery background limits, and longer screen timeout.
+
+### Content fix
+- **Real ARASAAC pictograms for `minta` / `punya` / `lihat`**. When the core grid expanded from 10 to 24 words in the v0.4.1 improvement sprint, these three got a single shared placeholder PNG (byte-identical files, same MD5). The download script `src/scripts/vocab-list.ts` was never extended to cover the new core words. Downloaded correct pictograms from `static.arasaac.org`:
+  - minta → ID 25062 (order / ask / request)
+  - punya → ID 7271 (have / hold / own)
+  - lihat → ID 6564 (see / look / watch)
+- Audit of all 24 core + ~60 fringe symbols for byte duplicates; only remaining dup is `lelah.png = capek.png` (both mean "tired" — semantically correct).
+
 ## v1.2.1 — Folder view hotfix (2026-04-16)
 
 Fixes two regressions reported by the primary caregiver testing v1.2.0 on Tab A11:

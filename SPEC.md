@@ -1,6 +1,6 @@
 # Suara — Product & Technical Specification
 
-> Last updated: 2026-04-16, corresponds to **v1.1.0** (Deep audit Wave A + B).
+> Last updated: 2026-04-16, corresponds to **v1.2.2** (Deep audit complete + post-audit polish).
 > This is the single source of truth for what the app does and why. If the code and this document disagree, the code wins — but then this document is a bug and must be updated.
 
 ---
@@ -44,22 +44,42 @@ These come from AAC clinical research (see [RESEARCH.md](./RESEARCH.md)). Violat
 
 ### 3.1 Main screen
 
+### Home view (no folder open)
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ [⚡][🔍][🕐][🔊][💬]  word chips ...  [⌫][✕ Hapus][▶ Bicara] │  ← SentenceBar (56 px, blue)
+│ [⚡][🕐][💬][⚙️]  word chips ...  [⌫][✕ Hapus][▶ Bicara]    │  ← SentenceBar (56 px, blue)
 ├─────────────────────────────────────────────────────────────┤
-│ [intent suggestion 1] [sugg 2] [sugg 3]                     │  ← IntentSuggestions (53 px, amber tint)
+│ [intent suggestion 1] [sugg 2] [sugg 3]                     │  ← IntentSuggestions (when present; null if empty)
 ├─────────────────────────────────────────────────────────────┤
 │  mau    berhenti  bantu   ya      tidak   lagi              │  ← Row 1: verbs + negation + descriptor
 │  pergi  suka      makan   minum   aku     kamu              │  ← Row 2: verbs + pronouns
 │  ini    itu       ada     bisa    apa     punya             │  ← Row 3: pronouns + descriptor + question + verb
 │  ke     di        dan     sama    minta   lihat             │  ← Row 4: prepositions + conjunction + verbs
-│  [Ibu]  [Ayah]    [Bibi]  [Kakak] [+ Tambah] [·]            │  ← Row 5: People (max 4 + Tambah + spacer)
-│  🍽️     🎮        👕      🫀      ❓      [·]              │  ← Row 6: Folders (Makanan, Aktivitas, Pakaian, Tubuh, Pertanyaan, spacer)
+│  [Ayah] [Ibu]    [Nenek] [Mbak]  [+ Tambah] [·]            │  ← Row 5: People (up to 6; Tambah opens admin PIN gate, hides when full)
+│  🍽️   😊       🎮     📍     🫀     ❓                   │  ← Row 6: Folders (Makanan, Perasaan, Aktivitas, Tempat, Tubuh, Pertanyaan)
 └─────────────────────────────────────────────────────────────┘
 ```
 
-6-column grid, 10 rows total when visible. No scroll on Tab A11 — everything fits.
+### Folder view (when a folder is open)
+
+Core rows, people, and folder row are ALL hidden. Fringe words get the full 5-row grid + Kembali at the bottom:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ [⚡][🕐][💬][⚙️]  word chips ...  [⌫][✕ Hapus][▶ Bicara]    │  ← SentenceBar (unchanged)
+├─────────────────────────────────────────────────────────────┤
+│  lapar  haus  sakit  mual  pusing  ngantuk                  │  ← Rows 1-5: fringe words (up to 30 visible)
+│  panas  dingin gatal capek                                  │
+│  ...                                                        │
+├─────────────────────────────────────────────────────────────┤
+│  ← Kembali                                                  │  ← Row 6: full-span back button
+└─────────────────────────────────────────────────────────────┘
+```
+
+Why core is hidden in folder view: she auto-returns to home after tapping a fringe word, so she never needs core while inside a folder. Commercial AAC embeds core on fringe pages because they keep the user in the folder; our auto-return model is different. See [AAC_COMPETITIVE_ANALYSIS.md](./.audit/AAC_COMPETITIVE_ANALYSIS.md) for industry comparison.
+
+6-column grid. No scroll on Tab A11 — everything fits.
 
 ### 3.2 Core tap flow
 
@@ -74,9 +94,10 @@ These come from AAC clinical research (see [RESEARCH.md](./RESEARCH.md)). Violat
 
 ### 3.3 Folders
 
-- Tap 🍽️ Makanan → grid replaces with folder contents (Dasar pack by default), plus a "Kembali" button.
-- Tap any fringe word → added to sentence, user is returned home automatically.
-- "Lihat semua" inside folder switches to Lengkap pack (full vocabulary).
+- Tap 🍽️ Makanan → grid replaces entirely with folder contents (core/people/folder rows all hidden). Plus a full-span "Kembali" button at row 6.
+- Tap any fringe word → added to sentence + spoken, user is auto-returned to home.
+- Up to 30 words visible at once (5 rows × 6 cols). Existing folders are all ≤15 words — pagination isn't currently needed. If a folder exceeds 30 words in the future, `FolderContents` would need to re-introduce the `lihat semua` pagination path.
+- VocabPackAdmin (Dasar/Lengkap toggle) was removed in v1.1.0 — it was a silent feature (toggle updated DB but FolderContents never read the pack table). Caregivers use Admin → 📝 Kelola Kata to prune unwanted words.
 
 ### 3.4 Emergency surface (new in v1.0.1)
 
@@ -217,9 +238,9 @@ suara/
 │   ├── components/
 │   │   ├── AI/
 │   │   │   ├── CaregiverPane.tsx
-│   │   │   ├── EmergencyBoard.tsx       # NEW v1.0.1
+│   │   │   ├── EmergencyBoard.tsx       # v1.0.1
 │   │   │   ├── IntentSuggestions.tsx
-│   │   │   └── SymbolSearch.tsx
+│   │   │   └── SymbolSearch.tsx         # retained but unreachable from UI (🔍 button removed v1.2.2)
 │   │   ├── Admin/
 │   │   │   ├── AddPerson.tsx
 │   │   │   ├── AddWord.tsx
@@ -251,7 +272,8 @@ suara/
 │   │   └── shared/
 │   │       ├── AvatarCircle.tsx
 │   │       ├── BottomSheet.tsx
-│   │       └── ErrorBoundary.tsx
+│   │       ├── ErrorBoundary.tsx
+│   │       └── InstallBanner.tsx        # v1.2.2 — programmatic PWA install (beforeinstallprompt)
 │   ├── data/
 │   │   └── vocabulary.ts               # 24 CORE_WORDS + SEED_FOLDERS + SEED_WORDS + SEED_PEOPLE + SEED_QUICK_PHRASES
 │   ├── hooks/
@@ -333,11 +355,14 @@ All are prefixed `VITE_` so they're baked into the client bundle. That means the
 
 ### Tablet install flow
 
-1. Open https://suara-tau.vercel.app in Chrome on Tab A11.
-2. Chrome menu → "Install app" → confirm.
-3. App launches full-screen, landscape-locked.
+1. Open https://suara-tau.vercel.app in Chrome on Tab A11. Wait 5-10 s for the page + Service Worker to register.
+2. A blue banner appears at the top: "📲 Install Suara di tablet — [Install]". Tap **Install** → Chrome's native install dialog fires → confirm.
+   - Fallback: Chrome menu (⋮) → "Install aplikasi" or "Install Suara" (a menu item with a small ↓ download icon). **Do NOT tap "Tambahkan ke layar utama"** — that creates a Chrome tab shortcut, not a real PWA install.
+3. App launches full-screen, landscape-locked. No Chrome URL bar visible. Appears in Android Settings → Apps as "Suara".
 4. First tap anywhere triggers orientation lock + TTS warmup.
-5. For true kiosk: Android Settings → Security → App pinning → pin Suara.
+5. For true kiosk: Android Settings → Security → Pin windows → pin Suara. See the in-app guide at Admin → 📱 Mode Kiosk for the full 10-step setup.
+
+**If the install banner never appears:** Chrome considers the PWA not installable. Common causes: Service Worker hasn't registered (reload and wait), already installed (check app drawer), or Samsung Chrome suppressing the event (try Samsung Internet or Microsoft Edge for Android, which handle PWA install more reliably on some builds).
 
 ---
 
@@ -373,6 +398,9 @@ Semantic versioning, but the 1.0.0 line represents "shipped to my daughter." Min
 
 | Version | Date | Scope |
 |---|---|---|
+| v1.2.2 | 2026-04-16 | UX cleanup (🔍 + 🔊 buttons removed) + InstallBanner + real ARASAAC icons for minta/punya/lihat |
+| v1.2.1 | 2026-04-16 | Folder view hotfix: hide core in folder view, revert P2-7 spacer bug |
+| v1.2.0 | 2026-04-16 | Deep audit Wave C (P2): quick phrase expansion (4 communicative purposes), a11y focus-visible + ARIA live |
 | v1.1.0 | 2026-04-16 | Deep audit Wave B (P1): FK colors on fringe, visible ⚙️ admin, undo toast, modeling ring persist, test-SMS/call, VocabPack removed |
 | v1.0.3 | 2026-04-16 | Deep audit Wave A (P0): usage logging wired, Ibu initial, Tambah→admin, no auto-clear, Ambulans tel: |
 | v1.0.2 | 2026-04-16 | Tab A11 viewport fit |

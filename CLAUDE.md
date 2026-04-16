@@ -1,6 +1,6 @@
 # Suara — AAC Communication App
 
-> **Current version:** v1.1.0 (2026-04-16) — Deep audit Wave A + B
+> **Current version:** v1.2.2 (2026-04-16) — Deep audit complete + post-audit polish
 > **Live at:** https://suara-tau.vercel.app
 > **Related docs:** [SPEC.md](./SPEC.md) (product+tech spec) · [RESEARCH.md](./RESEARCH.md) (clinical evidence) · [AGENTS.md](./AGENTS.md) (AI agent rules) · [CHANGELOG.md](./CHANGELOG.md) (release history) · [.audit/](./.audit/) (deep-audit reports)
 
@@ -87,6 +87,7 @@ src/
       AvatarCircle.tsx
       BottomSheet.tsx
       ErrorBoundary.tsx                # Independent crash recovery per section
+      InstallBanner.tsx                # v1.2.2 — programmatic PWA install via beforeinstallprompt
   data/
     vocabulary.ts                      # 24 CORE_WORDS (hardcoded) + SEED_FOLDERS + SEED_WORDS + SEED_PEOPLE + SEED_QUICK_PHRASES
   hooks/
@@ -173,8 +174,9 @@ Tables: `words`, `folders`, `people`, `usageEvents`, `quickPhrases`, `settings`,
 - Seeding: `seedDatabase()` → `runInitialSeed()` on first install, `topUpSeedData()` on every launch (idempotent migration)
 
 ## Key Components
-- **SentenceBar** — top blue bar, word chips, action buttons (⚡ quick phrases, 🔍 search, 🕐 history, 🔊/🔇 mute, 💬 caregiver), ⌫ backspace, ✕ Hapus (confirm-clear), ▶ Bicara (long-press 2s → modeling mode)
-- **SymbolGrid** — 6-col grid, renders CoreRow × 4 + PeopleRow + FolderRow OR FolderContents when a folder is open
+- **SentenceBar** — top blue bar, word chips, action buttons (⚡ quick phrases, 🕐 history, 💬 caregiver, ⚙️ admin). Removed in v1.2.2: 🔍 search (distraction) and 🔊 mute (device volume handles it). ⌫ backspace (with visible undo toast), ✕ Hapus (confirm-clear), ▶ Bicara (long-press 2s → modeling mode).
+- **SymbolGrid** — 6-col grid. Home view: CoreRow × 4 + PeopleRow + FolderRow. Folder view (v1.2.1+): `FolderContents` ONLY — core rows hidden so fringe words get the full 5-row grid instead of being squeezed into 1 row. The auto-return-to-home after fringe tap means she never needs core while inside a folder.
+- **InstallBanner** (v1.2.2) — floating top banner that appears when `beforeinstallprompt` fires; tap "Install" to trigger Chrome's native PWA install dialog programmatically. Bypasses the buried/missing "Install aplikasi" menu item on some Samsung Chrome builds.
 - **SymbolButton** — color-coded by variant + Fitzgerald Key `fkColor` (applies to BOTH `core` and `fringe` variants as of v1.1.0); haptic on `onPointerDown`; optional `onLongPress` (1500 ms, used by `bantu` for emergency). Modeling-mode amber ring persists 2s (was 500ms before v1.1.0).
 - **IntentSuggestions** — 3 prediction buttons after 2+ words; renders an invisible 53px placeholder when empty to prevent grid reflow
 - **EmergencyBoard** — full-screen red overlay with 4 large SMS buttons; triggered by 1.5 s long-press on `bantu`
@@ -268,7 +270,10 @@ All `VITE_` prefixed → baked into client bundle → **public**. Acceptable for
 - Separate page component (`src/pages/Dashboard.tsx`), not part of main AAC interface
 
 ## Build Tags
-- `v1.1.0` — **Deep audit Wave B** (2026-04-16) — FK colors on fringe, visible ⚙️ admin, undo toast, modeling ring 2s, test-SMS/call, VocabPack removal, Dashboard admin card
+- `v1.2.2` — **UX cleanup + install UX + icon fix** (2026-04-16) — removed 🔍 + 🔊 buttons, InstallBanner component, KioskGuide rewrite, real ARASAAC icons for minta/punya/lihat
+- `v1.2.1` — **Folder view hotfix** (2026-04-16) — hide core in folder view so fringe gets full grid, revert P2-7 spacer bug, remove lihat-semua
+- `v1.2.0` — **Deep audit Wave C P2** (2026-04-16) — FK colors complete, undo toast, modeling ring 2s, quick phrase expansion across 4 communicative purposes, a11y focus-visible + ARIA live
+- `v1.1.0` — **Deep audit Wave B** (2026-04-16) — visible ⚙️ admin, test-SMS/call, VocabPack removal, Dashboard admin card
 - `v1.0.3` — **Deep audit Wave A P0** (2026-04-16) — usage logging wired, Ibu initial fix, Tambah opens admin, no auto-clear after Bicara, Ambulans tel:
 - `v1.0.2` — Tab A11 viewport fit (grid gap 8→6, IntentSuggestions placeholder removed)
 - `v1.0.1` — Clinical content sprint — Pertanyaan folder, social phrases, emergency SOS, bug fixes
