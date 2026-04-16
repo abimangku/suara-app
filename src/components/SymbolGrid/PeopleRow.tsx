@@ -8,12 +8,17 @@ export default function PeopleRow() {
   const { addWord } = useSentenceBar()
 
   const peopleList = people ?? []
-  const usedSlots = peopleList.length + 1 // +1 for Tambah button
+  // 6-col grid cap: show up to 6 people. Hide the "Tambah" placeholder once the
+  // row is full so the row never overflows (overflow would wrap Tambah onto the
+  // folder row). Caregiver can still add more people via Admin → Kelola Orang.
+  const visiblePeople = peopleList.slice(0, 6)
+  const showTambah = visiblePeople.length < 6
+  const usedSlots = visiblePeople.length + (showTambah ? 1 : 0)
   const padCount = Math.max(0, 6 - usedSlots)
 
   return (
     <>
-      {peopleList.map((person) => (
+      {visiblePeople.map((person) => (
         <SymbolButton
           key={person.id}
           label={person.name}
@@ -24,14 +29,16 @@ export default function PeopleRow() {
           {!person.photoBlob ? <AvatarCircle initial={person.initial} /> : undefined}
         </SymbolButton>
       ))}
-      <SymbolButton
-        label="Tambah"
-        variant="people"
-        onTap={() => {}}
-        disabled
-      >
-        <AvatarCircle initial="+" size={46} />
-      </SymbolButton>
+      {showTambah && (
+        <SymbolButton
+          label="Tambah"
+          variant="people"
+          onTap={() => {}}
+          disabled
+        >
+          <AvatarCircle initial="+" size={46} />
+        </SymbolButton>
+      )}
       {Array.from({ length: padCount }).map((_, i) => (
         <div key={`spacer-${i}`} aria-hidden="true" />
       ))}
