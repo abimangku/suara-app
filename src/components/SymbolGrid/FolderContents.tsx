@@ -32,7 +32,7 @@ export default function FolderContents({ folderKey }: FolderContentsProps) {
           variant="fringe"
           symbolPath={fw.symbolPath}
           photoBlob={fw.photoBlob}
-          onTap={() =>
+          onTap={() => {
             addWord({
               id: String(fw.id),
               label: fw.label,
@@ -42,7 +42,13 @@ export default function FolderContents({ folderKey }: FolderContentsProps) {
               audioPath: fw.audioPath,
               audioBlob: fw.audioBlob,
             })
-          }
+            // Auto-return to home after selecting a fringe word.
+            // Reduces navigation overhead: she picks a word, the sentence
+            // updates, and she's straight back to core vocabulary for the
+            // next word. Avoids the manual Kembali tap which is cognitively
+            // separate from speaking.
+            setActiveFolder(null)
+          }}
         />
       ))}
 
