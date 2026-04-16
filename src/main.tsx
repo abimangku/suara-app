@@ -43,17 +43,23 @@ function setupFullscreenAndOrientationOnFirstTouch() {
     } catch {
       // Silently ignore — fullscreen fails in iframes, dev preview, etc.
     }
-    try {
-      // Lock to landscape — requires fullscreen on Android Chrome
-      const orientation = screen.orientation as ScreenOrientation & {
-        lock?: (orientation: OrientationLockType) => Promise<void>
+
+    // Only attempt orientation lock if we actually entered fullscreen
+    if (document.fullscreenElement) {
+      try {
+        if (screen.orientation?.lock) {
+          await screen.orientation.lock('landscape')
+        }
+      } catch {
+        // Orientation lock unsupported (iOS, older Chrome) — silently fall back to CSS portrait warning
       }
-      if (orientation && typeof orientation.lock === 'function') {
-        await orientation.lock('landscape')
-      }
-    } catch {
-      // Falls back to CSS portrait warning if lock is unsupported
     }
+
+    // Fire silent warmup utterance to prime TTS phoneme engine.
+    // Must run inside a user gesture handler — Chrome Android autoplay policy
+    // drops pre-gesture warmups silently.
+    warmupTtsEngine()
+
     window.removeEventListener('touchend', requestImmersive)
     window.removeEventListener('click', requestImmersive)
   }
@@ -61,25 +67,29 @@ function setupFullscreenAndOrientationOnFirstTouch() {
   window.addEventListener('click', requestImmersive, { once: true })
 }
 
-// Pre-warm the browser TTS engine on app init.
-// This loads the Indonesian voice and pronunciation data BEFORE the user taps,
-// eliminating the 200-500ms cold-start latency on the first word.
-function prewarmSpeechSynthesis() {
+// Load browser voice list — does NOT require a user gesture.
+// Indonesian voice metadata needs to be resolved before the first tap.
+function loadVoices() {
   try {
-    // Trigger voice list loading (async on most browsers)
     speechSynthesis.getVoices()
-    // Some browsers populate voices lazily — listen for the event
     if (speechSynthesis.onvoiceschanged !== undefined) {
-      speechSynthesis.onvoiceschanged = () => {
+      speechSynthesis.addEventListener('voiceschanged', () => {
         speechSynthesis.getVoices()
-      }
+      })
     }
-    // Fire a silent utterance to warm up the phoneme engine.
-    // Using a very short string at zero volume — imperceptible but forces init.
+  } catch {
+    // TTS not supported — fallback handled elsewhere
+  }
+}
+
+// Fire a silent utterance to warm up the phoneme engine.
+// MUST run inside a user gesture handler on Chrome Android (autoplay policy).
+function warmupTtsEngine() {
+  try {
     const warmup = new SpeechSynthesisUtterance(' ')
     warmup.lang = 'id-ID'
     warmup.volume = 0
-    warmup.rate = 10
+    warmup.rate = 2 // Some browsers clamp rate > ~4; 2 is safe and still fast.
     speechSynthesis.speak(warmup)
   } catch {
     // TTS not supported — fallback handled elsewhere
@@ -94,7 +104,17 @@ async function init() {
     </StrictMode>,
   )
   setupFullscreenAndOrientationOnFirstTouch()
-  prewarmSpeechSynthesis()
+  loadVoices()
+
+  // Re-acquire orientation lock when user re-enters fullscreen
+  // (Android back button / swipe gesture releases it).
+  document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement && screen.orientation?.lock) {
+      screen.orientation.lock('landscape').catch(() => {
+        // Lock not supported — silently continue
+      })
+    }
+  })
 }
 
 init()

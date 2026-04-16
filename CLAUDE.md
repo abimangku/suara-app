@@ -137,7 +137,8 @@ src/
 - 24 core words (rows 1-4) — HARDCODED in src/data/vocabulary.ts, never from database
 - People row (row 5) — from IndexedDB, max 6
 - Folder row (row 6) — 5 categories + 1 slot
-- Grid gap: 10px, padding: 12px
+- Grid gap: 8px, padding: 8px
+  - Tightened for Samsung Galaxy Tab A11 (~1000x600 CSS viewport). Larger viewports have extra breathing room.
 - Button border-radius: 14px, press animation: scale(0.96) for 80ms
 - Button labels: 18px bold, 0.4px letter-spacing, Nunito font
 - Symbol images: 52x52px within buttons

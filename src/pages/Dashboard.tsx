@@ -37,6 +37,7 @@ export default function Dashboard() {
         <input
           type="password"
           inputMode="numeric"
+          maxLength={6}
           value={pin}
           onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
           placeholder="PIN"

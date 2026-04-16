@@ -47,10 +47,11 @@ export default function SymbolSearch() {
       <div className="flex items-center gap-3 px-4 py-3 bg-suara-blue-bar">
         <button
           onClick={() => { toggleSearch(); setQuery(''); setResults([]) }}
-          className="w-10 h-10 rounded-lg bg-white/20 text-white flex items-center justify-center font-bold shrink-0 active:scale-[0.96] transition-transform duration-[80ms]"
+          className="h-12 px-4 rounded-lg bg-white/20 text-white flex items-center gap-2 shrink-0 active:scale-[0.96] transition-transform duration-[80ms] font-bold"
           type="button"
+          aria-label="Kembali"
         >
-          ←
+          ← <span className="text-sm">Kembali</span>
         </button>
         <input
           type="text"

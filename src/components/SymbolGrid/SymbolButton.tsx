@@ -89,7 +89,17 @@ export default function SymbolButton({
     if (emoji) {
       return <span className="leading-tight" style={{ fontSize: 'min(34px, 40%)' }}>{emoji}</span>
     }
-    return <span className="leading-tight" style={{ fontSize: 'min(34px, 40%)' }}>❓</span>
+    // Neutral fallback: circle with first letter of label (not ❓ which looks like a question word)
+    return (
+      <div
+        className="flex items-center justify-center rounded-full border-2 border-dashed border-current opacity-60"
+        style={{ width: 'min(52px, 60%)', height: 'min(52px, 60%)' }}
+      >
+        <span className="font-bold" style={{ fontSize: 'min(24px, 30%)' }}>
+          {label.charAt(0).toUpperCase()}
+        </span>
+      </div>
+    )
   }
 
   return (
@@ -115,7 +125,7 @@ export default function SymbolButton({
         }
         onTap()
         const elapsed = performance.now() - start
-        if (elapsed > 100) {
+        if (elapsed > 100 && import.meta.env.DEV) {
           console.warn(`[Suara Perf] Tap on "${label}" took ${elapsed.toFixed(1)}ms (target: <100ms)`)
         }
       }}
