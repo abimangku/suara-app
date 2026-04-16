@@ -2,6 +2,32 @@
 
 All notable changes to the Suara AAC app are documented here.
 
+## v1.0.1 — Deep AAC Audit + Clinical Content Sprint (2026-04-16)
+### Bug fixes (critical)
+- **Grid row mixing**: PeopleRow emitted 5 cells instead of 6, causing the first folder (Makanan) to wrap into the people row. Both PeopleRow and FolderRow now pad to 6 cells with `aria-hidden` spacer divs.
+- **Haptic double-fire**: tapping fired vibration twice (once from `onPointerDown` hardcoded 10ms, once from `useAudio.playWord`), silently overriding the user's "off" setting. Haptic is now consolidated into `SymbolButton.onPointerDown` with the configured level from the store; folder/kembali navigation no longer vibrates.
+- **Modeling banner text wrong**: amber banner said "ketuk tombol untuk menunjukkan, tanpa suara" but modeling mode DOES play audio (per ALgS research). Changed to "suara main, kalimat tidak bertambah".
+- **Grid shift when suggestions disappear**: IntentSuggestions returned `null` when empty, causing the grid to reflow. Now returns an invisible 53px placeholder so button sizes stay stable.
+- **TTS cancel+speak Android race**: on Chrome Android, calling `speechSynthesis.speak()` immediately after `cancel()` drops the second utterance silently (chromium/679043). `fallbackTTS` and `speakSentence` now add a 50ms setTimeout between cancel and speak.
+- **Orientation lock runs without fullscreen**: `screen.orientation.lock('landscape')` threw when fullscreen had failed. Added `if (document.fullscreenElement)` guard. Also added `fullscreenchange` listener to re-acquire the lock when the user re-enters fullscreen (Android back button releases it).
+- **TTS prewarm blocked by autoplay policy**: Chrome Android drops prewarm utterances fired outside a user gesture. Split into `loadVoices()` (init) and `warmupTtsEngine()` (first gesture); warmup rate dropped 10 → 2 (some browsers clamp rate > 4).
+- **Prod console warnings**: SymbolButton's perf-tap warning now guarded with `import.meta.env.DEV`.
+- **Sentence bar height clip**: fixed `height: 56` replaced with `minHeight: 56` so the bar can expand for long chip lists.
+- **`ada` FK color wrong**: was `descriptor`, should be `verb` per Fitzgerald Key (existence is a verbal action, not a descriptor).
+- **`❓` fallback misread as "apa"**: neutral dashed circle with the first letter of the label replaces the `?` emoji when no symbol/photo/emoji is available.
+- **Non-standard `screen-orientation` meta**: removed from `index.html` (it's not a web standard — real orientation lock comes from manifest + Screen Orientation API).
+- **Dashboard PIN input**: already had `maxLength={6}` + `inputMode="numeric"` — verified correct.
+
+### New clinical content
+- **Pertanyaan folder** with 5 question words (who/where/when/why/how): `siapa`, `dimana`, `kapan`, `kenapa`, `bagaimana`. ARASAAC pictograms downloaded. Vocabulary packs: `Pertanyaan Dasar` (first 3) and `Pertanyaan Lengkap` (all 5).
+- **6 social quick phrases**: `halo`, `terima kasih`, `maaf`, `selamat pagi`, `selamat malam`, `dadah`. Teaches greeting and gratitude routines per AAC best practice.
+- **Emergency SOS surface**: long-press `bantu` for 1.5s to open a full-screen red overlay with 4 large buttons (Aku sakit / Panggil Ibu / Panggil Ayah / Panggil Ambulans). Each triggers an SMS via `sms:...?body=...` URI to a caregiver-configured contact. Ambulans pre-filled with `118` (Indonesian emergency medical number).
+- **Emergency Contacts admin**: new card in AdminHome (🆘 Kontak Darurat) to configure the three phone numbers. Stored in `db.settings` under `emergencyContacts` key.
+- **Idempotent top-up seed**: `seedDatabase()` now calls `topUpSeedData()` after initial seed so already-installed users pick up the Pertanyaan folder + social phrases without wiping their custom content.
+
+### Documentation
+- `CLAUDE.md` grid spec updated to match reality (8px gap + 8px padding, tightened for Tab A11 viewport). Note added explaining larger viewports have breathing room.
+
 ## v1.0.0 — Production Release (2026-04-10)
 ### Phase 6: Polish & Hardening
 - Error boundaries for independent crash recovery per UI section
