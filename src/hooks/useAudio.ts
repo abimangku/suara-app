@@ -5,11 +5,14 @@ import type { Word } from '@/types'
 export function useAudio() {
   function playWord(word: Word): void {
     // Sync haptic level from store (kept in sync for other code paths that may vibrate)
-    const { isMuted, hapticLevel } = useAppStore.getState()
+    const { hapticLevel } = useAppStore.getState()
     audioEngine.setHapticLevel(hapticLevel)
     // Haptic fires from SymbolButton.onPointerDown before this runs (for faster perceived response)
 
-    if (isMuted) return
+    // Note: isMuted guard was removed in v1.2.2 when the 🔊 mute button was
+    // removed from SentenceBar. Device hardware volume now handles muting.
+    // Leaving the old isMuted check in place would risk permanently silencing
+    // the app if the state got stuck at true with no UI to toggle it back.
 
     // Kick off audio — fire-and-forget, no await
     if (word.audioBlob) {
@@ -25,9 +28,6 @@ export function useAudio() {
   }
 
   function playSentence(words: Word[]): void {
-    const isMuted = useAppStore.getState().isMuted
-    if (isMuted) return
-
     const text = words.map((w) => w.label).join(' ')
     audioEngine.speakSentence(text)
   }
