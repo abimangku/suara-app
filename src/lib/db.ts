@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie'
 import type { DbWord, DbFolder, DbPerson, UsageEvent, DbQuickPhrase, AppSettings, VocabularyPack, CommunicationMilestone } from '@/types'
+import { scheduleAutoBackup } from '@/lib/auto-backup'
 
 class SuaraDatabase extends Dexie {
   words!: Table<DbWord>
@@ -47,3 +48,15 @@ class SuaraDatabase extends Dexie {
 }
 
 export const db = new SuaraDatabase()
+
+// Auto-backup: schedule a localStorage snapshot whenever user-configurable
+// data changes. Debounced (2s) so rapid admin edits produce one backup.
+// Covers: people, folders, words, quickPhrases, settings.
+// Excludes: usageEvents, communicationMilestones, vocabularyPacks (high-volume
+// analytics data that doesn't need localStorage backup).
+const configTables = [db.people, db.folders, db.words, db.quickPhrases, db.settings] as Table[]
+for (const table of configTables) {
+  table.hook('creating', () => { scheduleAutoBackup() })
+  table.hook('updating', () => { scheduleAutoBackup() })
+  table.hook('deleting', () => { scheduleAutoBackup() })
+}

@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client'
 import '@/styles/globals.css'
 import App from '@/App'
 import { seedDatabase } from '@/lib/seed'
+import { db } from '@/lib/db'
+import { useAppStore } from '@/store/appStore'
 
 // Register PWA update handler
 if ('serviceWorker' in navigator) {
@@ -115,6 +117,19 @@ async function init() {
   }
 
   await seedDatabase()
+
+  // Restore persisted settings into Zustand store.
+  // These settings live in IndexedDB (survive reloads) but the store
+  // defaults to safe values — we read DB and override if present.
+  try {
+    const hapticSetting = await db.settings.get('hapticLevel')
+    if (hapticSetting?.value) {
+      useAppStore.getState().setHapticLevel(hapticSetting.value as 'off' | 'light' | 'medium' | 'strong')
+    }
+  } catch {
+    // DB read failure — keep default
+  }
+
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <App />

@@ -7,6 +7,27 @@ All notable changes to the Suara AAC app are documented here.
 > For AI agent conventions, see [AGENTS.md](./AGENTS.md).
 > For codebase quick reference, see [CLAUDE.md](./CLAUDE.md).
 
+## v1.3.0 — State persistence + data safety + consistency (2026-04-18)
+
+Major reliability update addressing the "changes come back to normal" bug reported during real-world testing.
+
+### Data persistence
+- **Persistent storage requested** (`navigator.storage.persist()` in `main.tsx`). Chrome Android was silently evicting IndexedDB under storage pressure on Tab A11, wiping all user customizations. Installed PWAs typically get persistence auto-granted — data is now protected from storage eviction.
+- **Auto-backup system** (`src/lib/auto-backup.ts`). Every admin edit (people, words, phrases, settings) silently snapshots all configurable data to `localStorage` (separate storage pool from IndexedDB). Debounced at 2 seconds so rapid edits batch. If IndexedDB is ever wiped, the auto-backup restores user customizations on next launch — no manual backup file needed. Photos (blobs) are NOT in the auto-backup (localStorage size limit) — manual backup (Admin → 💾 Cadangan Data) still needed for those.
+- **Auto-restore on data loss**. `seedDatabase()` now checks: if IndexedDB is empty but an auto-backup exists in localStorage, it seeds defaults THEN overlays the backup data (names, phrases, settings, words) non-destructively.
+- **Re-seed guard improved**. If `appVersion` flag is lost but tables have data, the flag is restored without re-seeding — prevents duplicate rows from accumulating.
+
+### State consistency
+- **`hapticLevel` now persisted to IndexedDB** (P0 audit finding). Previously Zustand-only — reset to 'light' on every reload. A caregiver setting haptic to 'off' for sensory reasons would see it revert on next app start. Now: `setHapticLevel` writes to `db.settings`, and `init()` reads it back on app launch.
+- **Dexie table hooks** trigger auto-backup on any write to people, folders, words, quickPhrases, or settings tables — no admin component needs to call backup explicitly.
+
+### Error handling
+- **All admin save operations now have try/catch** (ManagePeople, EditWord, AddWord, AddPerson). Previously, if IndexedDB was full or corrupted, saves failed silently — the UI looked like it worked but data was lost. Now: shows an alert in the user's language ("Gagal menyimpan. Coba lagi.").
+- **Duplicate guards** on AddPerson (checks name exists) and AddWord (checks label+folder exists). Prevents double-saves from rapid tapping or accidental repeat submissions.
+
+### Content
+- **Tubuh → Rasa Tubuh** folder rename. Contents are physical states (lapar/haus/pusing/dingin/gatal), not body parts. "Tubuh" (body) was misleading — "Rasa Tubuh" (body feelings) matches the actual words. `topUpSeedData` renames the folder on existing installs.
+
 ## v1.2.2 — UX cleanup + install UX + icon fix (2026-04-16)
 
 Several small changes shipped as individual commits; consolidating here.

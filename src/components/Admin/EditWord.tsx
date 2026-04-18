@@ -33,21 +33,33 @@ export default function EditWord({ onDone: _onDone, onAddWord }: EditWordProps) 
 
   async function handleUpdateLabel(id: number) {
     if (!editLabel.trim()) return
-    await db.words.update(id, { label: editLabel.trim(), updatedAt: Date.now() })
-    setEditingId(null)
-    setEditLabel('')
+    try {
+      await db.words.update(id, { label: editLabel.trim(), updatedAt: Date.now() })
+      setEditingId(null)
+      setEditLabel('')
+    } catch {
+      alert('Gagal menyimpan. Coba lagi.')
+    }
   }
 
   async function handleUpdatePhoto(word: DbWord) {
     const blob = await pickAndCrop(200)
     if (blob && word.id) {
-      await db.words.update(word.id, { photoBlob: blob, updatedAt: Date.now() })
+      try {
+        await db.words.update(word.id, { photoBlob: blob, updatedAt: Date.now() })
+      } catch {
+        alert('Gagal menyimpan foto. Coba lagi.')
+      }
     }
   }
 
   async function handleDelete(id: number) {
-    await db.words.update(id, { isActive: false, updatedAt: Date.now() })
-    setConfirmDeleteId(null)
+    try {
+      await db.words.update(id, { isActive: false, updatedAt: Date.now() })
+      setConfirmDeleteId(null)
+    } catch {
+      alert('Gagal menghapus. Coba lagi.')
+    }
   }
 
   // Folder picker view

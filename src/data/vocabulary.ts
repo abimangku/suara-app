@@ -41,7 +41,7 @@ export const SEED_FOLDERS: Omit<DbFolder, 'id' | 'createdAt' | 'updatedAt'>[] = 
   { key: 'perasaan',  label: 'Perasaan',  emoji: '😊', sortOrder: 1, isActive: true },
   { key: 'aktivitas', label: 'Aktivitas', emoji: '🎮', sortOrder: 2, isActive: true },
   { key: 'tempat',    label: 'Tempat',    emoji: '📍', sortOrder: 3, isActive: true },
-  { key: 'tubuh',     label: 'Tubuh',     emoji: '💪', sortOrder: 4, isActive: true },
+  { key: 'tubuh',     label: 'Rasa Tubuh', emoji: '🫀', sortOrder: 4, isActive: true },
   { key: 'pertanyaan', label: 'Pertanyaan', emoji: '❓', sortOrder: 5, isActive: true },
 ]
 

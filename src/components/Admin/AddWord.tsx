@@ -32,6 +32,17 @@ export default function AddWord({ onDone }: AddWordProps) {
     if (!label.trim() || !selectedFolderId) return
     setSaving(true)
     try {
+      // Duplicate guard: check if word with same label exists in same folder
+      const existing = await db.words
+        .where('folderId')
+        .equals(selectedFolderId)
+        .filter((w) => w.label === label.trim() && w.isActive)
+        .first()
+      if (existing) {
+        alert(`"${label.trim()}" sudah ada di folder ini.`)
+        setSaving(false)
+        return
+      }
       const wordCount = await db.words.where('folderId').equals(selectedFolderId).count()
       await db.words.add({
         folderId: selectedFolderId,
@@ -44,6 +55,8 @@ export default function AddWord({ onDone }: AddWordProps) {
         source: 'family',
       })
       onDone()
+    } catch {
+      alert('Gagal menyimpan kata. Coba lagi.')
     } finally {
       setSaving(false)
     }

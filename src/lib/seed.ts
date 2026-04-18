@@ -1,5 +1,6 @@
 import { db } from '@/lib/db'
 import { SEED_FOLDERS, SEED_PEOPLE, SEED_QUICK_PHRASES, SEED_WORDS } from '@/data/vocabulary'
+import { getAutoBackup, restoreFromAutoBackup, clearAutoBackup } from '@/lib/auto-backup'
 
 export async function seedDatabase(): Promise<void> {
   const existing = await db.settings.get('appVersion')
@@ -13,8 +14,19 @@ export async function seedDatabase(): Promise<void> {
     const peopleCount = await db.people.count()
 
     if (folderCount === 0 && peopleCount === 0) {
-      // Truly fresh install — seed everything
-      await runInitialSeed()
+      // Check for auto-backup before seeding defaults — if the user had
+      // customized data that was lost to storage eviction, restore it
+      // instead of re-creating generic defaults.
+      const autoBackup = getAutoBackup()
+      if (autoBackup) {
+        console.log(`[Suara] Found auto-backup from ${new Date(autoBackup.timestamp).toLocaleString()} — restoring`)
+        await runInitialSeed() // Seed base structure first
+        await restoreFromAutoBackup(autoBackup) // Then overlay user's customizations
+        clearAutoBackup() // Clear so we don't re-restore next time
+      } else {
+        // Truly fresh install, no backup — seed defaults
+        await runInitialSeed()
+      }
     } else {
       // Tables have data but appVersion is missing — restore the flag
       // without re-seeding. This prevents the "defaults overwrite customs" bug.
@@ -207,6 +219,18 @@ async function topUpSeedData(): Promise<void> {
         })
       }
     }
+  }
+
+  // --- Rename Tubuh → Rasa Tubuh (v1.3.0) ---
+  // Contents are physical states (lapar/haus/pusing), not body parts.
+  // "Tubuh" (body) was misleading. "Rasa Tubuh" (body feelings) is clearer.
+  const tubuhFolder = await db.folders.where('key').equals('tubuh').first()
+  if (tubuhFolder && tubuhFolder.label === 'Tubuh') {
+    await db.folders.update(tubuhFolder.id!, {
+      label: 'Rasa Tubuh',
+      emoji: '🫀',
+      updatedAt: Date.now(),
+    })
   }
 
   // --- Social + pragmatic quick phrases ---

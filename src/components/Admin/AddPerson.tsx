@@ -34,6 +34,13 @@ export default function AddPerson({ onDone }: AddPersonProps) {
     if (!name.trim()) return
     setSaving(true)
     try {
+      // Duplicate guard: check if person with same name already exists
+      const existing = await db.people.filter((p) => p.name === name.trim() && p.isActive).first()
+      if (existing) {
+        alert(`"${name.trim()}" sudah ada. Gunakan nama yang berbeda.`)
+        setSaving(false)
+        return
+      }
       const lastPerson = await db.people.orderBy('sortOrder').last()
       const nextOrder = (lastPerson?.sortOrder ?? -1) + 1
       await db.people.add({
@@ -46,6 +53,8 @@ export default function AddPerson({ onDone }: AddPersonProps) {
         updatedAt: Date.now(),
       })
       onDone()
+    } catch {
+      alert('Gagal menyimpan. Coba lagi.')
     } finally {
       setSaving(false)
     }

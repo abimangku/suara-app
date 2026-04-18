@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { Word } from '@/types'
+import { db } from '@/lib/db'
 
 interface AppStore {
   // Sentence bar
@@ -101,9 +102,14 @@ export const useAppStore = create<AppStore>((set) => ({
   isMuted: false,
   toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
 
-  // Haptic feedback
+  // Haptic feedback — persisted to IndexedDB so it survives reloads.
+  // A caregiver setting haptic to 'off' for sensory reasons must not
+  // reset to 'light' on the next app start.
   hapticLevel: 'light' as const,
-  setHapticLevel: (level) => set({ hapticLevel: level }),
+  setHapticLevel: (level) => {
+    set({ hapticLevel: level })
+    db.settings.put({ key: 'hapticLevel', value: level, updatedAt: Date.now() }).catch(() => {})
+  },
 
   // Caregiver pane
   isCaregiverPaneOpen: false,

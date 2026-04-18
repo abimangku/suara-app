@@ -27,25 +27,37 @@ export default function ManagePeople({ onDone: _onDone, onAddPerson }: ManagePeo
 
   async function handleUpdateName(id: number) {
     if (!editName.trim()) return
-    await db.people.update(id, {
-      name: editName.trim(),
-      initial: editName.trim().charAt(0).toUpperCase(),
-      updatedAt: Date.now(),
-    })
-    setEditingId(null)
-    setEditName('')
+    try {
+      await db.people.update(id, {
+        name: editName.trim(),
+        initial: editName.trim().charAt(0).toUpperCase(),
+        updatedAt: Date.now(),
+      })
+      setEditingId(null)
+      setEditName('')
+    } catch {
+      alert('Gagal menyimpan nama. Coba lagi.')
+    }
   }
 
   async function handleUpdatePhoto(person: DbPerson) {
     const blob = await pickAndCrop(200)
     if (blob && person.id) {
-      await db.people.update(person.id, { photoBlob: blob, updatedAt: Date.now() })
+      try {
+        await db.people.update(person.id, { photoBlob: blob, updatedAt: Date.now() })
+      } catch {
+        alert('Gagal menyimpan foto. Coba lagi.')
+      }
     }
   }
 
   async function handleDelete(id: number) {
-    await db.people.update(id, { isActive: false, updatedAt: Date.now() })
-    setConfirmDeleteId(null)
+    try {
+      await db.people.update(id, { isActive: false, updatedAt: Date.now() })
+      setConfirmDeleteId(null)
+    } catch {
+      alert('Gagal menghapus. Coba lagi.')
+    }
   }
 
   return (
