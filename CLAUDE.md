@@ -1,8 +1,8 @@
 # Suara — AAC Communication App
 
-> **Current version:** v1.2.2 (2026-04-16) — Deep audit complete + post-audit polish
+> **Current version:** v2.0.0 (2026-04-18) — Major grid redesign + progressive disclosure
 > **Live at:** https://suara-tau.vercel.app
-> **Related docs:** [SPEC.md](./SPEC.md) (product+tech spec) · [RESEARCH.md](./RESEARCH.md) (clinical evidence) · [AGENTS.md](./AGENTS.md) (AI agent rules) · [CHANGELOG.md](./CHANGELOG.md) (release history) · [.audit/](./.audit/) (deep-audit reports)
+> **Related docs:** [SPEC.md](./SPEC.md) (product+tech spec) · [RESEARCH.md](./RESEARCH.md) (clinical evidence) · [AGENTS.md](./AGENTS.md) (AI agent rules) · [CHANGELOG.md](./CHANGELOG.md) (release history) · [.audit/](./.audit/) (deep-audit reports) · [aac-starter-kit/](./aac-starter-kit/) (shareable kit for other parents)
 
 ## What This Is
 Suara ("voice" in Indonesian) is a tablet-based AAC app for a young non-speaking autistic woman in Jakarta. She taps symbol buttons to build Bahasa Indonesia sentences the tablet speaks aloud. Every design decision is research-backed (see [RESEARCH.md](./RESEARCH.md)) and serves her communication.
@@ -77,12 +77,14 @@ src/
       SentenceBar.tsx                  # Top blue bar; minHeight 56, not fixed height
       WordChip.tsx                     # White pill with flash state
     SymbolGrid/
-      CoreRow.tsx                      # 6 core words; passes onLongPress=openEmergency for `bantu`
-      FolderContents.tsx               # Fringe words inside open folder
-      FolderRow.tsx                    # 6 folders (Makanan, Aktivitas, Pakaian, Tubuh, Pertanyaan, spacer)
-      PeopleRow.tsx                    # Up to 4 people + Tambah + spacer pad to 6 cells
-      SymbolButton.tsx                 # Color-coded by FK category; haptic from store; onLongPress support
-      SymbolGrid.tsx                   # 6-col container — CoreRows + PeopleRow + FolderRow
+      HomeGrid.tsx                     # v2.0.0 — unified 6×6 grid (core + folders + growth slots + progressive disclosure)
+      PeopleContents.tsx               # v2.0.0 — full-screen people folder view with photos
+      FolderContents.tsx               # fringe words full-screen, auto-return-to-home
+      SymbolButton.tsx                 # FK colors for core+fringe; folder teal gradient; haptic; onLongPress
+      SymbolGrid.tsx                   # routes: HomeGrid | FolderContents | PeopleContents
+      CoreRow.tsx                      # legacy (retained, not imported by SymbolGrid)
+      FolderRow.tsx                    # legacy
+      PeopleRow.tsx                    # legacy
     shared/
       AvatarCircle.tsx
       BottomSheet.tsx
@@ -149,14 +151,33 @@ Per-category color-coding supports grammatical awareness and reduces visual sear
 - Sentence bar: `#2563EB` (white text, 5.2:1)
 - Emergency board: `#DC2626` full-screen red overlay with white buttons
 
-## Grid Layout
-- 6 columns × variable rows (4 core + 1 people + 1 folder visible simultaneously)
-- 24 core words (rows 1-4) — HARDCODED in `src/data/vocabulary.ts`, NEVER from database
-- People row (row 5) — up to 6 from IndexedDB; Tambah placeholder visible when <6, opens admin PIN gate on tap. When people.length = 6, Tambah hides.
-- Folder row (row 6) — 5 folders + Pertanyaan (new v1.0.1) = 6; spacer pad if fewer
+## Grid Layout (v2.0.0 — sentence-order columns)
+
+The grid follows sentence order left → right, based on Smartbox Grid Pad + Avaz AAC analysis + Wilkinson et al. 2022 spatial clustering research:
+
+```
+  Col 0        Col 1        Col 2        Col 3        Col 4        Col 5
+  WHO          DOING        DOING        DESCRIBE     CONNECT      TOPICS
+  (yellow)     (green)      (green)      (blue/pink)  (purple)     (teal)
+┌────────────┬────────────┬────────────┬────────────┬────────────┬────────────┐
+│ aku        │ mau        │ makan      │ ya         │ ke         │👥 Orang   │
+│ kamu       │ pergi      │ minum      │ tidak      │ di         │🍽️ Makanan │
+│ ini        │ suka       │ lihat      │ lagi       │ dan        │🎮 Aktivitas│
+│ itu        │ bantu      │ punya      │ bisa       │ sama       │📍 Tempat  │
+│ apa        │ berhenti   │ minta      │ ada        │  [growth]  │😊 Perasaan│
+│  [growth]  │ nonton     │ bobo       │  [growth]  │  [growth]  │❓ Pertanyaan│
+└────────────┴────────────┴────────────┴────────────┴────────────┴────────────┘
+```
+
+- **26 core words** — HARDCODED in `src/data/vocabulary.ts`, NEVER from database. Positions are motor-memory anchors.
+- **6 folders** in col 5 — Orang (people as folder, Smartbox/Avaz pattern), Makanan, Aktivitas, Tempat, Perasaan (merged with old Rasa Tubuh), Pertanyaan
+- **4 growth slots** (dashed placeholders) — fill with new core words as she grows (e.g., siapa, boleh, sudah). Never reshuffle existing positions.
+- **Rendered by `HomeGrid.tsx`** — unified component replaces old CoreRow + PeopleRow + FolderRow separation.
+- **Folder view (when folder tapped):** core rows HIDDEN, fringe gets full 5-row grid + Kembali. Auto-return to home after fringe tap. People folder opens `PeopleContents.tsx` (photos + Tambah).
 - Grid gap: **6px**, padding: **6px** (via `gap-[6px] p-1.5`)
-  - Tightened further in v1.0.2 so the full 6-row grid fits on Samsung Galaxy Tab A11's ~1024×600 CSS viewport. Larger viewports have extra breathing room.
-  - IntentSuggestions has NO reserved placeholder — returns `null` when empty. A ~8% reflow when it appears after 2+ taps is acceptable; button positions stay fixed so motor memory is preserved.
+
+### Progressive disclosure (v2.0.0)
+Caregivers can hide any core word or folder via Admin → 👁️ Atur Tampilan. Hidden items render as subtle dashed placeholders (position preserved for motor memory). Start with ~12 words visible, reveal more as she grows. `hiddenWords` array stored in IndexedDB settings, restored on app init.
 - Button border-radius: 14px (`rounded-button` token)
 - Press animation: `scale(0.96)` for 80ms (the ONLY allowed grid animation)
 - Button labels: 18px bold, 0.4px letter-spacing, Nunito font
@@ -175,8 +196,11 @@ Tables: `words`, `folders`, `people`, `usageEvents`, `quickPhrases`, `settings`,
 
 ## Key Components
 - **SentenceBar** — top blue bar, word chips, action buttons (⚡ quick phrases, 🕐 history, 💬 caregiver, ⚙️ admin). Removed in v1.2.2: 🔍 search (distraction) and 🔊 mute (device volume handles it). ⌫ backspace (with visible undo toast), ✕ Hapus (confirm-clear), ▶ Bicara (long-press 2s → modeling mode).
-- **SymbolGrid** — 6-col grid. Home view: CoreRow × 4 + PeopleRow + FolderRow. Folder view (v1.2.1+): `FolderContents` ONLY — core rows hidden so fringe words get the full 5-row grid instead of being squeezed into 1 row. The auto-return-to-home after fringe tap means she never needs core while inside a folder.
-- **InstallBanner** (v1.2.2) — floating top banner that appears when `beforeinstallprompt` fires; tap "Install" to trigger Chrome's native PWA install dialog programmatically. Bypasses the buried/missing "Install aplikasi" menu item on some Samsung Chrome builds.
+- **SymbolGrid** — 6-col grid. Home: renders `HomeGrid` (unified 6×6 with core + folders + growth slots). Folder: renders `FolderContents` (fringe words full-screen) or `PeopleContents` (people with photos). Core hidden during folder view. Auto-return-to-home after fringe/person tap.
+- **HomeGrid** (v2.0.0) — unified grid component replacing CoreRow + PeopleRow + FolderRow. Renders core words from CORE_WORDS array, folders from SEED_FOLDERS, and dashed growth slots. Reads `hiddenWords` from store for progressive disclosure.
+- **PeopleContents** (v2.0.0) — full-screen people view when 👥 Orang folder is tapped. Shows all active people with photos + Tambah (opens admin). Auto-returns to home after tapping a person.
+- **InstallBanner** (v1.2.2) — floating top banner that appears when `beforeinstallprompt` fires; tap "Install" to trigger Chrome's native PWA install dialog programmatically.
+- **WordVisibility** (v2.0.0) — Admin → 👁️ Atur Tampilan. Toggle core words + folders on/off. Proloquo's "progressive language" model.
 - **SymbolButton** — color-coded by variant + Fitzgerald Key `fkColor` (applies to BOTH `core` and `fringe` variants as of v1.1.0); haptic on `onPointerDown`; optional `onLongPress` (1500 ms, used by `bantu` for emergency). Modeling-mode amber ring persists 2s (was 500ms before v1.1.0).
 - **IntentSuggestions** — 3 prediction buttons after 2+ words; renders an invisible 53px placeholder when empty to prevent grid reflow
 - **EmergencyBoard** — full-screen red overlay with 4 large SMS buttons; triggered by 1.5 s long-press on `bantu`
@@ -210,7 +234,8 @@ Tables: `words`, `folders`, `people`, `usageEvents`, `quickPhrases`, `settings`,
 2. Tap the ⚙️ gear icon in the sentence bar (v1.1.0)
 3. Tap the + "Tambah" placeholder in people row (v1.0.3)
 
-All paths land on the PIN gate (SHA-256 hash in IndexedDB). 11 admin sections:
+All paths land on the PIN gate (SHA-256 hash in IndexedDB). 12 admin sections:
+- 👁️ Atur Tampilan (progressive disclosure — hide/show core words + folders)
 - 📝 Kelola Kata (edit/add/delete fringe words with photos)
 - 👥 Kelola Orang (edit/add/delete people with photos)
 - ⚡ Frasa Cepat (phrase CRUD + reorder)
@@ -256,6 +281,15 @@ All `VITE_` prefixed → baked into client bundle → **public**. Acceptable for
 - Ambulans defaults to `118` (Indonesian emergency medical)
 - Falls back to alert if contact not configured
 
+## Data Safety (v1.3.0+)
+
+Three layers of data protection:
+1. **`navigator.storage.persist()`** — prevents Chrome from evicting IndexedDB under storage pressure. Called in `main.tsx` init.
+2. **Auto-backup to localStorage** — every admin edit (people, words, phrases, settings) triggers a debounced (2s) snapshot of all config data to localStorage via Dexie table hooks in `db.ts`. If IndexedDB is wiped, auto-restore overlays user customizations on next launch. Photos NOT included (localStorage size limit). See `src/lib/auto-backup.ts`.
+3. **Manual JSON backup** — Admin → 💾 Cadangan Data. Exports everything including photo blobs. The only way to preserve photos across a full data loss.
+
+Re-seed guard: if `appVersion` flag is lost but tables have data, flag is restored without re-seeding (prevents duplicate rows).
+
 ## PWA Configuration
 - Manifest: `display: 'fullscreen'`, `display_override: ['fullscreen', 'standalone']`, `orientation: 'landscape'`
 - Theme color: `#2563EB`, background color: `#F8F7F4`
@@ -270,11 +304,13 @@ All `VITE_` prefixed → baked into client bundle → **public**. Acceptable for
 - Separate page component (`src/pages/Dashboard.tsx`), not part of main AAC interface
 
 ## Build Tags
-- `v1.2.2` — **UX cleanup + install UX + icon fix** (2026-04-16) — removed 🔍 + 🔊 buttons, InstallBanner component, KioskGuide rewrite, real ARASAAC icons for minta/punya/lihat
-- `v1.2.1` — **Folder view hotfix** (2026-04-16) — hide core in folder view so fringe gets full grid, revert P2-7 spacer bug, remove lihat-semua
-- `v1.2.0` — **Deep audit Wave C P2** (2026-04-16) — FK colors complete, undo toast, modeling ring 2s, quick phrase expansion across 4 communicative purposes, a11y focus-visible + ARIA live
-- `v1.1.0` — **Deep audit Wave B** (2026-04-16) — visible ⚙️ admin, test-SMS/call, VocabPack removal, Dashboard admin card
-- `v1.0.3` — **Deep audit Wave A P0** (2026-04-16) — usage logging wired, Ibu initial fix, Tambah opens admin, no auto-clear after Bicara, Ambulans tel:
+- `v2.0.0` — **MAJOR: Grid redesign** (2026-04-18) — Column-organized layout (sentence order), progressive disclosure (hide/show words), People as folder, Perasaan+Tubuh merged, nonton+bobo as core, growth slots, HomeGrid unified component
+- `v1.3.0` — **State persistence** (2026-04-18) — navigator.storage.persist(), auto-backup to localStorage, hapticLevel persisted, error handling on admin saves, duplicate guards, Tubuh→Rasa Tubuh rename
+- `v1.2.2` — **UX cleanup** (2026-04-16) — removed 🔍 + 🔊 buttons, InstallBanner, KioskGuide rewrite, real ARASAAC icons for minta/punya/lihat
+- `v1.2.1` — **Folder view hotfix** (2026-04-16) — hide core in folder view, revert spacer bug
+- `v1.2.0` — **Deep audit Wave C** (2026-04-16) — quick phrase expansion, a11y focus-visible + ARIA live
+- `v1.1.0` — **Deep audit Wave B** (2026-04-16) — visible ⚙️ admin, test-SMS, VocabPack removal
+- `v1.0.3` — **Deep audit Wave A** (2026-04-16) — usage logging wired, no auto-clear, Ambulans tel:
 - `v1.0.2` — Tab A11 viewport fit (grid gap 8→6, IntentSuggestions placeholder removed)
 - `v1.0.1` — Clinical content sprint — Pertanyaan folder, social phrases, emergency SOS, bug fixes
 - `v1.0.0` — Production Release (Phase 6: Polish & Hardening)
