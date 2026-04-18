@@ -5,12 +5,17 @@ import AdminHome from '@/components/Admin/AdminHome'
 type AdminView = 'pin' | 'createPin' | 'home'
 
 export default function AdminOverlay() {
-  const { hasPin, verifyPin, setPin, closeAdmin } = useAdmin()
-  const [view, setView] = useState<AdminView>(hasPin ? 'pin' : 'createPin')
+  const { hasPin, verifyPin, setPin, closeAdmin, isLoading } = useAdmin()
+  const [view, setView] = useState<AdminView | null>(null)
   const [pin, setPinInput] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
   const [error, setError] = useState('')
   const [step, setStep] = useState<'enter' | 'confirm'>('enter')
+
+  // Determine view AFTER useLiveQuery resolves. Previously useState
+  // initialized to 'createPin' before the async DB query returned the
+  // PIN hash — so even when a PIN existed, the create screen showed.
+  const activeView = view ?? (isLoading ? null : (hasPin ? 'pin' : 'createPin'))
 
   const handlePinSubmit = useCallback(async () => {
     if (pin.length < 4) {
@@ -53,7 +58,7 @@ export default function AdminOverlay() {
   }, [step, pin, confirmPin, setPin])
 
   const handleDigit = (digit: string) => {
-    if (view === 'createPin' && step === 'confirm') {
+    if (activeView === 'createPin' && step === 'confirm') {
       if (confirmPin.length < 6) setConfirmPin((p) => p + digit)
     } else {
       if (pin.length < 6) setPinInput((p) => p + digit)
@@ -62,14 +67,23 @@ export default function AdminOverlay() {
   }
 
   const handleBackspace = () => {
-    if (view === 'createPin' && step === 'confirm') {
+    if (activeView === 'createPin' && step === 'confirm') {
       setConfirmPin((p) => p.slice(0, -1))
     } else {
       setPinInput((p) => p.slice(0, -1))
     }
   }
 
-  if (view === 'home') {
+    // Show loading while DB query is pending
+  if (activeView === null) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-suara-bg flex items-center justify-center">
+        <p className="text-suara-gray font-bold">Memuat...</p>
+      </div>
+    )
+  }
+
+  if (activeView === 'home') {
     return (
       <div className="fixed inset-0 z-[100] bg-white overflow-auto">
         <div className="flex items-center justify-between px-4 py-3 bg-suara-blue-bar text-white">
@@ -88,8 +102,8 @@ export default function AdminOverlay() {
   }
 
   // PIN entry or create PIN view
-  const currentValue = view === 'createPin' && step === 'confirm' ? confirmPin : pin
-  const title = view === 'createPin'
+  const currentValue = activeView === 'createPin' && step === 'confirm' ? confirmPin : pin
+  const title = activeView === 'createPin'
     ? step === 'enter' ? 'Buat PIN Baru' : 'Konfirmasi PIN'
     : 'Masukkan PIN'
 
@@ -149,11 +163,11 @@ export default function AdminOverlay() {
 
       {/* Submit button */}
       <button
-        onClick={view === 'createPin' ? handleCreatePin : handlePinSubmit}
+        onClick={activeView === 'createPin' ? handleCreatePin : handlePinSubmit}
         className="mt-6 px-8 py-3 rounded-xl bg-suara-blue-bar text-white font-bold text-base active:scale-[0.96] transition-transform duration-[80ms]"
         type="button"
       >
-        {view === 'createPin' && step === 'enter' ? 'Lanjut' : view === 'createPin' ? 'Simpan PIN' : 'Masuk'}
+        {activeView === 'createPin' && step === 'enter' ? 'Lanjut' : activeView === 'createPin' ? 'Simpan PIN' : 'Masuk'}
       </button>
     </div>
   )

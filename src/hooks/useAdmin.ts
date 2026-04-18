@@ -9,7 +9,10 @@ export function useAdmin() {
   const closeAdmin = useAppStore((s) => s.closeAdmin)
 
   const pinSetting = useLiveQuery(() => db.settings.get('adminPinHash'))
-  const hasPin = pinSetting?.value != null
+  // useLiveQuery returns undefined while loading, then the actual value.
+  // We need to distinguish "still loading" from "loaded, no PIN."
+  const isLoading = pinSetting === undefined
+  const hasPin = pinSetting?.value != null && pinSetting?.value !== null
 
   async function verifyPin(pin: string): Promise<boolean> {
     if (!hasPin || !pinSetting?.value) return false
@@ -21,5 +24,5 @@ export function useAdmin() {
     await db.settings.put({ key: 'adminPinHash', value: hash, updatedAt: Date.now() })
   }
 
-  return { isAdminOpen, openAdmin, closeAdmin, hasPin, verifyPin, setPin }
+  return { isAdminOpen, openAdmin, closeAdmin, hasPin, isLoading, verifyPin, setPin }
 }
