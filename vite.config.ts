@@ -12,6 +12,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,mp3,woff2}'],
+        // Skip waiting when the app sends SKIP_WAITING message.
+        // This lets new versions activate immediately instead of waiting
+        // for all tabs to close (which never happens on a dedicated tablet).
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

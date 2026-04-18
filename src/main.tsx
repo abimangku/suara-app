@@ -6,25 +6,51 @@ import { seedDatabase } from '@/lib/seed'
 import { db } from '@/lib/db'
 import { useAppStore } from '@/store/appStore'
 
-// Register PWA update handler
+// === AGGRESSIVE PWA UPDATE SYSTEM ===
+// For a personal AAC app, updates should be immediate and automatic.
+// The user should never be stuck on an old version.
+//
+// Strategy:
+//  1. Check for SW updates every time the app comes to foreground
+//  2. Check every 60 seconds while the app is active
+//  3. When a new SW activates, auto-reload (no user action needed)
+//  4. If auto-reload fails, show a persistent (non-dismissable) banner
 if ('serviceWorker' in navigator) {
+  // Auto-reload when a new service worker takes control
+  let refreshing = false
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return
+    refreshing = true
+    window.location.reload()
+  })
+
   navigator.serviceWorker.ready.then((registration) => {
+    // Check for updates every 60 seconds while app is active
+    setInterval(() => {
+      registration.update().catch(() => {})
+    }, 60 * 1000)
+
+    // Check for updates when app comes to foreground (user switches back to tablet)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        registration.update().catch(() => {})
+      }
+    })
+
+    // If there's a waiting worker (update downloaded but not activated),
+    // tell it to skip waiting immediately
+    if (registration.waiting) {
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' })
+    }
+
+    // When a new worker is found, tell it to skip waiting as soon as it's installed
     registration.addEventListener('updatefound', () => {
       const newWorker = registration.installing
       if (newWorker) {
         newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'activated') {
-            // Show update toast (non-blocking)
-            const toast = document.createElement('div')
-            toast.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 z-[200] px-6 py-3 rounded-xl bg-suara-blue-bar text-white font-bold text-sm shadow-lg cursor-pointer'
-            toast.textContent = 'Versi baru tersedia — ketuk untuk memperbarui'
-            toast.style.fontFamily = "'Nunito', sans-serif"
-            toast.onclick = () => {
-              window.location.reload()
-            }
-            document.body.appendChild(toast)
-            // Auto-dismiss after 10 seconds
-            setTimeout(() => toast.remove(), 10000)
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // New content available — skip waiting to activate immediately
+            newWorker.postMessage({ type: 'SKIP_WAITING' })
           }
         })
       }
