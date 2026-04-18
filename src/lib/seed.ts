@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
 import { SEED_FOLDERS, SEED_PEOPLE, SEED_QUICK_PHRASES, SEED_WORDS } from '@/data/vocabulary'
 import { getAutoBackup, restoreFromAutoBackup, clearAutoBackup } from '@/lib/auto-backup'
+import { restoreFromCloud } from '@/lib/cloud-backup'
 
 export async function seedDatabase(): Promise<void> {
   const existing = await db.settings.get('appVersion')
@@ -14,17 +15,38 @@ export async function seedDatabase(): Promise<void> {
     const peopleCount = await db.people.count()
 
     if (folderCount === 0 && peopleCount === 0) {
-      // Check for auto-backup before seeding defaults — if the user had
-      // customized data that was lost to storage eviction, restore it
-      // instead of re-creating generic defaults.
-      const autoBackup = getAutoBackup()
-      if (autoBackup) {
-        console.log(`[Suara] Found auto-backup from ${new Date(autoBackup.timestamp).toLocaleString()} — restoring`)
-        await runInitialSeed() // Seed base structure first
-        await restoreFromAutoBackup(autoBackup) // Then overlay user's customizations
-        clearAutoBackup() // Clear so we don't re-restore next time
-      } else {
-        // Truly fresh install, no backup — seed defaults
+      // Try to restore data from backups (3-tier fallback):
+      //  1. Cloud backup (Supabase) — includes photos, most complete
+      //  2. Auto-backup (localStorage) — no photos, but has config
+      //  3. Fresh seed (defaults) — generic starting point
+      let restored = false
+
+      // Tier 1: Cloud backup (if online + Supabase configured)
+      if (navigator.onLine) {
+        try {
+          restored = await restoreFromCloud()
+          if (restored) {
+            console.log('[Suara] Restored from cloud backup (Supabase)')
+          }
+        } catch {
+          // Cloud restore failed — try local backup
+        }
+      }
+
+      // Tier 2: Local auto-backup
+      if (!restored) {
+        const autoBackup = getAutoBackup()
+        if (autoBackup) {
+          console.log(`[Suara] Found auto-backup from ${new Date(autoBackup.timestamp).toLocaleString()} — restoring`)
+          await runInitialSeed() // Seed base structure first
+          await restoreFromAutoBackup(autoBackup) // Then overlay user's customizations
+          clearAutoBackup()
+          restored = true
+        }
+      }
+
+      // Tier 3: Fresh install — seed defaults
+      if (!restored) {
         await runInitialSeed()
       }
     } else {

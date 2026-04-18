@@ -5,6 +5,7 @@ import App from '@/App'
 import { seedDatabase } from '@/lib/seed'
 import { db } from '@/lib/db'
 import { useAppStore } from '@/store/appStore'
+import { initCloudBackup } from '@/lib/cloud-backup'
 
 // === AGGRESSIVE PWA UPDATE SYSTEM ===
 // For a personal AAC app, updates should be immediate and automatic.
@@ -169,6 +170,7 @@ async function init() {
   )
   setupFullscreenAndOrientationOnFirstTouch()
   loadVoices()
+  initCloudBackup() // Start cloud backup listeners (Supabase Storage)
 
   // Re-acquire orientation lock when user re-enters fullscreen
   // (Android back button / swipe gesture releases it).
