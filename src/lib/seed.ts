@@ -62,8 +62,18 @@ export async function seedDatabase(): Promise<void> {
   }
 
   // Always run top-up to ensure existing installs get new content
-  // (e.g., Pertanyaan folder, social quick phrases added after v1.0.0)
   await topUpSeedData()
+
+  // Prune old usage events — the table grows by ~200 rows/day and never
+  // shrinks. After months this causes GC pressure when milestones.ts calls
+  // db.usageEvents.toArray(). Keep 90 days of data (enough for frequency
+  // model + dashboard), delete the rest.
+  try {
+    const ninetyDaysAgo = Date.now() - 90 * 24 * 60 * 60 * 1000
+    await db.usageEvents.where('timestamp').below(ninetyDaysAgo).delete()
+  } catch {
+    // Non-critical — cleanup failure doesn't affect communication
+  }
 }
 
 async function runInitialSeed(): Promise<void> {

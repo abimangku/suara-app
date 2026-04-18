@@ -17,10 +17,37 @@ import { initCloudBackup } from '@/lib/cloud-backup'
 //  3. When a new SW activates, auto-reload (no user action needed)
 //  4. If auto-reload fails, show a persistent (non-dismissable) banner
 if ('serviceWorker' in navigator) {
-  // Auto-reload when a new service worker takes control
+  // Auto-reload when a new service worker takes control.
+  // BUT: defer if the user has an unsaid sentence (sentenceWords > 0).
+  // For a non-speaking person, losing an unsaid sentence mid-composition
+  // is equivalent to being interrupted mid-speech.
   let refreshing = false
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (refreshing) return
+
+    // Check if she's composing a sentence
+    const sentenceWords = useAppStore.getState().sentenceWords
+    if (sentenceWords.length > 0) {
+      // Defer — wait until sentence is cleared or spoken, then reload.
+      // Check every 2 seconds.
+      const checkAndReload = setInterval(() => {
+        if (useAppStore.getState().sentenceWords.length === 0) {
+          clearInterval(checkAndReload)
+          refreshing = true
+          window.location.reload()
+        }
+      }, 2000)
+      // Safety: force reload after 5 minutes regardless (don't stay on old version forever)
+      setTimeout(() => {
+        clearInterval(checkAndReload)
+        if (!refreshing) {
+          refreshing = true
+          window.location.reload()
+        }
+      }, 5 * 60 * 1000)
+      return
+    }
+
     refreshing = true
     window.location.reload()
   })

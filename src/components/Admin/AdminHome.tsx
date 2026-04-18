@@ -193,6 +193,11 @@ export default function AdminHome() {
           </button>
         ))}
       </div>
+      {/* Version + debug info — helps remote troubleshooting */}
+      <div className="mt-6 text-center text-suara-gray/30 text-[11px]">
+        <p>Suara v2.0.0 · {navigator.onLine ? '🟢 Online' : '🔴 Offline'}</p>
+        <p>{screen.width}×{screen.height} · {navigator.userAgent.includes('Android') ? 'Android' : navigator.platform}</p>
+      </div>
     </div>
   )
 }

@@ -11,6 +11,8 @@ export default function AdminOverlay() {
   const [confirmPin, setConfirmPin] = useState('')
   const [error, setError] = useState('')
   const [step, setStep] = useState<'enter' | 'confirm'>('enter')
+  const [failCount, setFailCount] = useState(0)
+  const [lockedUntil, setLockedUntil] = useState(0)
 
   // Determine view AFTER useLiveQuery resolves. Previously useState
   // initialized to 'createPin' before the async DB query returned the
@@ -18,6 +20,13 @@ export default function AdminOverlay() {
   const activeView = view ?? (isLoading ? null : (hasPin ? 'pin' : 'createPin'))
 
   const handlePinSubmit = useCallback(async () => {
+    // Brute-force protection: lockout after 5 failed attempts
+    if (lockedUntil > Date.now()) {
+      const secsLeft = Math.ceil((lockedUntil - Date.now()) / 1000)
+      setError(`Terlalu banyak percobaan. Tunggu ${secsLeft} detik.`)
+      setPinInput('')
+      return
+    }
     if (pin.length < 4) {
       setError('Minimal 4 digit')
       return
@@ -27,11 +36,22 @@ export default function AdminOverlay() {
       setView('home')
       setPinInput('')
       setError('')
+      setFailCount(0)
     } else {
-      setError('PIN salah')
+      const newFails = failCount + 1
+      setFailCount(newFails)
+      if (newFails >= 5) {
+        // Lock for 30 seconds after 5 fails, 5 minutes after 10
+        const lockMs = newFails >= 10 ? 5 * 60 * 1000 : 30 * 1000
+        setLockedUntil(Date.now() + lockMs)
+        const secs = lockMs / 1000
+        setError(`Terlalu banyak percobaan. Tunggu ${secs} detik.`)
+      } else {
+        setError(`PIN salah (${newFails}/5)`)
+      }
       setPinInput('')
     }
-  }, [pin, verifyPin])
+  }, [pin, verifyPin, failCount, lockedUntil])
 
   const handleCreatePin = useCallback(async () => {
     if (step === 'enter') {

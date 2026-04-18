@@ -136,9 +136,21 @@ export const useAppStore = create<AppStore>((set) => ({
   },
   toggleWordVisibility: (id) => {
     set((state) => {
-      const next = state.hiddenWords.includes(id)
-        ? state.hiddenWords.filter((x) => x !== id)
-        : [...state.hiddenWords, id]
+      const isHiding = !state.hiddenWords.includes(id)
+
+      if (isHiding) {
+        // Guard: don't allow hiding if it would leave fewer than 4 visible
+        // core words. A blank grid silences the user.
+        const coreWordCount = 26 // current CORE_WORDS count
+        const currentlyHiddenCore = state.hiddenWords.filter((x) => !x.startsWith('folder:')).length
+        const wouldBeHiddenCore = id.startsWith('folder:') ? currentlyHiddenCore : currentlyHiddenCore + 1
+        const wouldBeVisible = coreWordCount - wouldBeHiddenCore
+        if (wouldBeVisible < 4) return state // block — keep at least 4
+      }
+
+      const next = isHiding
+        ? [...state.hiddenWords, id]
+        : state.hiddenWords.filter((x) => x !== id)
       db.settings.put({ key: 'hiddenWords', value: next, updatedAt: Date.now() }).catch(() => {})
       return { hiddenWords: next }
     })

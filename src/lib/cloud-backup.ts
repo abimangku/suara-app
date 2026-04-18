@@ -42,6 +42,26 @@ export function scheduleCloudBackup(): void {
 /**
  * Upload the current app state to Supabase Storage.
  */
+/**
+ * Get a stable device ID that survives IndexedDB wipe.
+ * Stored in BOTH IndexedDB AND localStorage so cloud restore can find
+ * the right backup even after the DB that generated it was wiped.
+ */
+function getStableDeviceId(): string {
+  const LS_KEY = 'suara-device-id'
+
+  // Try localStorage first (survives some DB wipes)
+  try {
+    const lsId = localStorage.getItem(LS_KEY)
+    if (lsId) return lsId
+  } catch { /* localStorage unavailable */ }
+
+  // Generate new ID + store in both locations
+  const newId = `device-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+  try { localStorage.setItem(LS_KEY, newId) } catch { /* best effort */ }
+  return newId
+}
+
 async function uploadBackup(): Promise<void> {
   const supabase = getSupabase()
   if (!supabase || !navigator.onLine) return
@@ -50,9 +70,7 @@ async function uploadBackup(): Promise<void> {
     const json = await exportVocabulary()
     const blob = new Blob([json], { type: 'application/json' })
 
-    // Get device ID to namespace backups (if multiple devices in future)
-    const deviceSetting = await db.settings.get('deviceId')
-    const deviceId = (deviceSetting?.value as string) ?? 'default'
+    const deviceId = getStableDeviceId()
     const path = `${deviceId}/${BACKUP_FILENAME}`
 
     // Upload (upsert — overwrite existing backup)
@@ -95,8 +113,7 @@ export async function restoreFromCloud(): Promise<boolean> {
   if (!supabase) return false
 
   try {
-    const deviceSetting = await db.settings.get('deviceId')
-    const deviceId = (deviceSetting?.value as string) ?? 'default'
+    const deviceId = getStableDeviceId()
     const path = `${deviceId}/${BACKUP_FILENAME}`
 
     const { data, error } = await supabase.storage
@@ -120,7 +137,12 @@ export async function restoreFromCloud(): Promise<boolean> {
  * Call once at app init after seedDatabase().
  */
 export function initCloudBackup(): void {
-  if (!isSupabaseAvailable()) return
+  // Only check for env var presence, NOT online status. If we check
+  // navigator.onLine here and the app starts offline (common for tablets),
+  // none of the listeners get registered and cloud backup never activates
+  // for the entire session — even after the device comes online.
+  const hasSupabaseConfig = Boolean(import.meta.env.VITE_SUPABASE_URL) && Boolean(import.meta.env.VITE_SUPABASE_ANON_KEY)
+  if (!hasSupabaseConfig) return
 
   // Upload on foreground (user comes back to app)
   document.addEventListener('visibilitychange', () => {
