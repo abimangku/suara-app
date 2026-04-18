@@ -11,8 +11,9 @@
  *    when IndexedDB is evicted under storage pressure.
  *  - localStorage has a ~5MB limit, which is plenty for text data (names,
  *    phrases, settings). Photos (blobs) are NOT backed up here — they'd
- *    exceed the limit. The manual JSON backup (Admin → Cadangan Data) includes
- *    photos; this auto-backup covers configuration.
+ *    exceed the limit. The manual JSON backup (Admin → Cadangan Data)
+ *    includes photos as Base64 (fixed in v2.0.0); this auto-backup
+ *    covers configuration only.
  *
  * Format: JSON string under key 'suara-auto-backup' with timestamp.
  * Restore: on app init, if IndexedDB is empty but auto-backup exists, offer restore.
