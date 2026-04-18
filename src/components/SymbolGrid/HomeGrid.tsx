@@ -4,6 +4,17 @@ import { useSentenceBar } from '@/hooks/useSentenceBar'
 import { useVocabulary } from '@/hooks/useVocabulary'
 import { useAppStore } from '@/store/appStore'
 
+// ARASAAC symbol paths for folders — proper pictograms instead of emoji.
+// Every button in the grid should use ARASAAC for visual consistency.
+const FOLDER_SYMBOL_PATHS: Record<string, string> = {
+  orang: 'folder/orang.png',
+  makanan: 'folder/makanan.png',
+  aktivitas: 'folder/aktivitas.png',
+  tempat: 'folder/tempat.png',
+  perasaan: 'folder/perasaan.png',
+  pertanyaan: 'folder/pertanyaan.png',
+}
+
 /**
  * Unified 6×6 home grid. Replaces the old CoreRow + PeopleRow + FolderRow
  * separation with a single grid where:
@@ -110,6 +121,7 @@ export default function HomeGrid() {
               emoji={folder.emoji}
               label={folder.label}
               variant="folder"
+              symbolPath={FOLDER_SYMBOL_PATHS[folder.key]}
               onTap={() => setActiveFolder(folder.key)}
             />
           )
