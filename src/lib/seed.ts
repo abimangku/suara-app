@@ -5,7 +5,26 @@ export async function seedDatabase(): Promise<void> {
   const existing = await db.settings.get('appVersion')
 
   if (!existing) {
-    await runInitialSeed()
+    // Guard: check if tables already have data (e.g., appVersion was lost
+    // due to storage eviction or corruption, but other tables survived).
+    // Without this guard, runInitialSeed would ADD duplicate rows to all
+    // tables on top of existing data.
+    const folderCount = await db.folders.count()
+    const peopleCount = await db.people.count()
+
+    if (folderCount === 0 && peopleCount === 0) {
+      // Truly fresh install — seed everything
+      await runInitialSeed()
+    } else {
+      // Tables have data but appVersion is missing — restore the flag
+      // without re-seeding. This prevents the "defaults overwrite customs" bug.
+      await db.settings.put({
+        key: 'appVersion',
+        value: '1.2.2',
+        updatedAt: Date.now(),
+      })
+      console.log('[Suara] appVersion restored — skipped re-seed (tables already have data)')
+    }
   }
 
   // Always run top-up to ensure existing installs get new content

@@ -97,6 +97,23 @@ function warmupTtsEngine() {
 }
 
 async function init() {
+  // Request persistent storage so Chrome doesn't evict IndexedDB under
+  // storage pressure. Without this, Android Chrome can silently wipe all
+  // user data (renamed people, photos, emergency contacts, PIN) when disk
+  // is low — and seedDatabase() recreates defaults, making it look like
+  // "changes came back to normal." Installed PWAs usually get persistence
+  // granted automatically on Chrome Android.
+  try {
+    if (navigator.storage?.persist) {
+      const granted = await navigator.storage.persist()
+      if (!granted && import.meta.env.DEV) {
+        console.warn('[Suara] Persistent storage NOT granted — data may be evicted under storage pressure')
+      }
+    }
+  } catch {
+    // Storage API not available — continue without persistence
+  }
+
   await seedDatabase()
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
