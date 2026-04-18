@@ -7,6 +7,33 @@ All notable changes to the Suara AAC app are documented here.
 > For AI agent conventions, see [AGENTS.md](./AGENTS.md).
 > For codebase quick reference, see [CLAUDE.md](./CLAUDE.md).
 
+## v2.0.0 — Grid redesign: sentence-order columns + progressive disclosure (2026-04-18)
+
+The biggest change in the app's history — a complete grid restructure based on commercial AAC analysis (Smartbox Grid Pad, Avaz) + Wilkinson et al. 2022 spatial-clustering research.
+
+### Grid layout overhaul
+- **Column-organized layout** following sentence order left → right: WHO (pronouns, yellow) → DOING (verbs, green) → DESCRIBE (descriptors/negation, blue/pink) → CONNECT (prepositions, purple) → TOPICS (folders, teal). Previously words were scattered by row without spatial logic.
+- **26 core words** (was 24): added `nonton` (watch — her #1 activity) and `bobo` (her word for sleep, not dictionary "tidur"). Both placed in row 6 verb columns.
+- **4 growth slots** — empty cells (dashed placeholders) in row 5-6 for future core words (siapa, boleh, sudah, bagus). New words fill empty positions without reshuffling existing ones (Proloquo's "progressive language" model).
+- **Unified `HomeGrid` component** replaces the old CoreRow + PeopleRow + FolderRow separation. Single 6×6 grid renders core words, folders, and growth slots together.
+
+### People as a folder
+- **Orang folder** added — people moved from a dedicated row 5 into column 5 as a folder (consistent with Smartbox + Avaz commercial pattern). Supports unlimited people with photos inside `PeopleContents` view.
+- **Auto-return to home** after tapping a person (same as fringe words).
+- PeopleRow.tsx retained as legacy but no longer imported.
+
+### Folder restructure
+- **Perasaan + Rasa Tubuh merged** into a single "Perasaan" folder containing both emotional states (senang, sedih, marah) AND physical states (lapar, haus, pusing). `topUpSeedData` migrates words and soft-deletes old tubuh folder on existing installs.
+- **Folder buttons have teal gradient** + folder-tab/ear visual (CSS positioned div at top-left, mimicking physical file folder shape — inspired by Avaz).
+- **All folders now use ARASAAC pictograms** instead of emoji. Symbols downloaded for: orang (ID 7093), makanan (ID 4610), aktivitas (ID 3262), tempat (ID 4643), perasaan (ID 37190), pertanyaan (ID 9847).
+
+### Progressive disclosure
+- **Admin → 👁️ Atur Tampilan** — caregivers toggle visibility of individual core words and folders. Hidden items render as subtle dashed placeholders (position preserved for motor memory). Start with ~12 most important words visible, reveal more as she learns.
+- `hiddenWords` array persisted to IndexedDB settings, restored on app init.
+
+### ARASAAC everywhere
+- Removed all emoji dependency — every button (core + folder) uses ARASAAC pictograms. Emoji is now last-resort fallback only (if .png fails to load). Ensures visual consistency across all devices.
+
 ## v1.3.0 — State persistence + data safety + consistency (2026-04-18)
 
 Major reliability update addressing the "changes come back to normal" bug reported during real-world testing.

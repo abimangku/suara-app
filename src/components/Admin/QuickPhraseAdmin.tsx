@@ -16,52 +16,72 @@ export default function QuickPhraseAdmin({ onDone: _onDone }: QuickPhraseAdminPr
 
   async function handleAdd() {
     if (!newPhrase.trim()) return
-    const count = await db.quickPhrases.filter((qp) => qp.isActive).count()
-    await db.quickPhrases.add({
-      phrase: newPhrase.trim(),
-      words: newPhrase.trim().split(/\s+/),
-      sortOrder: count,
-      isActive: true,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    })
-    setNewPhrase('')
-    setIsAdding(false)
+    try {
+      const count = await db.quickPhrases.filter((qp) => qp.isActive).count()
+      await db.quickPhrases.add({
+        phrase: newPhrase.trim(),
+        words: newPhrase.trim().split(/\s+/),
+        sortOrder: count,
+        isActive: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      })
+      setNewPhrase('')
+      setIsAdding(false)
+    } catch {
+      alert('Gagal menyimpan frasa. Coba lagi.')
+    }
   }
 
   async function handleEdit(id: number) {
     if (!editText.trim()) return
-    await db.quickPhrases.update(id, {
-      phrase: editText.trim(),
-      words: editText.trim().split(/\s+/),
-      updatedAt: Date.now(),
-    })
-    setEditingId(null)
-    setEditText('')
+    try {
+      await db.quickPhrases.update(id, {
+        phrase: editText.trim(),
+        words: editText.trim().split(/\s+/),
+        updatedAt: Date.now(),
+      })
+      setEditingId(null)
+      setEditText('')
+    } catch {
+      alert('Gagal menyimpan. Coba lagi.')
+    }
   }
 
   async function handleDelete(id: number) {
-    await db.quickPhrases.update(id, { isActive: false, updatedAt: Date.now() })
+    try {
+      await db.quickPhrases.update(id, { isActive: false, updatedAt: Date.now() })
+    } catch {
+      alert('Gagal menghapus. Coba lagi.')
+    }
   }
 
   async function handleMoveUp(index: number) {
     if (!phrases || index <= 0) return
-    const current = phrases[index]
-    const above = phrases[index - 1]
-    await db.transaction('rw', db.quickPhrases, async () => {
-      await db.quickPhrases.update(current.id!, { sortOrder: above.sortOrder, updatedAt: Date.now() })
-      await db.quickPhrases.update(above.id!, { sortOrder: current.sortOrder, updatedAt: Date.now() })
-    })
+    try {
+      const current = phrases[index]
+      const above = phrases[index - 1]
+      await db.transaction('rw', db.quickPhrases, async () => {
+        await db.quickPhrases.update(current.id!, { sortOrder: above.sortOrder, updatedAt: Date.now() })
+        await db.quickPhrases.update(above.id!, { sortOrder: current.sortOrder, updatedAt: Date.now() })
+      })
+    } catch {
+      alert('Gagal mengubah urutan. Coba lagi.')
+    }
   }
 
   async function handleMoveDown(index: number) {
     if (!phrases || index >= phrases.length - 1) return
-    const current = phrases[index]
-    const below = phrases[index + 1]
-    await db.transaction('rw', db.quickPhrases, async () => {
-      await db.quickPhrases.update(current.id!, { sortOrder: below.sortOrder, updatedAt: Date.now() })
-      await db.quickPhrases.update(below.id!, { sortOrder: current.sortOrder, updatedAt: Date.now() })
-    })
+    try {
+      const current = phrases[index]
+      const below = phrases[index + 1]
+      await db.transaction('rw', db.quickPhrases, async () => {
+        await db.quickPhrases.update(current.id!, { sortOrder: below.sortOrder, updatedAt: Date.now() })
+        await db.quickPhrases.update(below.id!, { sortOrder: current.sortOrder, updatedAt: Date.now() })
+      })
+    } catch {
+      alert('Gagal mengubah urutan. Coba lagi.')
+    }
   }
 
   return (

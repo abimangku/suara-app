@@ -91,7 +91,7 @@ src/
       ErrorBoundary.tsx                # Independent crash recovery per section
       InstallBanner.tsx                # v1.2.2 — programmatic PWA install via beforeinstallprompt
   data/
-    vocabulary.ts                      # 24 CORE_WORDS (hardcoded) + SEED_FOLDERS + SEED_WORDS + SEED_PEOPLE + SEED_QUICK_PHRASES
+    vocabulary.ts                      # 26 CORE_WORDS (hardcoded) + SEED_FOLDERS + SEED_WORDS + SEED_PEOPLE + SEED_QUICK_PHRASES
   hooks/
     useAdmin.ts
     useAudio.ts                        # playWord, playSentence (no longer double-fires haptic)

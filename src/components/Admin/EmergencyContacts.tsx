@@ -42,13 +42,17 @@ export default function EmergencyContacts({ onDone: _onDone }: EmergencyContacts
   }, [])
 
   async function handleSave() {
-    await db.settings.put({
-      key: 'emergencyContacts',
-      value: contacts,
-      updatedAt: Date.now(),
-    })
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    try {
+      await db.settings.put({
+        key: 'emergencyContacts',
+        value: contacts,
+        updatedAt: Date.now(),
+      })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch {
+      alert('Gagal menyimpan kontak darurat. Coba lagi.')
+    }
   }
 
   function updateContact(key: keyof EmergencyContactsState, field: 'name' | 'phone', value: string) {
