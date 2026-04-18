@@ -221,17 +221,40 @@ async function topUpSeedData(): Promise<void> {
     }
   }
 
-  // --- Rename Tubuh → Rasa Tubuh (v1.3.0) ---
-  // Contents are physical states (lapar/haus/pusing), not body parts.
-  // "Tubuh" (body) was misleading. "Rasa Tubuh" (body feelings) is clearer.
-  const tubuhFolder = await db.folders.where('key').equals('tubuh').first()
-  if (tubuhFolder && tubuhFolder.label === 'Tubuh') {
-    await db.folders.update(tubuhFolder.id!, {
-      label: 'Rasa Tubuh',
-      emoji: '🫀',
-      updatedAt: Date.now(),
-    })
+  // --- v2.0.0: Add Orang (People) folder ---
+  const orangFolder = await db.folders.where('key').equals('orang').first()
+  if (!orangFolder) {
+    const orangSeed = SEED_FOLDERS.find((f) => f.key === 'orang')
+    if (orangSeed) {
+      await db.folders.add({ ...orangSeed, createdAt: now, updatedAt: now })
+    }
   }
+
+  // --- v2.0.0: Merge Rasa Tubuh into Perasaan ---
+  // Previously "Tubuh" / "Rasa Tubuh" had physical states (lapar, haus, pusing).
+  // "Perasaan" had emotional states (senang, sedih, marah). Now merged into one
+  // "Perasaan" folder containing both emotional + physical feelings.
+  const tubuhFolder = await db.folders.where('key').equals('tubuh').first()
+  const perasaanFolder = await db.folders.where('key').equals('perasaan').first()
+  if (tubuhFolder && perasaanFolder && tubuhFolder.id && perasaanFolder.id) {
+    // Move all tubuh words into perasaan folder
+    const tubuhWords = await db.words.where('folderId').equals(tubuhFolder.id).toArray()
+    for (const w of tubuhWords) {
+      // Check if perasaan already has a word with the same label
+      const existing = await db.words
+        .where('folderId')
+        .equals(perasaanFolder.id)
+        .filter((pw) => pw.label === w.label)
+        .first()
+      if (!existing && w.id) {
+        await db.words.update(w.id, { folderId: perasaanFolder.id, updatedAt: now })
+      }
+    }
+    // Soft-delete the tubuh folder
+    await db.folders.update(tubuhFolder.id, { isActive: false, updatedAt: now })
+  }
+
+  // v1.3.0 rename (Tubuh → Rasa Tubuh) is superseded by the v2.0.0 merge above.
 
   // --- Social + pragmatic quick phrases ---
   // Extended in v1.2.0 with phrases covering Light & McNaughton's 4 communicative

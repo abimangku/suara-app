@@ -1,47 +1,77 @@
 import type { CoreWord, DbFolder, DbPerson, DbQuickPhrase, Folder, Person, QuickPhrase } from '@/types'
 
-// Core words — rows 1-4, 6 columns, positions fixed forever
+// =============================================================================
+// CORE WORDS — Column-based layout, 6×6 grid, positions fixed FOREVER.
+//
+// Layout follows sentence order left → right:
+//   Col 0: WHO (pronouns, yellow)
+//   Col 1: DOING (verbs, green)
+//   Col 2: DOING (verbs, green)
+//   Col 3: DESCRIBE (descriptors + negation, blue/pink)
+//   Col 4: CONNECT (prepositions, purple)
+//   Col 5: TOPICS (folders, teal) — rendered separately, not in this array
+//
+// Row 6 has growth slots — empty positions filled as she grows.
+// Per Proloquo's progressive language model: add by revealing, never reshuffle.
+//
+// IMPORTANT: `row` and `position` are grid coordinates (1-indexed row, 0-indexed col).
+// They are MOTOR MEMORY anchors. Changing them after she learns the layout is
+// the single most disruptive thing you can do (Thistle & Wilkinson 2018).
+// =============================================================================
 export const CORE_WORDS: CoreWord[] = [
-  // Row 1: verbs + negation
-  { id: 'mau',      label: 'mau',      emoji: '✋', symbolPath: 'core/mau.png',      audioPath: 'core/mau.mp3',      row: 1, position: 0, fkColor: 'verb' },
-  { id: 'berhenti', label: 'berhenti', emoji: '🛑', symbolPath: 'core/berhenti.png', audioPath: 'core/berhenti.mp3', row: 1, position: 1, fkColor: 'verb' },
-  { id: 'bantu',    label: 'bantu',    emoji: '🆘', symbolPath: 'core/bantu.png',    audioPath: 'core/bantu.mp3',    row: 1, position: 2, fkColor: 'verb' },
+  // Col 0: WHO (pronouns) — yellow
+  { id: 'aku',      label: 'aku',      emoji: '👤', symbolPath: 'core/aku.png',      audioPath: 'core/aku.mp3',      row: 1, position: 0, fkColor: 'pronoun' },
+  { id: 'kamu',     label: 'kamu',     emoji: '👉', symbolPath: 'core/kamu.png',     audioPath: 'core/kamu.mp3',     row: 2, position: 0, fkColor: 'pronoun' },
+  { id: 'ini',      label: 'ini',      emoji: '👇', symbolPath: 'core/ini.png',      audioPath: 'core/ini.mp3',      row: 3, position: 0, fkColor: 'pronoun' },
+  { id: 'itu',      label: 'itu',      emoji: '👆', symbolPath: 'core/itu.png',      audioPath: 'core/itu.mp3',      row: 4, position: 0, fkColor: 'pronoun' },
+  { id: 'apa',      label: 'apa',      emoji: '❓', symbolPath: 'core/apa.png',      audioPath: 'core/apa.mp3',      row: 5, position: 0, fkColor: 'pronoun' },
+  // R6 Col 0: growth slot (future pronoun — siapa, dia, kita)
+
+  // Col 1: DOING (verbs group 1) — green
+  { id: 'mau',      label: 'mau',      emoji: '✋', symbolPath: 'core/mau.png',      audioPath: 'core/mau.mp3',      row: 1, position: 1, fkColor: 'verb' },
+  { id: 'pergi',    label: 'pergi',    emoji: '🚶', symbolPath: 'core/pergi.png',    audioPath: 'core/pergi.mp3',    row: 2, position: 1, fkColor: 'verb' },
+  { id: 'suka',     label: 'suka',     emoji: '❤️', symbolPath: 'core/suka.png',     audioPath: 'core/suka.mp3',     row: 3, position: 1, fkColor: 'verb' },
+  { id: 'bantu',    label: 'bantu',    emoji: '🆘', symbolPath: 'core/bantu.png',    audioPath: 'core/bantu.mp3',    row: 4, position: 1, fkColor: 'verb' },
+  { id: 'berhenti', label: 'berhenti', emoji: '🛑', symbolPath: 'core/berhenti.png', audioPath: 'core/berhenti.mp3', row: 5, position: 1, fkColor: 'verb' },
+  { id: 'nonton',   label: 'nonton',   emoji: '📺', symbolPath: 'core/nonton.png',   audioPath: 'core/nonton.mp3',   row: 6, position: 1, fkColor: 'verb' },
+
+  // Col 2: DOING (verbs group 2) — green
+  { id: 'makan',    label: 'makan',    emoji: '🍽️', symbolPath: 'core/makan.png',    audioPath: 'core/makan.mp3',    row: 1, position: 2, fkColor: 'verb' },
+  { id: 'minum',    label: 'minum',    emoji: '🥤', symbolPath: 'core/minum.png',    audioPath: 'core/minum.mp3',    row: 2, position: 2, fkColor: 'verb' },
+  { id: 'lihat',    label: 'lihat',    emoji: '👀', symbolPath: 'core/lihat.png',    audioPath: 'core/lihat.mp3',    row: 3, position: 2, fkColor: 'verb' },
+  { id: 'punya',    label: 'punya',    emoji: '🤲', symbolPath: 'core/punya.png',    audioPath: 'core/punya.mp3',    row: 4, position: 2, fkColor: 'verb' },
+  { id: 'minta',    label: 'minta',    emoji: '🙏', symbolPath: 'core/minta.png',    audioPath: 'core/minta.mp3',    row: 5, position: 2, fkColor: 'verb' },
+  { id: 'bobo',     label: 'bobo',     emoji: '😴', symbolPath: 'core/bobo.png',     audioPath: 'core/bobo.mp3',     row: 6, position: 2, fkColor: 'verb' },
+
+  // Col 3: DESCRIBE (descriptors + negation) — blue/pink
   { id: 'ya',       label: 'ya',       emoji: '✅', symbolPath: 'core/ya.png',       audioPath: 'core/ya.mp3',       row: 1, position: 3, fkColor: 'descriptor' },
-  { id: 'tidak',    label: 'tidak',    emoji: '🚫', symbolPath: 'core/tidak.png',    audioPath: 'core/tidak.mp3',    row: 1, position: 4, fkColor: 'negation' },
-  { id: 'lagi',     label: 'lagi',     emoji: '➕', symbolPath: 'core/lagi.png',     audioPath: 'core/lagi.mp3',     row: 1, position: 5, fkColor: 'descriptor' },
+  { id: 'tidak',    label: 'tidak',    emoji: '🚫', symbolPath: 'core/tidak.png',    audioPath: 'core/tidak.mp3',    row: 2, position: 3, fkColor: 'negation' },
+  { id: 'lagi',     label: 'lagi',     emoji: '➕', symbolPath: 'core/lagi.png',     audioPath: 'core/lagi.mp3',     row: 3, position: 3, fkColor: 'descriptor' },
+  { id: 'bisa',     label: 'bisa',     emoji: '💪', symbolPath: 'core/bisa.png',     audioPath: 'core/bisa.mp3',     row: 4, position: 3, fkColor: 'descriptor' },
+  { id: 'ada',      label: 'ada',      emoji: '📍', symbolPath: 'core/ada.png',      audioPath: 'core/ada.mp3',      row: 5, position: 3, fkColor: 'verb' },
+  // R6 Col 3: growth slot (future descriptor — bagus, besar, kecil)
 
-  // Row 2: verbs + pronouns
-  { id: 'pergi',    label: 'pergi',    emoji: '🚶', symbolPath: 'core/pergi.png',    audioPath: 'core/pergi.mp3',    row: 2, position: 0, fkColor: 'verb' },
-  { id: 'suka',     label: 'suka',     emoji: '❤️', symbolPath: 'core/suka.png',     audioPath: 'core/suka.mp3',     row: 2, position: 1, fkColor: 'verb' },
-  { id: 'makan',    label: 'makan',    emoji: '🍽️', symbolPath: 'core/makan.png',    audioPath: 'core/makan.mp3',    row: 2, position: 2, fkColor: 'verb' },
-  { id: 'minum',    label: 'minum',    emoji: '🥤', symbolPath: 'core/minum.png',    audioPath: 'core/minum.mp3',    row: 2, position: 3, fkColor: 'verb' },
-  { id: 'aku',      label: 'aku',      emoji: '👈', symbolPath: 'core/aku.png',      audioPath: 'core/aku.mp3',      row: 2, position: 4, fkColor: 'pronoun' },
-  { id: 'kamu',     label: 'kamu',     emoji: '👉', symbolPath: 'core/kamu.png',     audioPath: 'core/kamu.mp3',     row: 2, position: 5, fkColor: 'pronoun' },
+  // Col 4: CONNECT (prepositions + conjunctions) — purple
+  { id: 'ke',       label: 'ke',       emoji: '➡️', symbolPath: 'core/ke.png',       audioPath: 'core/ke.mp3',       row: 1, position: 4, fkColor: 'preposition' },
+  { id: 'di',       label: 'di',       emoji: '📌', symbolPath: 'core/di.png',       audioPath: 'core/di.mp3',       row: 2, position: 4, fkColor: 'preposition' },
+  { id: 'dan',      label: 'dan',      emoji: '🤝', symbolPath: 'core/dan.png',      audioPath: 'core/dan.mp3',      row: 3, position: 4, fkColor: 'preposition' },
+  { id: 'sama',     label: 'sama',     emoji: '👥', symbolPath: 'core/sama.png',     audioPath: 'core/sama.mp3',     row: 4, position: 4, fkColor: 'preposition' },
+  // R5 Col 4: growth slot (future — untuk, dari, dengan)
+  // R6 Col 4: growth slot
 
-  // Row 3: descriptors
-  { id: 'ini',      label: 'ini',      emoji: '👇', symbolPath: 'core/ini.png',      audioPath: 'core/ini.mp3',      row: 3, position: 0, fkColor: 'descriptor' },
-  { id: 'itu',      label: 'itu',      emoji: '👆', symbolPath: 'core/itu.png',      audioPath: 'core/itu.mp3',      row: 3, position: 1, fkColor: 'descriptor' },
-  { id: 'ada',      label: 'ada',      emoji: '📍', symbolPath: 'core/ada.png',      audioPath: 'core/ada.mp3',      row: 3, position: 2, fkColor: 'verb' },
-  { id: 'bisa',     label: 'bisa',     emoji: '💪', symbolPath: 'core/bisa.png',     audioPath: 'core/bisa.mp3',     row: 3, position: 3, fkColor: 'descriptor' },
-  { id: 'apa',      label: 'apa',      emoji: '❓', symbolPath: 'core/apa.png',      audioPath: 'core/apa.mp3',      row: 3, position: 4, fkColor: 'descriptor' },
-  { id: 'punya',    label: 'punya',    emoji: '🤲', symbolPath: 'core/punya.png',    audioPath: 'core/punya.mp3',    row: 3, position: 5, fkColor: 'verb' },
-
-  // Row 4: prepositions + verbs
-  { id: 'ke',       label: 'ke',       emoji: '➡️', symbolPath: 'core/ke.png',       audioPath: 'core/ke.mp3',       row: 4, position: 0, fkColor: 'preposition' },
-  { id: 'di',       label: 'di',       emoji: '📌', symbolPath: 'core/di.png',       audioPath: 'core/di.mp3',       row: 4, position: 1, fkColor: 'preposition' },
-  { id: 'dan',      label: 'dan',      emoji: '🤝', symbolPath: 'core/dan.png',      audioPath: 'core/dan.mp3',      row: 4, position: 2, fkColor: 'preposition' },
-  { id: 'sama',     label: 'sama',     emoji: '👥', symbolPath: 'core/sama.png',     audioPath: 'core/sama.mp3',     row: 4, position: 3, fkColor: 'preposition' },
-  { id: 'minta',    label: 'minta',    emoji: '🙏', symbolPath: 'core/minta.png',    audioPath: 'core/minta.mp3',    row: 4, position: 4, fkColor: 'verb' },
-  { id: 'lihat',    label: 'lihat',    emoji: '👀', symbolPath: 'core/lihat.png',    audioPath: 'core/lihat.mp3',    row: 4, position: 5, fkColor: 'verb' },
+  // Col 5: folders — NOT in this array; rendered by SymbolGrid from SEED_FOLDERS
 ]
 
-// Seed data for folders — used by src/lib/seed.ts
+// Folder definitions — rendered in column 5 of the home grid.
+// Each folder opens a full-screen view of fringe words inside it.
+// People (Orang) is a folder now — consistent with Smartbox/Avaz commercial AAC.
+// Perasaan + Rasa Tubuh merged into one "Perasaan" folder (emotional + physical states).
 export const SEED_FOLDERS: Omit<DbFolder, 'id' | 'createdAt' | 'updatedAt'>[] = [
-  { key: 'makanan',   label: 'Makanan',   emoji: '🍽️', sortOrder: 0, isActive: true },
-  { key: 'perasaan',  label: 'Perasaan',  emoji: '😊', sortOrder: 1, isActive: true },
+  { key: 'orang',     label: 'Orang',     emoji: '👥', sortOrder: 0, isActive: true },
+  { key: 'makanan',   label: 'Makanan',   emoji: '🍽️', sortOrder: 1, isActive: true },
   { key: 'aktivitas', label: 'Aktivitas', emoji: '🎮', sortOrder: 2, isActive: true },
   { key: 'tempat',    label: 'Tempat',    emoji: '📍', sortOrder: 3, isActive: true },
-  { key: 'tubuh',     label: 'Rasa Tubuh', emoji: '🫀', sortOrder: 4, isActive: true },
+  { key: 'perasaan',  label: 'Perasaan',  emoji: '😊', sortOrder: 4, isActive: true },
   { key: 'pertanyaan', label: 'Pertanyaan', emoji: '❓', sortOrder: 5, isActive: true },
 ]
 

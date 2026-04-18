@@ -122,12 +122,18 @@ async function init() {
   // These settings live in IndexedDB (survive reloads) but the store
   // defaults to safe values — we read DB and override if present.
   try {
-    const hapticSetting = await db.settings.get('hapticLevel')
+    const [hapticSetting, hiddenSetting] = await Promise.all([
+      db.settings.get('hapticLevel'),
+      db.settings.get('hiddenWords'),
+    ])
     if (hapticSetting?.value) {
       useAppStore.getState().setHapticLevel(hapticSetting.value as 'off' | 'light' | 'medium' | 'strong')
     }
+    if (hiddenSetting?.value && Array.isArray(hiddenSetting.value)) {
+      useAppStore.setState({ hiddenWords: hiddenSetting.value as string[] })
+    }
   } catch {
-    // DB read failure — keep default
+    // DB read failure — keep defaults
   }
 
   createRoot(document.getElementById('root')!).render(

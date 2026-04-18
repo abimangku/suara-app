@@ -11,13 +11,15 @@ import BackupRestore from '@/components/Admin/BackupRestore'
 import KioskGuide from '@/components/Admin/KioskGuide'
 import VoiceCloneGuide from '@/components/Admin/VoiceCloneGuide'
 import EmergencyContacts from '@/components/Admin/EmergencyContacts'
+import WordVisibility from '@/components/Admin/WordVisibility'
 
-type AdminSection = 'home' | 'manageWords' | 'managePeople' | 'addPerson' | 'addWord' | 'quickPhrases' | 'insights' | 'onboarding' | 'vocabSuggestions' | 'backup' | 'kioskGuide' | 'voiceClone' | 'emergencyContacts' | 'dashboard'
+type AdminSection = 'home' | 'manageWords' | 'managePeople' | 'addPerson' | 'addWord' | 'quickPhrases' | 'insights' | 'onboarding' | 'vocabSuggestions' | 'backup' | 'kioskGuide' | 'voiceClone' | 'emergencyContacts' | 'dashboard' | 'visibility'
 
 const ADMIN_CARDS = [
   { id: 'manageWords' as const, emoji: '📝', label: 'Kelola Kata', desc: 'Tambah, edit, hapus kosakata' },
   { id: 'managePeople' as const, emoji: '👥', label: 'Kelola Orang', desc: 'Tambah foto dan nama keluarga' },
   { id: 'quickPhrases' as const, emoji: '⚡', label: 'Frasa Cepat', desc: 'Atur frasa yang sering digunakan' },
+  { id: 'visibility' as const, emoji: '👁️', label: 'Atur Tampilan', desc: 'Sembunyikan/tampilkan kata — mulai sederhana, tumbuh bertahap' },
   { id: 'insights' as const, emoji: '📊', label: 'Wawasan Penggunaan', desc: 'Lihat kata yang paling sering digunakan' },
   { id: 'dashboard' as const, emoji: '📈', label: 'Dashboard Orang Tua', desc: 'Analitik dan milestone komunikasi' },
   { id: 'onboarding' as const, emoji: '📖', label: 'Panduan Keluarga', desc: 'Cara menggunakan Suara' },
@@ -83,6 +85,15 @@ export default function AdminHome() {
     window.open(url, '_blank', 'noopener')
     setActiveSection('home')
     return null
+  }
+
+  if (activeSection === 'visibility') {
+    return (
+      <div className="p-4">
+        <button onClick={() => setActiveSection('home')} className="mb-4 px-4 py-2 rounded-lg bg-suara-gray-light text-suara-gray font-bold text-sm active:scale-[0.96] transition-transform duration-[80ms]" type="button">← Kembali</button>
+        <WordVisibility onDone={() => setActiveSection('home')} />
+      </div>
+    )
   }
 
   if (activeSection === 'insights') {

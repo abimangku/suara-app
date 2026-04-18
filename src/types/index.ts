@@ -105,7 +105,7 @@ export interface CoreWord {
   emoji: string
   symbolPath: string
   audioPath: string
-  row: 1 | 2 | 3 | 4
+  row: 1 | 2 | 3 | 4 | 5 | 6
   position: 0 | 1 | 2 | 3 | 4 | 5
   fkColor: FKColor
 }

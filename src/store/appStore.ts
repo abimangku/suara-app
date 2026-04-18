@@ -56,6 +56,14 @@ interface AppStore {
   isEmergencyOpen: boolean
   openEmergency: () => void
   closeEmergency: () => void
+
+  // Progressive disclosure — caregivers can hide core words/folders
+  // so the grid starts simple and grows as the child learns.
+  // Hidden words show as subtle dashed placeholders (position preserved).
+  // IDs are core word IDs (e.g., 'berhenti') or 'folder:key' (e.g., 'folder:pertanyaan').
+  hiddenWords: string[]
+  setHiddenWords: (ids: string[]) => void
+  toggleWordVisibility: (id: string) => void
 }
 
 export const useAppStore = create<AppStore>((set) => ({
@@ -119,4 +127,20 @@ export const useAppStore = create<AppStore>((set) => ({
   isEmergencyOpen: false,
   openEmergency: () => set({ isEmergencyOpen: true }),
   closeEmergency: () => set({ isEmergencyOpen: false }),
+
+  // Progressive disclosure
+  hiddenWords: [],
+  setHiddenWords: (ids) => {
+    set({ hiddenWords: ids })
+    db.settings.put({ key: 'hiddenWords', value: ids, updatedAt: Date.now() }).catch(() => {})
+  },
+  toggleWordVisibility: (id) => {
+    set((state) => {
+      const next = state.hiddenWords.includes(id)
+        ? state.hiddenWords.filter((x) => x !== id)
+        : [...state.hiddenWords, id]
+      db.settings.put({ key: 'hiddenWords', value: next, updatedAt: Date.now() }).catch(() => {})
+      return { hiddenWords: next }
+    })
+  },
 }))
