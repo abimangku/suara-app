@@ -22,7 +22,7 @@ interface SymbolButtonProps {
 const variantStyles = {
   core: 'bg-suara-blue-light border-suara-blue-border text-suara-blue',
   people: 'bg-suara-green-light border-suara-green-border text-suara-green',
-  folder: 'bg-suara-gray-light border-suara-gray-border text-suara-gray',
+  folder: 'bg-gradient-to-b from-cyan-50 to-teal-100 border-teal-300 text-teal-800',
   fringe: 'bg-suara-content-bg border-suara-gray-border text-suara-content',
   kembali: 'bg-suara-gray-light border-suara-gray-border text-suara-gray',
 }
@@ -109,7 +109,10 @@ export default function SymbolButton({
       )
     }
     if (emoji) {
-      return <span className="leading-tight" style={{ fontSize: 'min(34px, 40%)' }}>{emoji}</span>
+      // Folders get bigger emoji since they don't have ARASAAC symbols —
+      // the emoji IS the primary visual for category identification
+      const emojiSize = variant === 'folder' ? 'min(44px, 50%)' : 'min(34px, 40%)'
+      return <span className="leading-tight" style={{ fontSize: emojiSize }}>{emoji}</span>
     }
     // Neutral fallback: circle with first letter of label (not ❓ which looks like a question word)
     return (
