@@ -127,9 +127,14 @@ export default function SymbolButton({
     )
   }
 
+  // For folder variant: wrap in a container that adds a folder-tab ear at the top,
+  // creating the visual metaphor "I can open this, there's more inside."
+  // Inspired by Avaz AAC's folder buttons.
+  const isFolder = variant === 'folder'
+
   return (
     <button
-      className={`${baseClasses} ${(fkColor && fkStyles[fkColor] && (variant === 'core' || variant === 'fringe')) ? fkStyles[fkColor] : variantStyles[variant]} ${activeClass} ${disabledClass} ${highlightClass}`}
+      className={`${isFolder ? 'relative' : ''} ${baseClasses} ${(fkColor && fkStyles[fkColor] && (variant === 'core' || variant === 'fringe')) ? fkStyles[fkColor] : variantStyles[variant]} ${activeClass} ${disabledClass} ${highlightClass}`}
       onPointerDown={() => {
         // Fire haptic on pointer-down for maximum perceived responsiveness.
         // This runs ~50-100ms earlier than onClick.
@@ -188,6 +193,18 @@ export default function SymbolButton({
       role="gridcell"
       aria-label={label}
     >
+      {/* Folder tab — small ear at top-left that makes the button look like a file folder */}
+      {isFolder && (
+        <div
+          className="absolute top-0 left-0 bg-teal-200 border-b-2 border-r-2 border-teal-300"
+          style={{
+            width: '35%',
+            height: '6px',
+            borderRadius: '10px 6px 6px 0',
+          }}
+          aria-hidden="true"
+        />
+      )}
       {renderImage()}
       <span
         className="font-bold leading-tight text-center px-1 truncate w-full shrink-0"
